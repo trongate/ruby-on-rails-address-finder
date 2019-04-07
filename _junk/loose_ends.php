@@ -7,3 +7,6 @@
 * remove public.php file from templates/views
 
 * remove public() from templates controller
+
+* clear the database settings
+
