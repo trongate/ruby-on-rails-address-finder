@@ -3,7 +3,7 @@ class url {
 
     public function segment($num) {
 
-        $segments = get_segments();
+        $segments = SEGMENTS;
         if (isset($segments[$num])) {
             $value = $segments[$num];
         } else {
@@ -45,6 +45,14 @@ function anchor($target_url, $text, $attributes=NULL, $additional_code=NULL) {
     $str = substr($target_url, 0, 4);
     if ($str != 'http') {
         $target_url = BASE_URL.$target_url;
+    }
+
+    $target_url = attempt_return_nice_url($target_url);
+
+    $text_type = gettype($text);
+
+    if ($text_type == 'boolean') {
+        return $target_url;
     }
 
     $extra = '';
