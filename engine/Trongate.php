@@ -6,7 +6,8 @@ class Trongate {
     protected $parent_module = '';
     protected $child_module = '';
 
-    public function __construct($module_name) {
+    public function __construct($module_name=NULL) {
+    
         $this->module_name = $module_name;
         $this->modules = new Modules;
 
@@ -19,6 +20,7 @@ class Trongate {
         //load the model class
         require_once 'Model.php';
         $this->model = new Model;
+
     }
 
     public function load($helper) {
@@ -31,6 +33,27 @@ class Trongate {
     }
 
     public function template($template_name, $data=NULL) {
+        $template_controller_path = '../templates/controllers/Templates.php';
+        require_once $template_controller_path;
+
+        $templates = new Templates;
+
+        if (method_exists($templates, $template_name)) {
+
+            if (!isset($data['view_file'])) {
+                $data['view_file'] = DEFAULT_METHOD;
+            }
+
+            $templates->$template_name($data);
+
+        } else {
+            $template_controller_path = str_replace('../', APPPATH, $template_controller_path);
+            die('ERROR: Unable to find '.$template_name.' method in '.$template_controller_path.'.');
+        }
+    }
+
+    public function templateOLD($template_name, $data=NULL) {
+
         $template_file_path = '../templates/'.$template_name.'.php';
 
         if (!isset($data['view_file'])) {
@@ -39,7 +62,7 @@ class Trongate {
 
         if (!isset($data['view_module'])) {
 
-            $segments = get_segments();
+            $segments = SEGMENTS;
 
             if (isset($segments[1])) {
                 $data['view_module'] = $segments[1];

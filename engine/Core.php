@@ -1,31 +1,4 @@
 <?php
-function get_segments() {
-    $url = BASE_URL;
-    $url = str_replace('://', '', $url);
-    $url = rtrim($url, '/');
-    $bits = explode('/', $url);
-    $num_bits = count($bits);
-
-    if ($num_bits>1) {
-        $num_segments_to_ditch = $num_bits-1;
-    } else {
-        $num_segments_to_ditch = 0;
-    }
-
-    $url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'] .  $_SERVER['REQUEST_URI'];
-
-    $url = str_replace('://', '', $url);
-    $url = rtrim($url, '/');
-    $segments = explode('/', $url);
-
-    for ($i=0; $i < $num_segments_to_ditch; $i++) { 
-        unset($segments[$i]);
-    }
-
-    $segments = array_values($segments);
-    return $segments;
-}
-
 class Core {
 
     protected $current_module = DEFAULT_MODULE;
@@ -35,47 +8,19 @@ class Core {
 
     public function __construct() {
 
-        $url = rtrim($_SERVER['REQUEST_URI'], '/');
-        $url = filter_var($url, FILTER_SANITIZE_URL);
-        $url = $this->attempt_add_custom_routes($url);
-
-        $pos = strpos($url, MODULE_ASSETS_TRIGGER);
+        $pos = strpos(ASSUMED_URL, MODULE_ASSETS_TRIGGER);
 
         if ($pos === false) {
-            $this->serve_controller($url);
+            $this->serve_controller();
         } else {
-            $this->serve_module_asset($url);
+            $this->serve_module_asset();
         }
 
     }
 
-    private function attempt_add_custom_routes($url) {
+    private function serve_module_asset() {
 
-        foreach (CUSTOM_ROUTES as $key => $value) {
-            $contains_needle = $this->contains_needle($key, $url);
-
-            if ($contains_needle == true) {
-                $url = str_replace($key, $value, $url);
-            }
-
-        }
-
-        return $url;
-    }
-
-    private function contains_needle($needle, $haystack) {
-        $pos = strpos($haystack, $needle);
-
-        if ($pos === false) {
-            return FALSE;
-        } else {
-            return TRUE;
-        }
-    }
-
-    private function serve_module_asset($url) {
-
-        $url_segments = get_segments();
+        $url_segments = SEGMENTS;
 
         foreach ($url_segments as $url_segment_key => $url_segment_value) {
             $pos = strpos($url_segment_value, MODULE_ASSETS_TRIGGER);
@@ -122,7 +67,6 @@ class Core {
         $second_pos = stripos($str_two, $end);
         $str_three = substr($str_two, 0, $second_pos);
         $target_str = trim($str_three);
-
 
         $bits = explode('-', $target_str);
 
@@ -172,9 +116,9 @@ class Core {
         
     }
 
-    private function serve_controller($url) {
+    private function serve_controller() {
 
-        $segments = get_segments();
+        $segments = SEGMENTS;
 
         if (isset($segments[1])) {
             $this->current_module = strtolower($segments[1]);
@@ -236,7 +180,7 @@ class Core {
     }
 
     private function draw_error_page() {
-        require_once('../templates/error_404.php');
+        load('error_404');
     }
 
 }

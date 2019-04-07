@@ -5,6 +5,35 @@ class Pagination {
     static private $pagination_html;
     static private $pagination_links = [];
 
+    static protected function assume_page_num_segment() {
+        $page_num_segment = 3; //our default assumption
+
+        //are we using a custom route?
+        $target_url = current_url();
+
+        foreach (CUSTOM_ROUTES as $key => $value) {
+            $pos = strpos($target_url, $key);
+
+            if (is_numeric($pos)) {
+                //we must be viewing a custom route!
+                $target_url = str_replace($key, $value, $target_url);
+
+                //compare num segments in key (nice URL) and value (assumed URL)
+                $key_bits = explode('/', $key);
+                $value_bits = explode('/', $value);
+
+                $diff = count($value_bits)-count($key_bits);
+                if ($diff != 0) {
+                    $page_num_segment = $page_num_segment-$diff;
+                }
+
+            }
+
+        }
+
+        return $page_num_segment;
+    }
+
     static public function display($data=NULL) {
 
         if (!isset($data)) {
@@ -40,16 +69,24 @@ class Pagination {
             $pagination_template = $data['template'];
         }
 
+        if (!isset($data['page_num_segment'])) {
+            //$page_num_segment = 3;
+            $page_num_segment = self::assume_page_num_segment();
+        } else {
+            $page_num_segment = $data['page_num_segment'];
+        }
+
         if (!isset($data['pagination_root'])) {
 
             $pagination_root = BASE_URL;
-            $segments = get_segments();
+            $segments_data = get_segments(true);
+            $segments = $segments_data['segments'];
 
             if (isset($segments[1])) {
                 $pagination_root.= $segments[1];
             } 
 
-            if (isset($segments[2])) {
+            if ((isset($segments[2])) && ($page_num_segment>2)) {
                 $pagination_root.= '/'.$segments[2];
             }
 
@@ -58,12 +95,6 @@ class Pagination {
         }
 
         $pagination_data['root'] = $pagination_root.'/';
-
-        if (!isset($data['page_num_segment'])) {
-            $page_num_segment = 3;
-        } else {
-            $page_num_segment = $data['page_num_segment'];
-        }
 
         if (!isset($data['limit'])) {
             $limit = self::$default_limit;
@@ -75,7 +106,7 @@ class Pagination {
         $num_pages = (int) ceil($total_rows / $limit);
 
         if ($num_pages<2) {
-            return true;
+            return '';
         }
 
         if (!isset($template)) {

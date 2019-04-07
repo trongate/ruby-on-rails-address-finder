@@ -278,7 +278,7 @@ class validation_helper {
     }
 
     public function url_segment($num) {
-        $sements = get_segments();
+        $segments = SEGMENTS;
         
         if (isset($segments[$num])) {
             $value = $segments[$num];

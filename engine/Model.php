@@ -9,7 +9,7 @@ class Model {
     private $dbh;
     private $stmt;
     private $error;
-    private $debug = true;
+    private $debug = false;
     private $query_caveat = 'The query shown above is how the query would look <i>before</i> binding.';
 
     public function __construct() {
@@ -54,7 +54,7 @@ class Model {
     }
 
     private function get_table_from_url() {
-        $segments = get_segments();
+        $segments = SEGMENTS;
 
         if (isset($segments[1])) {
             $target_tbl = $segments[1];

@@ -1,21 +1,7 @@
 <?php
 class Template {
 
-    public function load($template_name, $data=NULL) {
-        $view_path = APPPATH.'templates/'.$template_name.'.php';
-
-        if (!isset($data['view_file'])) {
-            $data['view_file'] = DEFAULT_METHOD;
-        }
-
-        if (!isset($data['view_module'])) {
-            $data['view_module'] = $this->get_view_module();
-        }
-
-        $this->attempt_include($view_path, $data);
-    }
-
-    private function get_view_module() {
+    static public function get_view_module() {
         //attempt to get view_module from URL
         $url = rtrim($_SERVER['REQUEST_URI'], '/');
         $url = filter_var($url, FILTER_SANITIZE_URL);
@@ -45,7 +31,7 @@ class Template {
     }
 
     static public function partial($file_name, $data=NULL) {
-        $file_path = APPPATH.'templates/'.$file_name.'.php';
+        $file_path = APPPATH.'templates/views/'.$file_name.'.php';
         self::attempt_include($file_path, $data);
     }
 
