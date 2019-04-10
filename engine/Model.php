@@ -80,6 +80,75 @@ class Model {
 
     private function prepare_and_execute($sql, $params=NULL) {
 
+        // foreach ($params as $key => $value) {
+        //     echo "key of $key is $value<br>";
+        // }
+        // echo $sql; die();
+
+        // if (count($params)>0) {
+        //     extract($params);
+        // }
+
+        // if ((isset($limit)) && (isset($offset))) {
+        //     $sql = $this->add_limit_offset($sql, $limit, $offset);
+        //     $params['limit'] = $limit;
+        //     $params['offset'] = $offset;
+        // }
+
+        
+
+        // if ($this->debug == true) {
+
+        //     if (!isset($params)) {
+        //         $params = [];
+        //     }
+
+        //     if ((isset($operator)) && (isset($value))) {
+        //         $operator = strtoupper($operator);
+        //         if (($operator == 'LIKE') || ($operator == 'NOT LIKE')) {
+        //             $value = '%'.$value.'%';
+        //             $params['value'] = $value;
+        //         }
+        //     }
+
+        //     $query_to_execute = $this->show_query($sql, $params, $this->query_caveat);
+        // }
+
+
+
+        $stmt = $this->dbh->prepare($sql);
+
+        // if (isset($params)) {
+        //     foreach ($params as $key => $value) {
+        //         $type = $this->get_param_type($value);
+        //         echo "binding the $key with the $value<br>";
+        //         //$stmt->bindValue(":$key", $value, $type);
+        //         echo 'yes';
+        //         $stmt->bindValue($key, $value, $type);
+        //         echo "done";
+        //     }
+        // }
+
+        $key = 'id';
+        $value = 3;
+        $type = PDO::PARAM_INT;
+
+        $stmt->bindValue(":$key", $value, $type);
+
+
+        // if (!isset($limit_results)) {
+        //     $limit_results = false;
+        // } elseif ($limit_results == true) {
+        //     $stmt->bindValue(":limit", $limit, PDO::PARAM_INT);
+        //     $stmt->bindValue(":offset", $offset, PDO::PARAM_INT);
+        // }
+echo "hey";
+        $stmt->execute();
+        return $stmt;
+    }
+
+    private function prepare_and_executeDUFF($sql, $params=NULL) {
+
         if ((isset($params['limit'])) && (isset($params['offset']))) {
             $sql = $this->add_limit_offset($sql, $params['limit'], $params['offset']);;
         }
@@ -151,7 +220,7 @@ class Model {
         }
 
         $params[$column] = $value;
-        //$data['params'] = $params;
+        // //$data['params'] = $params;
 
 
         $stmt = $this->prepare_and_execute($sql, $params);

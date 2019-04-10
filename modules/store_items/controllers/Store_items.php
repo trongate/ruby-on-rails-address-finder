@@ -4,16 +4,21 @@ class Store_items extends Trongate {
     function hello() {
         echo "hello you<br>";
 
-        $link = anchor('store_items/goodbye', true);
+        //$link = anchor('store_items/goodbye', true);
 
-        echo $link;
+        $link = anchor('store_items/display', true);
 
-        echo "<hr>";
-        echo anchor('store_items/display', 'Click Here');
+        echo "the link is :".$link;
 
 
-        echo "<hr>";
-        echo anchor('store_items/display', 'Click Here');
+        // echo $link;
+
+        // echo "<hr>";
+        // echo anchor('store_items/display', 'Click Here');
+
+
+        // echo "<hr>";
+        // echo anchor('store_items/display', 'Click Here');
     }
 
     function goodbye() {
@@ -25,7 +30,7 @@ class Store_items extends Trongate {
     function display() {
 
         //$items = $this->model->get('id desc');
-        $items = $this->model->get_where_custom('id', 1, '!=');
+        $items = $this->model->get_where_custom('item_title', 'First Item', '=');
         // $item = $this->model->get_where(2);
         // $item = $this->model->get_one_where('id', 1);
         // $items = $this->model->count_where('item_title', 'Fender Stratocaster', '!=');
