@@ -9,10 +9,11 @@ class Model {
     private $dbh;
     private $stmt;
     private $error;
-    private $debug = true;
+    private $debug = false;
     private $query_caveat = 'The query shown above is how the query would look <i>before</i> binding.';
 
     public function __construct() {
+
         $dsn = 'mysql:host=' . $this->host . ';dbname=' . $this->dbname;
         $options = array(
             PDO::ATTR_PERSISTENT => true,
@@ -25,9 +26,11 @@ class Model {
             $this->error = $e->getMessage();
             echo $this->error; die();
         }
+
     }
 
     private function get_param_type($value) {
+
         switch(true){
             case is_int($value):
             $type = PDO::PARAM_INT;
@@ -70,29 +73,33 @@ class Model {
     }
 
     private function add_limit_offset($sql, $limit, $offset) {
+
         if ((is_numeric($limit)) && (is_numeric($offset))) {
             $limit_results = true;
             $sql.= " LIMIT $offset, $limit";
         }
 
         return $sql;
+
     }
 
-    private function prepare_and_execute($sql, $params=NULL) {
+    private function prepare_and_execute($sql, $data=NULL) {
 
-        // if (isset($data)) {
-        //     extract($data);
-        // }
+        if (isset($data)) {
+            extract($data);
+        }
 
-        // if (!isset($params)) {
-        //     $params = [];
-        // }
-
-        if ((isset($params['limit'])) && (isset($params['offset']))) {
-            $sql = $this->add_limit_offset($sql, $params['limit'], $params['offset']);;
+        if ((isset($limit)) && (isset($offset))) {
+            $sql = $this->add_limit_offset($sql, $limit, $offset);
+            $params['limit'] = $limit;
+            $params['offset'] = $offset;
         }
 
         if ($this->debug == true) {
+
+            if (!isset($params)) {
+                $params = [];
+            }
 
             if ((isset($operator)) && (isset($value))) {
                 $operator = strtoupper($operator);
@@ -104,22 +111,28 @@ class Model {
 
             $query_to_execute = $this->show_query($sql, $params, $this->query_caveat);
         }
-echo "yess";
+
         $stmt = $this->dbh->prepare($sql);
-echo "no";
+
+        if (isset($data_to_bind)) {
+            foreach ($data_to_bind as $key => $value) {
+                $type = $this->get_param_type($value);
+                $stmt->bindValue(":$key", $value, $type);
+            }
+        }
+
+        if (!isset($limit_results)) {
+            $limit_results = false;
+        } elseif ($limit_results == true) {
+            $stmt->bindValue(":limit", $limit, PDO::PARAM_INT);
+            $stmt->bindValue(":offset", $offset, PDO::PARAM_INT);
+        }
+
         $stmt->execute();
-        $sth->debugDumpParams();
-echo "maybe";
-
-$stmt->debugDumpParams();
-//echo $this->dbh->debugDumpParams();
-
         return $stmt;
     }
     
     public function get($order_by=NULL, $target_tbl=NULL, $limit=NULL, $offset=NULL) {
-
-        $params = [];
 
         if (!isset($order_by)) {
             $order_by = 'id';
@@ -133,18 +146,27 @@ $stmt->debugDumpParams();
 
         if ((isset($limit)) && (isset($offset))) {
             $sql = $this->add_limit_offset($sql, $limit, $offset);
-            $params['limit'] = $limit;
-            $params['offset'] = $offset;
+            $data['limit'] = $limit;
+            $data['offset'] = $offset;
+            $data['limit_results'] = true;
+        } else {
+            $data['limit_results'] = false;
         }
 
-        $data['params'] = $params;
-        $stmt = $this->prepare_and_execute($sql, $data);
-        $query = $stmt->fetchAll(PDO::FETCH_OBJ);
+        if (($this->debug == true) && ($data['limit_results'] == true)) {
+            $params['limit'] = $limit;
+            $params['offset'] = $offset;
+            $data['params'] = $params;
+        }
 
+        $stmt = $this->prepare_and_execute($sql, $data);
+
+        $query = $stmt->fetchAll(PDO::FETCH_OBJ);
         return $query;
     }
 
     public function get_where_custom($column, $value, $operator=NULL, $order_by=NULL, $target_tbl=NULL, $limit=NULL, $offset=NULL) {
+
         if (!isset($operator)) {
             $operator = '=';
         }
@@ -160,13 +182,19 @@ $stmt->debugDumpParams();
         $sql = "SELECT * FROM $target_tbl where $column $operator :value order by $order_by";
 
         if ((isset($limit)) && (isset($offset))) {
+            
             $params['limit'] = $limit;
             $params['offset'] = $offset;
-            $sql = $this->add_limit_offset($sql, $params['limit'], $params['offset']);
+            $data['limit_results'] = true;
+            $sql = $this->add_limit_offset($sql, $limit, $offset);
+        } else {
+            $data['limit_results'] = false;
         }
 
-        $params[$column] = $value;
+        $data_to_bind['value'] = $value;
+        $params['value'] = $value;
         $data['params'] = $params;
+        $data['data_to_bind'] = $data_to_bind;
         $stmt = $this->prepare_and_execute($sql, $data);
 
         $query = $stmt->fetchAll(PDO::FETCH_OBJ);
@@ -175,14 +203,20 @@ $stmt->debugDumpParams();
 
     //fetch a single record
     public function get_where($id, $target_tbl=NULL) {
+
         if (!isset($target_tbl)) {
             $target_tbl = $this->get_table_from_url();
         }
 
         $sql = "SELECT * FROM $target_tbl where id = :id";
 
-        $params['id'] = $id;
-        $data['params'] = $params;
+        if ($this->debug == true) {
+            $params['id'] = $id;
+            $data['params'] = $params;
+        }
+
+        $data_to_bind['id'] = $id;
+        $data['data_to_bind'] = $data_to_bind;
 
         $stmt = $this->prepare_and_execute($sql, $data);
 
@@ -195,22 +229,30 @@ $stmt->debugDumpParams();
         }
 
         return $row;
+
     }
 
     //fetch a single record (alternative version)
     public function get_one_where($column, $value, $target_tbl=NULL) {
+
         if (!isset($target_tbl)) {
             $target_tbl = $this->get_table_from_url();
         }
 
         $sql = "SELECT * FROM $target_tbl where $column = :value";
 
-        $params[$column] = $value;
-        $data['params'] = $params;
+        if ($this->debug == true) {
+            $params['value'] = $value;
+            $data['params'] = $params;
+        }
+
+        $data_to_bind['value'] = $value;
+        $data['data_to_bind'] = $data_to_bind;
 
         $stmt = $this->prepare_and_execute($sql, $data);
         $query = $stmt->fetch(PDO::FETCH_OBJ);
         return $query;
+        
     }
 
     public function count_where($column, $value, $operator=NULL, $order_by=NULL, $target_tbl=NULL, $limit=NULL, $offset=NULL) {
@@ -220,6 +262,7 @@ $stmt->debugDumpParams();
     }
 
     public function count($target_tbl=NULL) {
+
         if (!isset($target_tbl)) {
             $target_tbl = $this->get_table_from_url();
         }
@@ -229,9 +272,11 @@ $stmt->debugDumpParams();
 
         $result = $stmt->fetch(PDO::FETCH_OBJ);
         return $result->total;
+
     }
 
     public function get_max($target_tbl=NULL) {
+
         if (!isset($target_tbl)) {
             $target_tbl = $this->get_table_from_url();
         }
@@ -245,8 +290,15 @@ $stmt->debugDumpParams();
     }
 
     public function show_query($query, $params, $caveat=NULL) {
-
+        $keys = array();
+        $values = $params;
         $named_params = true;
+
+    //    var_dump($params); die();
+
+        # build a regular expression for each parameter
+
+        //echo count($params).'<br>';
 
         foreach ($params as $key => $value) {
 
@@ -314,6 +366,7 @@ margin: 1em 0;
     }
 
     public function insert($data, $target_tbl=NULL) {
+
         if (!isset($target_tbl)) {
             $target_tbl = $this->get_table_from_url();
         }
@@ -324,18 +377,23 @@ margin: 1em 0;
 
         foreach ($data as $key => $value) {
             $sql.=':'.$key.', ';
-            $params[$key] = $value;
+            $data_to_bind[$key] = $value;
         }
 
         $sql = rtrim($sql, ', ');
         $sql.=')';
 
+        if ($this->debug == true) {
+            $params = $data;
+            $data['params'] = $params;
+        }
 
-        $data['params'] = $params;
+        $data['data_to_bind'] = $data_to_bind;
         $stmt = $this->prepare_and_execute($sql, $data);
     }
 
     public function update($update_id, $data, $target_tbl=NULL) {
+
         if (!isset($target_tbl)) {
             $target_tbl = $this->get_table_from_url();
         }
@@ -344,27 +402,40 @@ margin: 1em 0;
 
         foreach ($data as $key => $value) {
             $sql.= "`$key` = :$key, ";
-            $params[$key] = $value;
+            $data_to_bind[$key] = $value;
         }
-
-        $params['id'] = $update_id;
 
         $sql = rtrim($sql, ', ');
         $sql.= " WHERE `$target_tbl`.`id` = :id";
 
-        $data['params'] = $params;
+        $data['id'] = $update_id;
+        $data_to_bind['id'] = $update_id;
+
+        if ($this->debug == true) {
+            $params = $data;
+            $data['params'] = $params;
+        }
+
+        $data['data_to_bind'] = $data_to_bind;
         $stmt = $this->prepare_and_execute($sql, $data);
     }
 
     public function delete($id, $target_tbl=NULL) {
+
         if (!isset($target_tbl)) {
             $target_tbl = $this->get_table_from_url();
         }
 
-        $params['id'] = $id;
-        $data['params'] = $params;
         $sql = "DELETE from `$target_tbl` WHERE id = :id ";
+        $data['id'] = $id;
+        $data_to_bind['id'] = $id;
 
+        if ($this->debug == true) {
+            $params = $data;
+            $data['params'] = $params;
+        }
+
+        $data['data_to_bind'] = $data_to_bind;
         $stmt = $this->prepare_and_execute($sql, $data);
     }
 
@@ -384,7 +455,22 @@ margin: 1em 0;
 
     public function query_bind($sql, $params, $return_type=false) {
 
-        $stmt = $this->prepare_and_execute($sql, $params);
+        if ($this->debug == true) {
+            $data['params'] = $params;
+        }
+
+
+
+        $data_to_bind = $params;
+        $data['data_to_bind'] = $data_to_bind;
+
+        // echo $sql; die();
+
+        // var_dump($data); die();
+
+        //$data['data_to_bind'] = $data;
+
+        $stmt = $this->prepare_and_execute($sql, $data);
 
         if ($return_type == 'object') {
             return $stmt->fetchAll(PDO::FETCH_OBJ);
