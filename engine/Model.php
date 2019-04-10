@@ -80,17 +80,14 @@ class Model {
 
     private function prepare_and_execute($sql, $params=NULL) {
 
-        // if (isset($data)) {
-        //     extract($data);
-        // }
-
-        // if (!isset($params)) {
-        //     $params = [];
-        // }
-
         if ((isset($params['limit'])) && (isset($params['offset']))) {
             $sql = $this->add_limit_offset($sql, $params['limit'], $params['offset']);;
         }
+
+        // foreach ($params as $key => $value) {
+        //     echo "key of $key is <br>";
+        // }
+        // die();
 
         if ($this->debug == true) {
 
@@ -104,16 +101,9 @@ class Model {
 
             $query_to_execute = $this->show_query($sql, $params, $this->query_caveat);
         }
-echo "yess";
+
         $stmt = $this->dbh->prepare($sql);
-echo "no";
         $stmt->execute();
-        $sth->debugDumpParams();
-echo "maybe";
-
-$stmt->debugDumpParams();
-//echo $this->dbh->debugDumpParams();
-
         return $stmt;
     }
     
@@ -144,14 +134,9 @@ $stmt->debugDumpParams();
         return $query;
     }
 
-    public function get_where_custom($column, $value, $operator=NULL, $order_by=NULL, $target_tbl=NULL, $limit=NULL, $offset=NULL) {
-        if (!isset($operator)) {
-            $operator = '=';
-        }
+    public function get_where_custom($column, $value, $operator='=', $order_by='id', $target_tbl=NULL, $limit=NULL, $offset=NULL) {
 
-        if (!isset($order_by)) {
-            $order_by = 'id';
-        }
+        //$items = $this->model->get_where_custom('id', 1, '!=');
 
         if (!isset($target_tbl)) {
             $target_tbl = $this->get_table_from_url();
@@ -166,8 +151,10 @@ $stmt->debugDumpParams();
         }
 
         $params[$column] = $value;
-        $data['params'] = $params;
-        $stmt = $this->prepare_and_execute($sql, $data);
+        //$data['params'] = $params;
+
+
+        $stmt = $this->prepare_and_execute($sql, $params);
 
         $query = $stmt->fetchAll(PDO::FETCH_OBJ);
         return $query;
@@ -244,7 +231,50 @@ $stmt->debugDumpParams();
         return $max_id;
     }
 
-    public function show_query($query, $params, $caveat=NULL) {
+    public function show_query($raw_sql, $parameters) {
+
+        $keys = array();
+        $values = array();
+        /*
+         * Get longest keys first, sot the regex replacement doesn't
+         * cut markers (ex : replace ":username" with "'joe'name"
+         * if we have a param name :user )
+         */
+        $isNamedMarkers = false;
+        if (count($parameters) && is_string(key($parameters))) {
+            uksort($parameters, function($k1, $k2) {
+                return strlen($k2) - strlen($k1);
+            });
+            $isNamedMarkers = true;
+        }
+        foreach ($parameters as $key => $value) {
+            // check if named parameters (':param') or anonymous parameters ('?') are used
+            if (is_string($key)) {
+                $keys[] = '/:'.ltrim($key, ':').'/';
+            } else {
+                $keys[] = '/[?]/';
+            }
+            // bring parameter into human-readable format
+            if (is_string($value)) {
+                $values[] = "'" . addslashes($value) . "'";
+            } elseif(is_int($value)) {
+                $values[] = strval($value);
+            } elseif (is_float($value)) {
+                $values[] = strval($value);
+            } elseif (is_array($value)) {
+                $values[] = implode(',', $value);
+            } elseif (is_null($value)) {
+                $values[] = 'NULL';
+            }
+        }
+        if ($isNamedMarkers) {
+            return preg_replace($keys, $values, $raw_sql);
+        } else {
+            return preg_replace($keys, $values, $raw_sql, 1, $count);
+        }
+    }
+
+    public function show_queryOLD($query, $params, $caveat=NULL) {
 
         $named_params = true;
 
