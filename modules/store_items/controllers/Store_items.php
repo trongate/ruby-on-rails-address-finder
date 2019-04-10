@@ -30,7 +30,7 @@ class Store_items extends Trongate {
     function display() {
 
         //$items = $this->model->get('id desc');
-        $items = $this->model->get_where_custom('item_title', 'First Item', '=');
+        $items = $this->model->get_where_custom('item_title', 'First Item', '!=');
         // $item = $this->model->get_where(2);
         // $item = $this->model->get_one_where('id', 1);
         // $items = $this->model->count_where('item_title', 'Fender Stratocaster', '!=');
@@ -53,10 +53,10 @@ class Store_items extends Trongate {
 
 
 
-//         foreach ($items as $key => $value) {
-//             echo "key of $value->id<br>";
-//             echo "key of $value->item_title x<br><hr>";
-//         }
+        foreach ($items as $key => $value) {
+            echo "key of $value->id<br>";
+            echo "key of $value->item_title x<br><hr>";
+        }
 
 
 
