@@ -9,7 +9,7 @@ class Model {
     private $dbh;
     private $stmt;
     private $error;
-    private $debug = false;
+    private $debug = true;
     private $query_caveat = 'The query shown above is how the query would look <i>before</i> binding.';
 
     public function __construct() {
@@ -131,27 +131,22 @@ class Model {
 
     }
 
-    public function get_where_custom($column, $value, $operator=NULL, $order_by=NULL, $target_tbl=NULL, $limit=NULL, $offset=NULL) {
+    public function get_where_custom($column, $value, $operator='=', $order_by='id', $target_tbl=NULL, $limit=NULL, $offset=NULL) {
 
-        $limit_results = false;
-
-        if (!isset($operator)) {
-            $operator = '=';
-        }
-
-        if (!isset($order_by)) {
-            $order_by = 'id';
-        }
-
+      
         if (!isset($target_tbl)) {
             $target_tbl = $this->get_table_from_url();
         }
 
+        $params[$column] = $value;
+
         $sql = "SELECT * FROM $target_tbl where $column $operator :value order by $order_by";
 
-        if ((isset($limit)) && (isset($offset))) {
-            $sql = $this->add_limit_offset($sql, $limit, $offset);
+        if ((isset($limit, $offset))) {
+            $params['limit'] = $limit;
+            $params['offset'] = $offset;
         }
+
 
         if ($this->debug == true) {
 
@@ -160,15 +155,19 @@ class Model {
                 $value = '%'.$value.'%';
             }
 
-            if ($limit_results == true) {
-                $params['limit'] = $limit;
-                $params['offset'] = $offset;
-            }
-
             $params['value'] = $value;
             $query_to_execute = $this->show_query($sql, $params, $this->query_caveat);
         }
 
+
+        $result = $this->prepare_and_execute($sql, $params);
+
+        if ($result == true) {
+            $items = $this->stmt->fetchAll(PDO::FETCH_OBJ);
+            return $items;
+        }
+
+/*
         $stmt = $this->dbh->prepare($sql);
         $stmt->bindValue(":value", $value, PDO::PARAM_STR);
 
@@ -178,8 +177,34 @@ class Model {
         }
 
         $stmt->execute();
-        $query = $stmt->fetchAll(PDO::FETCH_OBJ);
-        return $query;
+*/
+
+        // $query = $stmt->fetchAll(PDO::FETCH_OBJ);
+        // return $query;
+
+    }
+
+    function prepare_and_execute($sql, $params) {
+        $this->stmt = $this->dbh->prepare($sql);
+
+        foreach ($params as $key => $value) {
+            $type = $this->get_param_type($value);
+            $this->stmt->bindValue(":value", $value, $type);
+        }
+
+
+        // $this->stmt->bindValue(":value", $value, PDO::PARAM_STR);
+
+        // if ($limit_results == true) {
+        //     $this->stmt->bindValue(":limit", $limit, PDO::PARAM_INT);
+        //     $this->stmt->bindValue(":offset", $offset, PDO::PARAM_INT);
+        // }
+
+
+
+        return $this->stmt->execute();
+
+
 
     }
 
