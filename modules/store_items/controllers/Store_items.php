@@ -30,113 +30,41 @@ class Store_items extends Trongate {
     function display() {
 
         //$items = $this->model->get('id desc');
-        $items = $this->model->get_where_custom('item_title', 'First One', '!=');
-        // $item = $this->model->get_where(2);
-        // $item = $this->model->get_one_where('id', 1);
-        // $items = $this->model->count_where('item_title', 'Fender Stratocaster', '!=');
+        //$items = $this->model->get_where_custom('item_title', 'Fisdfsdrst one usdfdpdated', '=');
+        //$item = $this->model->get_where(3);
+        // echo $item->item_title; die();
+        //$item = $this->model->get_one_where('item_title', 'First one updated');
+        //$items = $this->model->count_where('item_title', 'Fender Stratocaster', '!=');
         //$count = $this->model->count('store_items');
-        //$max_id = $this->model->get_max('store_items');
+        //echo $count; die();
+        // $max_id = $this->model->get_max('store_items');
+        // echo $max_id; die();
         // $data['item_title'] = 'Some new title (I think this is the third one)';
         // $this->model->insert($data);
         //echo 'inserted'; die();
-        // $data['item_title'] = 'Item updated';
+        // $data['item_title'] = 'Item updated dc';
         // $update_id = 3;
         // $this->model->update($update_id, $data);
-        //$this->model->delete(2);
-
-
-
-//          $sql = "select * from store_items where id = ?";
-//          $data['id'] = 3;
-//          $items = $this->model->query_bind($sql, $data, 'array');
-// var_dump($items);
-
-
-
-        foreach ($items as $key => $value) {
-            echo "key of $value->id<br>";
-            echo "key of $value->item_title x<br><hr>";
-        }
-
-
-
-// echo 'fin';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      
-        // echo $item->item_title;
-        // echo $item->item_id;
-        // die();
-
-
-        // foreach ($items as $key => $value) {
-        //     echo "key of $value->id<br>";
-        //     echo "key of $value->item_title<br><hr>";
-        // }
-
-
-
-
-
-        //$this->model->delete(6);
-
-        // $sql = "select * from store_items where id>1";
-        // $items = $this->model->query($sql, 'array');
-        // foreach ($items as $item) {
-        //     echo 'ID is '.$item['id'].'<br>';
-        //     echo 'Title is '.$item['item_title'].'<br><hr>';
-        // }
-
-        // $sql = "update store_items set item_title = 'bla' where id>10";
+        // //echo 'yes'; die();
+        // $this->model->delete(8);
+        // echo "you bet"; die();
+        // //tesing query
+        // $sql = "select * from store_items";
         // $items = $this->model->query($sql);
+        // var_dump($items); die();
 
 
-        // $data['id'] = 3;
-        // $sql = "select * from store_items where id = ?";
+        $sql = "select * from store_items where id = :id and item_title NOT LIKE :item_title";
+        $data['id'] = 4;
+        $data['item_title'] = '%updated%';
+        $items = $this->model->query_bind($sql, $data, 'object');
+        var_dump($items); die();
 
-        // $items = $this->model->query_bind($sql, $data, 'array');
-
-        // foreach ($items as $item) {
-        //     echo 'ID is '.$item['id'].'<br>';
-        //     echo 'Title is '.$item['item_title'].'<br><hr>';
-        // }
-
-die();
 //query_bind($sql, $data, $return_type=false)
 
 
 
-        die();
 
-
-
-        $update_id = 6;
-        
-        echo "deleted";
-
-die();
 
 
         // echo $max_id; die();

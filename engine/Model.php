@@ -48,9 +48,23 @@ class Model {
         return $type;       
     }
 
-    //execute the prepared statement
-    public function execute(){
-        return $this->stmt->execute();
+    function prepare_and_execute($sql, $params) {
+
+        $this->stmt = $this->dbh->prepare($sql);
+
+        if (isset($params[0])) { //unnamaed params
+            return $this->stmt->execute($params);
+        } else {
+
+            foreach ($params as $key => $value) {
+                $type = $this->get_param_type($value);
+                $this->stmt->bindValue(":$key", $value, $type);
+            }
+
+            return $this->stmt->execute();
+
+        }
+
     }
 
     private function get_table_from_url() {
@@ -138,23 +152,21 @@ class Model {
         }
 
         $params[$column] = $value;
-
-        $sql = "SELECT * FROM $target_tbl where $column $operator :value order by $order_by";
+        $sql = "SELECT * FROM $target_tbl where $column $operator :$column order by $order_by";
 
         if ((isset($limit, $offset))) {
             $params['limit'] = $limit;
             $params['offset'] = $offset;
         }
 
-
         if ($this->debug == true) {
 
             $operator = strtoupper($operator);
             if (($operator == 'LIKE') || ($operator == 'NOT LIKE')) {
                 $value = '%'.$value.'%';
+                $params[$column] = $value;
             }
 
-            $params['value'] = $value;
             $query_to_execute = $this->show_query($sql, $params, $this->query_caveat);
 
         }
@@ -168,19 +180,10 @@ class Model {
 
     }
 
-    function prepare_and_execute($sql, $params) {
-        $this->stmt = $this->dbh->prepare($sql);
-
-        foreach ($params as $key => $value) {
-            $type = $this->get_param_type($value);
-            $this->stmt->bindValue(":value", $value, $type);
-        }
-
-        return $this->stmt->execute();
-    }
-
     //fetch a single record
     public function get_where($id, $target_tbl=NULL) {
+
+        $params['id'] = $id;
 
         if (!isset($target_tbl)) {
             $target_tbl = $this->get_table_from_url();
@@ -189,43 +192,41 @@ class Model {
         $sql = "SELECT * FROM $target_tbl where id = :id";
 
         if ($this->debug == true) {
-            $params['id'] = $id;
             $query_to_execute = $this->show_query($sql, $params, $this->query_caveat);
         }
 
-        $stmt = $this->dbh->prepare($sql);
-        $stmt->bindValue(":id", $id, PDO::PARAM_INT);
+        $result = $this->prepare_and_execute($sql, $params);
 
-        $stmt->execute();
-        $query = $stmt->fetch(PDO::FETCH_OBJ);
-        return $query;
+        if ($result == true) {
+            $item = $this->stmt->fetch(PDO::FETCH_OBJ);
+            return $item;            
+        }
 
     }
 
     //fetch a single record (alternative version)
     public function get_one_where($column, $value, $target_tbl=NULL) {
+        $params[$column] = $value;
 
         if (!isset($target_tbl)) {
             $target_tbl = $this->get_table_from_url();
         }
 
-        $sql = "SELECT * FROM $target_tbl where $column = :value";
+        $sql = "SELECT * FROM $target_tbl where $column = :$column";
 
         if ($this->debug == true) {
-            $params['value'] = $value;
             $query_to_execute = $this->show_query($sql, $params, $this->query_caveat);
         }
 
-        $stmt = $this->dbh->prepare($sql);
-        $stmt->bindValue(":value", $value, PDO::PARAM_INT);
+        $result = $this->prepare_and_execute($sql, $params);
 
-        $stmt->execute();
-        $query = $stmt->fetch(PDO::FETCH_OBJ);
-        return $query;
-        
+        if ($result == true) {
+            $item = $this->stmt->fetch(PDO::FETCH_OBJ);
+            return $item;            
+        }
     }
 
-    public function count_where($column, $value, $operator=NULL, $order_by=NULL, $target_tbl=NULL, $limit=NULL, $offset=NULL) {
+    public function count_where($column, $value, $operator='=', $order_by='id', $target_tbl=NULL, $limit=NULL, $offset=NULL) {
         $query = $this->get_where_custom($column, $value, $operator, $order_by, $target_tbl, $limit, $offset);
         $num_rows = count($query);
         return $num_rows;
@@ -238,16 +239,18 @@ class Model {
         }
 
         $sql = "SELECT COUNT(id) as total FROM $target_tbl";
+        $params = [];
 
         if ($this->debug == true) {
-            $params = [];
             $query_to_execute = $this->show_query($sql, $params);
         }
 
-        $stmt = $this->dbh->prepare($sql);
-        $stmt->execute();
-        $result = $stmt->fetch(PDO::FETCH_OBJ);
-        return $result->total;
+        $result = $this->prepare_and_execute($sql, $params);
+
+        if ($result == true) {
+            $obj = $this->stmt->fetch(PDO::FETCH_OBJ);
+            return $obj->total;            
+        }
 
     }
 
@@ -258,17 +261,20 @@ class Model {
         }
 
         $sql = "SELECT MAX(id) AS max_id FROM $target_tbl";
+        $params = [];
 
         if ($this->debug == true) {
-            $params = [];
             $query_to_execute = $this->show_query($sql, $params);
         }
 
-        $stmt = $this->dbh->prepare($sql);
-        $stmt->execute();
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        $max_id = $result['max_id'];
-        return $max_id;
+        $result = $this->prepare_and_execute($sql, $params);
+
+        if ($result == true) {
+            $assoc = $this->stmt->fetch(PDO::FETCH_ASSOC);
+            $max_id = $assoc['max_id'];
+            return $max_id;
+        }
+
     }
 
     //get result set as array of objects
@@ -370,8 +376,7 @@ margin: 1em 0;
             $query_to_execute = $this->show_query($sql, $params, $this->query_caveat);
         }
 
-        $stmt = $this->dbh->prepare($sql);
-        $stmt->execute($data);
+        $this->prepare_and_execute($sql, $params);
 
     }
 
@@ -391,14 +396,13 @@ margin: 1em 0;
         $sql.= " WHERE `$target_tbl`.`id` = :id";
 
         $data['id'] = $update_id;
+        $params = $data;
 
         if ($this->debug == true) {
-            $params = $data;
             $query_to_execute = $this->show_query($sql, $params, $this->query_caveat);
         }
 
-        $stmt = $this->dbh->prepare($sql);
-        $stmt->execute($data);
+        $this->prepare_and_execute($sql, $params);
 
     }
 
@@ -409,55 +413,52 @@ margin: 1em 0;
         }
 
         $sql = "DELETE from `$target_tbl` WHERE id = :id ";
-        $data['id'] = $id;
+        $params['id'] = $id;
 
         if ($this->debug == true) {
-            $params = $data;
             $query_to_execute = $this->show_query($sql, $params, $this->query_caveat);
         }
 
-        $stmt = $this->dbh->prepare($sql);
-        $stmt->execute($data);
+        $this->prepare_and_execute($sql, $params);
 
     }
 
-    public function query($sql) {
+    public function query($sql, $return_type=false) {
 
         //WARNING: very high risk of SQL injection - use with caution!
+        $params = [];
 
         if ($this->debug == true) {
-            $params = [];
             $query_to_execute = $this->show_query($sql, $params);
         }
 
-        $stmt = $this->dbh->prepare($sql);
-        $stmt->execute();
-        $query = $stmt->fetchAll(PDO::FETCH_OBJ);
-        return $query;
+        $this->prepare_and_execute($sql, $params);
+
+        if ($return_type == 'object') {
+            $query = $this->stmt->fetchAll(PDO::FETCH_OBJ);
+            return $query;
+        } elseif ($return_type == 'array') {
+            $query = $this->stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $query;
+        }
+
     }
 
-    public function query_bind($sql, $data) {
+    public function query_bind($sql, $params, $return_type=false) {
 
         if ($this->debug == true) {
-            $params = $data;
             $query_to_execute = $this->show_query($sql, $params, $this->query_caveat); 
         }
 
-        $stmt = $this->dbh->prepare($sql);
+        $this->prepare_and_execute($sql, $params);
 
-        if (isset($data[0])) {
-            $stmt->execute($data);
-        } else {
-            foreach ($data as $key => $value) {
-                $type = $this->get_param_type($value);
-                $stmt->bindValue(":$key", $value, $type);
-            }
-
-            $stmt->execute();
+        if ($return_type == 'object') {
+            $query = $this->stmt->fetchAll(PDO::FETCH_OBJ);
+            return $query;
+        } elseif ($return_type == 'array') {
+            $query = $this->stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $query;
         }
-
-        $query = $stmt->fetchAll(PDO::FETCH_OBJ);
-        return $query;
 
     }
 

@@ -9,7 +9,7 @@ class Model {
     private $dbh;
     private $stmt;
     private $error;
-    private $debug = true;
+    private $debug = false;
     private $query_caveat = 'The query shown above is how the query would look <i>before</i> binding.';
 
     public function __construct() {
@@ -131,21 +131,17 @@ class Model {
 
     }
 
-    private function prepare_and_execute($sql, $params=[]) {
-        
+    public function get_where_custom($column, $value, $operator=NULL, $order_by=NULL, $target_tbl=NULL, $limit=NULL, $offset=NULL) {
 
-        foreach ($params as $key => $value) {
-            $type = $this->get_param_type($value);
-            $stmt->bindValue(":value", $value, $type);
+        $limit_results = false;
+
+        if (!isset($operator)) {
+            $operator = '=';
         }
 
-        echo $sql;
-        echo count($params); die();
-
-
-    }
-
-    public function get_where_custom($column, $value, $operator='=', $order_by='id', $target_tbl=NULL, $limit=NULL, $offset=NULL) {
+        if (!isset($order_by)) {
+            $order_by = 'id';
+        }
 
         if (!isset($target_tbl)) {
             $target_tbl = $this->get_table_from_url();
@@ -157,35 +153,31 @@ class Model {
             $sql = $this->add_limit_offset($sql, $limit, $offset);
         }
 
-        // if ($this->debug == true) {
+        if ($this->debug == true) {
 
-        //     $operator = strtoupper($operator);
-        //     if (($operator == 'LIKE') || ($operator == 'NOT LIKE')) {
-        //         $value = '%'.$value.'%';
-        //     }
+            $operator = strtoupper($operator);
+            if (($operator == 'LIKE') || ($operator == 'NOT LIKE')) {
+                $value = '%'.$value.'%';
+            }
 
-        //     if ($limit_results == true) {
-        //         $params['limit'] = $limit;
-        //         $params['offset'] = $offset;
-        //     }
+            if ($limit_results == true) {
+                $params['limit'] = $limit;
+                $params['offset'] = $offset;
+            }
 
-        //     $params['value'] = $value;
-        //     $query_to_execute = $this->show_query($sql, $params, $this->query_caveat);
-        // }
+            $params['value'] = $value;
+            $query_to_execute = $this->show_query($sql, $params, $this->query_caveat);
+        }
 
-        // $stmt = $this->dbh->prepare($sql);
-        // $stmt->bindValue(":value", $value, PDO::PARAM_STR);
+        $stmt = $this->dbh->prepare($sql);
+        $stmt->bindValue(":value", $value, PDO::PARAM_STR);
 
-        // if ($limit_results == true) {
-        //     $stmt->bindValue(":limit", $limit, PDO::PARAM_INT);
-        //     $stmt->bindValue(":offset", $offset, PDO::PARAM_INT);
-        // }
+        if ($limit_results == true) {
+            $stmt->bindValue(":limit", $limit, PDO::PARAM_INT);
+            $stmt->bindValue(":offset", $offset, PDO::PARAM_INT);
+        }
 
-        $params[$column] = $value; 
-
-        $stmt = $this->prepare_and_execute($sql, $params);
-
-        // $stmt->execute();
+        $stmt->execute();
         $query = $stmt->fetchAll(PDO::FETCH_OBJ);
         return $query;
 
@@ -449,6 +441,32 @@ margin: 1em 0;
     }
 
     public function query_bind($sql, $data) {
+
+        $params = $data;
+
+        if ($this->debug == true) {
+            $query_to_execute = $this->show_query($sql, $params, $this->query_caveat); 
+        }
+
+        $stmt = $this->dbh->prepare($sql);
+
+        if (isset($data[0])) {
+            $stmt->execute($data);
+        } else {
+            foreach ($data as $key => $value) {
+                $type = $this->get_param_type($value);
+                $stmt->bindValue(":$key", $value, $type);
+            }
+
+            $stmt->execute();
+        }
+
+        $query = $stmt->fetchAll(PDO::FETCH_OBJ);
+        return $query;
+
+    }
+
+    public function query_bindNEW($sql, $data) {
 
         if ($this->debug == true) {
             $params = $data;
