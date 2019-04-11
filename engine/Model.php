@@ -133,7 +133,6 @@ class Model {
 
     public function get_where_custom($column, $value, $operator='=', $order_by='id', $target_tbl=NULL, $limit=NULL, $offset=NULL) {
 
-      
         if (!isset($target_tbl)) {
             $target_tbl = $this->get_table_from_url();
         }
@@ -157,8 +156,8 @@ class Model {
 
             $params['value'] = $value;
             $query_to_execute = $this->show_query($sql, $params, $this->query_caveat);
-        }
 
+        }
 
         $result = $this->prepare_and_execute($sql, $params);
 
@@ -166,21 +165,6 @@ class Model {
             $items = $this->stmt->fetchAll(PDO::FETCH_OBJ);
             return $items;
         }
-
-/*
-        $stmt = $this->dbh->prepare($sql);
-        $stmt->bindValue(":value", $value, PDO::PARAM_STR);
-
-        if ($limit_results == true) {
-            $stmt->bindValue(":limit", $limit, PDO::PARAM_INT);
-            $stmt->bindValue(":offset", $offset, PDO::PARAM_INT);
-        }
-
-        $stmt->execute();
-*/
-
-        // $query = $stmt->fetchAll(PDO::FETCH_OBJ);
-        // return $query;
 
     }
 
@@ -192,20 +176,7 @@ class Model {
             $this->stmt->bindValue(":value", $value, $type);
         }
 
-
-        // $this->stmt->bindValue(":value", $value, PDO::PARAM_STR);
-
-        // if ($limit_results == true) {
-        //     $this->stmt->bindValue(":limit", $limit, PDO::PARAM_INT);
-        //     $this->stmt->bindValue(":offset", $offset, PDO::PARAM_INT);
-        // }
-
-
-
         return $this->stmt->execute();
-
-
-
     }
 
     //fetch a single record
