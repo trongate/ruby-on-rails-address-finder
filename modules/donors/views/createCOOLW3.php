@@ -1,48 +1,5 @@
 <h1><?= $headline ?></h1>
-<?php
-$attributes['class'] = 'w3-button w3-medium primary';
-echo '<p>'.anchor('donors/create', 'CREATE NEW DONOR', $attributes).'</p>';
-echo Pagination::display($data);
-$attributes['class'] = 'w3-button w3-small w3-light-grey';
-?>
-
-
-
-<table class="w3-table">
-    <tr class="primary">
-        <th colspan="4">
-            Search Donors ....per page dd
-        </th>
-    </tr>
-    <tr class="secondary">
-        <th>First Name</th>
-        <th>Last Name</th>
-        <th>Points</th>
-        <th style="width: 20px;">Action</th>
-    </tr>
-    <tr>
-        <td>First Name</td>
-        <td>Last Name</td>
-        <td>Points</td>
-        <td><?= anchor('asdf', 'VIEW', $attributes) ?></td>
-    </tr>
-    <tr>
-        <td>First Name</td>
-        <td>Last Name</td>
-        <td>Points</td>
-        <td><?= anchor('asdf', 'VIEW', $attributes) ?></td>
-    </tr>
-    <tr>
-        <td>First Name</td>
-        <td>Last Name</td>
-        <td>Points</td>
-        <td><?= anchor('asdf', 'VIEW', $attributes) ?></td>
-    </tr>
-</table>
-
-<?php
-/*
-<div class="w3-card-4" style="margin-top: 12em;">
+<div class="w3-card-4">
     <div class="w3-container w3-dark-grey">
         <h4><i class="fa fa-calendar"></i> Booking Details</h4>
     </div>
@@ -96,10 +53,4 @@ $attributes['class'] = 'w3-button w3-small w3-light-grey';
         </p>
     </form>
 </div>
-*/
-?>
-<p>
-<?php 
-unset($data['include_showing_statement']);
-Pagination::display($data) ?>
-</p>
+    

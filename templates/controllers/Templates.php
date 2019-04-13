@@ -1,6 +1,10 @@
 <?php
 class Templates extends Trongate {
 
+    function admin($data) {
+        load('admin', $data);
+    }
+
     function public($data) {
         load('public', $data);
     }

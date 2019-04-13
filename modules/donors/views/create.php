@@ -1,113 +1,52 @@
-<?= validation_errors("<p style='color: red;'>", "</p>") ?>
-<div class="row">
-    <div class="col-md-6">
-        <?php
-        if (isset($flash)) {
-            echo $flash;
-        }
-        ?>
-        <div class="panel">
-            <div class="panel-heading">
-                <div class="panel-title">Donor Details</div>
-            </div>
-            <form class="panel-body" action="<?= $form_location ?>" method="post">
-
-                <fieldset class="form-group">
-	        		<label>First Name</label>
-	        		<input type="text" class="form-control" value="<?= $first_name ?>" name="first_name" placeholder="Enter First Name">
-	    		</fieldset>
-
-                <fieldset class="form-group">
-	        		<label>Email</label>
-	        		<input type="text" class="form-control" value="<?= $email ?>" name="email" placeholder="Enter Email">
-	    		</fieldset>
-                
-				<fieldset class="form-group">
-  					<label>Introduction</label>
-    				<textarea name="introduction" placeholder="Enter introduction here..." id="grid-input-15" class="form-control"><?= $introduction ?></textarea>
-                </fieldset>
-
-                <fieldset class="form-group">
-	        		<label>Price</label>
-	        		<input type="text" class="form-control" value="<?= $price ?>" name="price" placeholder="Enter Price">
-	    		</fieldset>
-
-                <fieldset class="form-group">
-					<label>Date of Birth <span style="color: green;">(optional)</span></label>
-					<input type="text" name="date_of_birth" value="<?= $date_of_birth ?>" autocomplete="off" class="form-control" id="datepicker-date_of_birth" placeholder="Select Date of Birth">
-				</fieldset>
-                
-                <fieldset class="form-group">
-                    <label>Next Appointment </label><br>
-
-                    <div style="padding: 0px;" class="input-group date form_datetime col-md-5" data-date="2019-04-13T01:02:04Z" data-date-format="dd MM yyyy - HH:ii p" data-link-field="dtp_input1">
-                        <input class="form-control" name="next_appointment" value="<?= $next_appointment ?>" size="16" type="text" readonly>
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-                    </div>
-                </fieldset>
-                
-				<fieldset class="form-group">
-	          		<label>Active</label>
-						<input name="active" value="1" type="checkbox"<?php
-
-                        if ($active==1) {
-                            echo " checked";
-                        }
-
-                        ?>>
-	        	</fieldset>
-
-                <fieldset class="form-group">
-                    <button type="submit" name="submit" value="Submit" class="btn btn-primary">Submit</button> 
-                    <a href="<?= $cancel_url ?>"><button type="button" class="btn btn-default">Cancel</button></a> 
-                    <?php
-                    if ($update_id>0) {
-                    ?>
-                    <span style="float: right; position: relative;"><!-- start of delete conf modal -->
-                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modal-danger">Delete</button> 
-
-                        <div id="modal-danger" class="modal fade modal-alert modal-danger">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header"><i class="fa fa-warning"></i></div>
-                                    <div class="modal-title">Confirm Delete</div>
-                                    <div class="modal-body">You are about to delete a donor record.  This cannot be undone.<br>
-                                        Do you really want to do this?</div>
-                                    <div class="modal-footer">
-                                        <button type="submit" name="submit" value="Delete" class="btn btn-danger">Yes - Delete it now!</button> 
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </span><!-- end of delete conf modal -->
-                    <?php
-                    }
-                    ?>
-                </fieldset>
-
-            </form>
-        </div>
+<h1><?= $headline ?></h1>
+<div class="w3-card-4">
+    <div class="w3-container primary">
+        <h4><i class="fa fa-calendar"></i> Booking Details</h4>
     </div>
+    <form class="w3-container" action="<?= $form_location ?>" method="post">
+        <p>
+            <label class="w3-text-dark-grey"><b>First Name</b> <span class="w3-text-green">(optional)</span></label>
+            <input type="text" name="first_name" value="<?= $first_name ?>" class="w3-input w3-border w3-sand" placeholder="Enter First Name">
+        </p>
+        <p>
+            <label class="w3-text-dark-grey"><b>Email</b></label>
+            <input type="email" name="email" value="<?= $email ?>" class="w3-input w3-border w3-sand" placeholder="Enter Email">
+        </p>
+        <p>
+            <label class="w3-text-grey">Introduction</label>
+            <textarea name="introduction" class="w3-input w3-border w3-sand" placeholder="Enter introduction here..." ><?= $introduction ?></textarea>
+        </p>
+        <p>
+            <label class="w3-text-dark-grey"><b>Price</b></label>
+            <input type="text" name="price" value="<?= $price ?>" class="w3-input w3-border w3-sand" placeholder="Enter Price">
+        </p>
+        <p>
+            <button type="submit" name="submit" value="Submit" class="w3-btn w3-medium primary">Submit</button> 
+            <?php 
+            $attributes['class'] = 'w3-btn w3-white w3-border';
+            echo anchor($cancel_url, 'Cancel', $attributes);
+            ?>
+        </p>
+    </form>
 </div>
 
-<script>
-
-  window.onload = function() {
-
+<script type="text/javascript">
     $(function() {
-      $('#datepicker-date_of_birth').datepicker({
-        calendarWeeks:         true,
-        todayBtn:              'linked',
-        clearBtn:              true,
-        todayHighlight:        true,
-        multidate:             false,
-        daysOfWeekHighlighted: '0,6',
-        orientation:           'bottom right',
-				format: 'dd/mm/yyyy'
-      });
 
-		});
+        $('input[name="date"]').daterangepicker({
+            autoUpdateInput: false,
+            locale: {
+                cancelLabel: 'Clear'
+            }
+        });
 
-  }
+        $('input[name="date"]').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+        });
+
+        $('input[name="date"]').on('cancel.daterangepicker', function(ev, picker) {
+            $(this).val('');
+        });
+
+    });
 </script>

@@ -1,8 +1,8 @@
 <?php
-class Donors extends MX_Controller {
-
-    function __construct() {
-        parent::__construct();
+class Donors extends Trongate {
+/*
+    function test() {
+        echo 'hello';
     }
 
     function _get_data_from_post() {
@@ -33,108 +33,74 @@ class Donors extends MX_Controller {
         $data['next_appointment'] = $this->timedate->get_nice_date($data['next_appointment'], 'dateandtimepicker');
         return $data;
     }
+*/
 
     function submit() {
-        $this->load->module('custom_pagination');
-        $this->load->module('flash_helper');
-        $this->load->module('site_security');
-        $this->site_security->_make_sure_is_admin();
 
-        $update_id = $this->uri->segment(3);
-        $data = $this->_get_data_from_post();
-        $submit = $this->input->post('submit', TRUE);
-        $module_root = $this->get_this_module_root();
-
-        if ($submit == 'Delete') {
-            $this->_delete($update_id);
-            $flash_title = 'Record Deleted';
-            $flash_msg = 'The donor was successfully deleted.';
-            $flash_theme = 'success';
-            $this->flash_helper->_set_flashdata($flash_title, $flash_msg, $flash_theme);
-            $target_url = $module_root.'manage';
-            redirect($target_url);
-        }
-
-        //process the form
-        $this->load->library('form_validation');
-        $this->form_validation->CI = & $this;
-        $this->form_validation->set_rules('first_name', 'first name', 'required|min_length[3]|max_length[65]');
-        $this->form_validation->set_rules('email', 'email', 'required|valid_email');
-        $this->form_validation->set_rules('introduction', 'introduction', 'required');
-        $this->form_validation->set_rules('price', 'price', 'numeric|required|min_length[0]');
-        $this->form_validation->set_rules('date_of_birth', 'date of birth', 'callback_in_the_past');
-        $this->form_validation->set_rules('next_appointment', 'next appointment', 'required');
+        $submit = $this->input('submit', true);
 
         if ($submit == 'Submit') {
 
-            //fetch the posted variables
-            $data = $this->_get_data_from_post();
+            $this->validation_helper->set_rules('first_name', 'first name', 'required|min_length[4]');
+            $this->validation_helper->set_rules('price', 'price', 'required|numeric|greater_than[0]');
+            $this->validation_helper->set_rules('introduction', 'introduction', 'required');
 
-            $this->load->module('timedate');
-            $data['date_of_birth'] = $this->timedate->make_timestamp_from_datepicker($data['date_of_birth']);
-            $data['next_appointment'] = $this->timedate->make_timestamp_from_dateandtimepicker($data['next_appointment']);
+            $result = $this->validation_helper->run();
 
-            $url_string = $this->input->post('first_name');
-            $url_string = url_title($url_string);
-            $data['url_string'] = $url_string;
+            if ($result == true) {
 
-            if (is_numeric($update_id)) {
+                $update_id = $this->url->segment(3);
+                $data = $this->_fetch_data_from_post();
 
-                //update the record details
-                $this->_update($update_id, $data);
-                $flash_title = 'Record Updated';
-                $flash_msg = 'The donor was successfully updated.';
-                $flash_theme = 'success';
-                $this->flash_helper->_set_flashdata($flash_title, $flash_msg, $flash_theme);
-                redirect($module_root.'view/'.$update_id);
+                if (is_numeric($update_id)) {
+                    //update an existing record
+                    $this->model->update($update_id, $data, 'store_items');
+                    $flash_msg = 'The record was successfully updated';
+                } else {
+                    //insert the new record
+                    $this->model->insert($data, 'store_items');
+                    $flash_msg = 'The record was successfully created';
+                }
+    
+                set_flashdata($flash_msg);
+                redirect('donors/manage');
 
             } else {
-
-                //insert a new record
-                $this->_insert($data);
-
-                //get the ID of the new item
-                $update_id = $this->get_max();
-                $flash_title = 'Record Created';
-                $flash_msg = 'The donor was successfully added.';
-                $flash_theme = 'success';
-                $this->flash_helper->_set_flashdata($flash_title, $flash_msg, $flash_theme);
-                redirect($module_root.'view/'.$update_id);
-
+                //form submission error
+                $this->create();
             }
 
-        } else {
-            $this->create();
         }
+
     }
 
+
+/*
+
+
+
     function manage() {
-        $this->load->module('custom_pagination');
-        $this->load->module('flash_helper');
-        $this->load->module('site_security');
-        $this->site_security->_make_sure_is_admin();
+        $this->module('security');
+        $this->security->_make_sure_allowed();
 
-        //count all of the records on the donors table
-        $use_limit = FALSE;
-        $mysql_query = $this->_generate_query($use_limit);
-        $query = $this->_custom_query($mysql_query);
-        $total_items = $query->num_rows();
+        //fetch the donors for this page
+        $limit = $this->_get_limit();
+        $offset = $this->_get_offset();
+        $data['query'] = $this->model->get('first_name', 'donors', $limit, $offset);
+        $data['total_rows'] = count($data['query']);
 
-        //fetch the records to be displayed on this page
-        $use_limit = TRUE;
-        $mysql_query = $this->_generate_query($use_limit);
-        $data['query'] = $this->_custom_query($mysql_query);
-        $data['num_rows'] = $data['query']->num_rows();
+        //format the pagination
+        $data['include_showing_statement'] = true;    
+        $data['record_name_plural'] = 'donors';  
 
-        //generate pagination for the donors/manage page
-        $pagination_data['template'] = 'admin';
-        $pagination_data['target_base_url'] = $this->get_target_pagination_base_url();
-        $pagination_data['total_rows'] = $total_items;
-        $pagination_data['offset_segment'] = 3;
-        $pagination_data['limit'] = $this->get_limit();
-        $data['pagination'] = $this->custom_pagination->_generate_pagination($pagination_data);
-        $pagination_data['offset'] = $this->get_offset();
-        $data['showing_statement'] = $this->custom_pagination->get_showing_statement($pagination_data);
+        $data['headline'] = 'Manage Donors';
+        $data['view_module'] = 'donors';
+        $data['view_file'] = 'manage';
+        $data['limit_pref'] = $_SESSION['limit_pref']; //the (max donors) 'per page' preference
+
+        $this->template('admin', $data);
+/*
+
 
         $data['limit_pref'] = $_SESSION['limit_pref']; //the (max donors) 'per page' preference
         $data['this_module_root'] = $this->get_this_module_root();
@@ -144,47 +110,88 @@ class Donors extends MX_Controller {
         $data['view_file'] = 'manage';
         $this->load->module('templates');
         $this->templates->admin($data);
+
+
+
+    }
+*/
+    function _fetch_data_from_db($update_id) {
+        $donors = $this->model->get_where($update_id, 'donors');
+
+        if ($donors == false) {
+            $this->template('error_404');
+            die();
+        } else {
+            $data['first_name'] = $donors->first_name;
+            $data['email'] = $donors->email;
+            $data['introduction'] = $donors->introduction;
+            $data['price'] = $donors->price;
+            $data['date_of_birth'] = $donors->date_of_birth;
+            $data['next_appointment'] = $donors->next_appointment;
+            $data['active'] = $donors->active;
+
+            //format the unix timestamps
+            $this->load->module('timedate');
+            $data['date_of_birth'] = $this->timedate->get_nice_date($data['date_of_birth'], 'datepicker');
+            $data['next_appointment'] = $this->timedate->get_nice_date($data['next_appointment'], 'dateandtimepicker');
+            return $data;        
+        }
+    }
+
+    function _fetch_data_from_post() {
+        $data['first_name'] = $this->input('first_name', true);
+        $data['email'] = $this->input('email', true);
+        $data['introduction'] = $this->input('introduction', true);
+        $data['price'] = $this->input('price', true);
+        $data['date_of_birth'] = $this->input('date_of_birth', true);
+        $data['next_appointment'] = $this->input('next_appointment', true);
+        $data['active'] = $this->input('active', true);
+        return $data;
     }
 
     function create() {
-        $this->load->module('custom_pagination');
-        $this->load->module('flash_helper');
-        $this->load->module('site_security');
-        $this->site_security->_make_sure_is_admin();
+        $this->module('security');
+        $this->security->_make_sure_allowed();
 
-        $update_id = $this->uri->segment(3);
-        $submit = $this->input->post('submit', TRUE);
+        $update_id = $this->url->segment(3);
+        $submit = $this->input('submit', true);
 
         if ((!is_numeric($update_id)) && ($update_id != '')) {
-            die();
+            redirect('donors/manage');
         }
-
-        $this_module_root = $this->get_this_module_root();
 
         //fetch the form data
         if (($submit == '') && ($update_id>0)) {
-            $data = $this->_get_data_from_db($update_id);
+            $data = $this->_fetch_data_from_db($update_id);
         } else {
-            $data = $this->_get_data_from_post();
+            $data = $this->_fetch_data_from_post();
         }
 
         if ($update_id>0) {
-            $data['cancel_url'] = $cancel_url = $this_module_root.'view/'.$update_id;
+            $data['cancel_url'] = BASE_URL.'donors/view/'.$update_id;
         } else {
-            $data['cancel_url'] = $this_module_root.'manage';
+            $data['cancel_url'] = BASE_URL.'donors/manage';
         }
 
-        $data['form_location'] = $this_module_root.'submit/'.$update_id;
+        $data['form_location'] = BASE_URL.'donors/submit/'.$update_id;
         $data['update_id'] = $update_id;
-        $data['this_module_root'] = $this_module_root;
-        $data['flash'] = $this->flash_helper->_get_flashdata();
-
         $data['headline'] = $this->_get_page_headline($update_id, 'donor');
         $data['view_file'] = 'create';
-        $this->load->module('templates');
-        $this->templates->admin($data);
+        $this->template('admin', $data);
     }
 
+    function _get_page_headline($update_id) {
+        //figure out what the page headline should be (on the donors/create page)
+        if (!is_numeric($update_id)) {
+            $headline = 'Create Donor';
+        } else {
+            $headline = 'Update Donor';
+        }
+
+        return $headline;
+    }
+
+/*
     function _get_page_headline($update_id) {
         //figure out what the page headline should be (on the donors/create page)
         if (!is_numeric($update_id)) {
@@ -426,8 +433,9 @@ class Donors extends MX_Controller {
 
         return $mysql_query;
     }
+*/
 
-    function get_limit() {
+    function _get_limit() {
         if (isset($_SESSION['limit_pref'])) {
             $limit = $_SESSION['limit_pref'];
         } else {
@@ -438,19 +446,22 @@ class Donors extends MX_Controller {
         return $limit;
     }
 
-    function get_offset() {
-        $offset = $this->uri->segment(3);
+    function _get_offset() {
+        $offset = $this->url->segment(3);
         if (!is_numeric($offset)) {
             $offset = 0;
         }
 
         return $offset;
     }
-
+/*
     function get_this_module_root() {
         $this_module = $this->uri->segment(1);
         $this_module_root = base_url().$this_module.'/';
         return $this_module_root;
     }
+*/
+
+
 
 }
