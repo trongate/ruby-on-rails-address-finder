@@ -21,10 +21,10 @@
             <input type="text" name="price" value="<?= $price ?>" class="w3-input w3-border w3-sand" placeholder="Enter Price">
         </p>
         <p>
-            <button type="submit" name="submit" value="Submit" class="w3-btn w3-medium primary">Submit</button> 
+            <button type="submit" name="submit" value="Submit" class="w3-button w3-medium primary">SUBMIT</button> 
             <?php 
-            $attributes['class'] = 'w3-btn w3-white w3-border';
-            echo anchor($cancel_url, 'Cancel', $attributes);
+            $attributes['class'] = 'w3-button w3-white w3-border';
+            echo anchor($cancel_url, 'CANCEL', $attributes);
             ?>
         </p>
     </form>

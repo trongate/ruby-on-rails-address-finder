@@ -85,6 +85,7 @@ class Donors extends Trongate {
         $offset = $this->_get_offset();
         $data['donors'] = $this->model->get('first_name', 'donors', $limit, $offset);
         $data['total_rows'] = count($data['donors']);
+        $data['total_rows'] = 888;
 
         //format the pagination
         $data['include_showing_statement'] = true;    
@@ -129,9 +130,10 @@ class Donors extends Trongate {
             $data['active'] = $donors->active;
 
             //format the unix timestamps
-            $this->load->module('timedate');
+            $this->module('timedate');
             $data['date_of_birth'] = $this->timedate->get_nice_date($data['date_of_birth'], 'datepicker');
-            $data['next_appointment'] = $this->timedate->get_nice_date($data['next_appointment'], 'dateandtimepicker');
+            //$data['next_appointment'] = $this->timedate->get_nice_date($data['next_appointment'], 'dateandtimepicker');
+            $data['next_appointment'] = $this->timedate->get_nice_date($data['next_appointment'], 'datepicker');
             return $data;        
         }
     }
@@ -166,7 +168,7 @@ class Donors extends Trongate {
         }
 
         if ($update_id>0) {
-            $data['cancel_url'] = BASE_URL.'donors/view/'.$update_id;
+            $data['cancel_url'] = BASE_URL.'donors/edit/'.$update_id;
         } else {
             $data['cancel_url'] = BASE_URL.'donors/manage';
         }
@@ -202,22 +204,21 @@ class Donors extends Trongate {
     }
 */
 
-    function view() {
+    function edit() {
         $this->module('security');
         $this->security->_make_sure_allowed();
 
-        $update_id = $this->uri->segment(3);
+        $update_id = $this->url->segment(3);
         
         if ((!is_numeric($update_id)) && ($update_id != '')) {
             redirect('donors/manage');
         }
-die();
-        $data = $this->_get_data_from_db($update_id);
+
+        $data = $this->_fetch_data_from_db($update_id);
         $data['form_location'] = BASE_URL.'donors/submit/'.$update_id;
         $data['update_id'] = $update_id;
         $data['headline'] = 'Donor Information';
-        $data['view_file'] = 'view';
-        $this->load->module('templates');
+        $data['view_file'] = 'edit';
         $this->template('admin', $data);
     }
 

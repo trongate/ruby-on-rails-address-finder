@@ -79,8 +79,8 @@
 
 
 <style>
-    .w3-button, .w3-btn {
-        transition: 0.3s;
+    .w3-button, .w3-btn, .w3-hover-black {
+        transition: 0.4s;
     }
 
     .w3-button.w3-medium.primary:hover {
@@ -109,7 +109,9 @@
         border: 1px #ddd solid !important;
     }
 
-
+    .edit-block {
+        min-height: 36em;
+    }
 
 
 
@@ -142,6 +144,8 @@
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
 }
+
+
 
 </style>
 
