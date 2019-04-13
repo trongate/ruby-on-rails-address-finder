@@ -20,12 +20,18 @@ $attributes['class'] = 'w3-button w3-small w3-light-grey';
         <th>Points</th>
         <th style="width: 20px;">Action</th>
     </tr>
+    <?php
+    foreach($donors as $donor) {
+    ?>
     <tr>
-        <td>First Name</td>
-        <td>Last Name</td>
+        <td><?= $donor->first_name ?></td>
+        <td><?= $donor->email ?></td>
         <td>Points</td>
-        <td><?= anchor('asdf', 'VIEW', $attributes) ?></td>
+        <td><?= anchor('donors/view/'.$donor->id, 'VIEW', $attributes) ?></td>
     </tr>
+    <?php
+    }
+    ?>
     <tr>
         <td>First Name</td>
         <td>Last Name</td>

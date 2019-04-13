@@ -86,13 +86,13 @@
                                 <td><?= Modules::run('timedate/get_nice_date', $row->date_of_birth, 'cool') ?></td>
                                 <td><?= Modules::run('timedate/get_nice_date', $row->next_appointment, 'full') ?></td>
                                 <td><?php
-if ($row->active == 1) {
-    echo 'Yes';
-} else {
-    echo 'No';
-}
-?>
-</td>
+                                if ($row->active == 1) {
+                                    echo 'Yes';
+                                } else {
+                                    echo 'No';
+                                }
+                                ?>
+                                </td>
                                 <td class="center">
                                     <a href="<?= $this_module_root ?>view/<?= $row->id ?>"><button type="button" class="btn btn-xs" ng-click="viewRecordOnPage(row.id)">View</button></a>
                                 </td>

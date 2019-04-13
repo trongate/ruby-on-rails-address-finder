@@ -36,6 +36,8 @@ class Donors extends Trongate {
 */
 
     function submit() {
+        $this->module('security');
+        $this->security->_make_sure_allowed();
 
         $submit = $this->input('submit', true);
 
@@ -54,11 +56,11 @@ class Donors extends Trongate {
 
                 if (is_numeric($update_id)) {
                     //update an existing record
-                    $this->model->update($update_id, $data, 'store_items');
+                    $this->model->update($update_id, $data, 'donors');
                     $flash_msg = 'The record was successfully updated';
                 } else {
                     //insert the new record
-                    $this->model->insert($data, 'store_items');
+                    $this->model->insert($data, 'donors');
                     $flash_msg = 'The record was successfully created';
                 }
     
@@ -74,11 +76,6 @@ class Donors extends Trongate {
 
     }
 
-
-/*
-
-
-
     function manage() {
         $this->module('security');
         $this->security->_make_sure_allowed();
@@ -86,8 +83,8 @@ class Donors extends Trongate {
         //fetch the donors for this page
         $limit = $this->_get_limit();
         $offset = $this->_get_offset();
-        $data['query'] = $this->model->get('first_name', 'donors', $limit, $offset);
-        $data['total_rows'] = count($data['query']);
+        $data['donors'] = $this->model->get('first_name', 'donors', $limit, $offset);
+        $data['total_rows'] = count($data['donors']);
 
         //format the pagination
         $data['include_showing_statement'] = true;    
@@ -99,6 +96,7 @@ class Donors extends Trongate {
         $data['limit_pref'] = $_SESSION['limit_pref']; //the (max donors) 'per page' preference
 
         $this->template('admin', $data);
+    }
 /*
 
 
@@ -202,8 +200,31 @@ class Donors extends Trongate {
 
         return $headline;
     }
+*/
 
     function view() {
+        $this->module('security');
+        $this->security->_make_sure_allowed();
+
+        $update_id = $this->uri->segment(3);
+        
+        if ((!is_numeric($update_id)) && ($update_id != '')) {
+            redirect('donors/manage');
+        }
+die();
+        $data = $this->_get_data_from_db($update_id);
+        $data['form_location'] = BASE_URL.'donors/submit/'.$update_id;
+        $data['update_id'] = $update_id;
+        $data['headline'] = 'Donor Information';
+        $data['view_file'] = 'view';
+        $this->load->module('templates');
+        $this->template('admin', $data);
+    }
+
+
+
+
+    function viewX() {
         $this->load->module('custom_pagination');
         $this->load->module('flash_helper');
         $this->load->module('site_security');
@@ -231,7 +252,7 @@ class Donors extends Trongate {
         $this->load->module('templates');
         $this->templates->admin($data);
     }
-
+/*
     function search_results() {
         $this->load->module('custom_pagination');
         $this->load->module('flash_helper');
