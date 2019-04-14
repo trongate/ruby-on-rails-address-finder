@@ -67,12 +67,12 @@
             </div>
             <div class="w3-container w3-center edit-block-content">
 
-                <p><button onclick="document.getElementById('create-comment-modal').style.display='block'" class="w3-button w3-white w3-border"><i class="fa fa-commenting-o"></i> CREATE NEW COMMENT</button></p>
+                <p><button onclick="document.getElementById('create-comment-modal').style.display='block'" class="w3-button w3-white w3-border"><i class="fa fa-commenting-o"></i> ADD NEW COMMENT</button></p>
 
                 <div id="create-comment-modal" class="w3-modal" style="padding-top: 7em;">
                     <div class="w3-modal-content w3-animate-top w3-card-4" style="width: 30%;">
                         <header class="w3-container primary w3-text-white">
-                            <h4><i class="fa fa-commenting-o"></i> CREATE NEW COMMENT</h4>
+                            <h4><i class="fa fa-commenting-o"></i> ADD NEW COMMENT</h4>
                         </header>
                         <div class="w3-container">
                             <p>
@@ -81,7 +81,7 @@
                             <p class="w3-right modal-btns">
                                 <button onclick="document.getElementById('create-comment-modal').style.display='none'" type="button" name="submit" value="Submit" class="w3-button w3-small 3-white w3-border">CANCEL</button> 
 
-                                <button type="submit" name="submit" value="Submit" class="w3-button w3-small primary">SUBMIT COMMENT</button> 
+                                <button type="submit" name="submit" value="Submit" class="w3-button w3-small primary">ADD COMMENT</button> 
                             </p>
                         </div>
                     </div>
