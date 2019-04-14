@@ -62,10 +62,11 @@ class Donors extends Trongate {
                     //insert the new record
                     $this->model->insert($data, 'donors');
                     $flash_msg = 'The record was successfully created';
+                    $update_id = $this->model->get_max('donors');
                 }
     
                 set_flashdata($flash_msg);
-                redirect('donors/manage');
+                redirect('donors/edit/'.$update_id);
 
             } else {
                 //form submission error

@@ -10,3 +10,5 @@
 
 * clear the database settings
 
+* remove next_appointment as hidden var on /create
+

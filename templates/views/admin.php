@@ -83,7 +83,7 @@
         transition: 0.4s;
     }
 
-    .w3-button.w3-medium.primary:hover {
+    .w3-button.w3-small.primary:hover, .w3-button.w3-medium.primary:hover {
         background-color: #4ba787 !important;
         color: #fff !important;
     }
@@ -110,10 +110,31 @@
     }
 
     .edit-block {
-        min-height: 36em;
+        height: 50vh;
     }
 
+    .edit-block-content {
+        height: 43vh; 
+        overflow: auto;
+    }
 
+    .edit-block-content > div {
+        padding: 0.6em;
+    }
+
+    .w3-modal textarea {
+        min-height: 12vh;
+        resize: none;
+    }
+
+    .modal-btns {
+        margin-top: 0;
+    }
+
+    .w3-modal header h4 {
+        top: 2px;
+        position: relative;
+    }
 
 .pagination {
   display: inline-block;

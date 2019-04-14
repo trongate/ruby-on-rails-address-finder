@@ -1,4 +1,5 @@
 <h1><?= $headline ?></h1>
+<?= validation_errors() ?>
 <div class="w3-card-4">
     <div class="w3-container primary">
         <h4><i class="fa fa-calendar"></i> Booking Details</h4>
@@ -27,6 +28,11 @@
             echo anchor($cancel_url, 'CANCEL', $attributes);
             ?>
         </p>
+        <?php 
+        echo form_hidden('date_of_birth', time());
+        echo form_hidden('next_appointment', time());
+        echo form_hidden('active', 1);
+        ?>
     </form>
 </div>
 
