@@ -184,9 +184,9 @@ class Donors extends Trongate {
     function _get_page_headline($update_id) {
         //figure out what the page headline should be (on the donors/create page)
         if (!is_numeric($update_id)) {
-            $headline = 'Create Donor';
+            $headline = 'Create New Donor';
         } else {
-            $headline = 'Update Donor';
+            $headline = 'Update Donor Details';
         }
 
         return $headline;

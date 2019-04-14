@@ -10,9 +10,30 @@
 
             <div class="w3-container">
             <p>
-                <a href="<?= BASE_URL ?>donors/manage"><button class="w3-button w3-white w3-border">VIEW ALL DONORS</button></a> 
-                <a href="<?= BASE_URL ?>donors/create/<?= $update_id ?>"><button class="w3-button w3-white w3-border">UPDATE DETAILS</button></a>
-                <a href="<?= BASE_URL ?>donors/create/<?= $update_id ?>"><button class="w3-button w3-red w3-hover-black w3-border w3-right">DELETE</button></a> 
+                <a href="<?= BASE_URL ?>donors/manage"><button class="w3-button w3-white w3-border"><i class="fa fa-list-alt"></i> VIEW ALL DONORS</button></a> 
+                <a href="<?= BASE_URL ?>donors/create/<?= $update_id ?>"><button class="w3-button w3-white w3-border"><i class="fa fa-pencil"></i> UPDATE DETAILS</button></a>
+                <button onclick="document.getElementById('delete-record-modal').style.display='block'" class="w3-button w3-red w3-hover-black w3-border w3-right"><i class="fa fa-trash-o"></i> DELETE</button>
+
+                <div id="delete-record-modal" class="w3-modal w3-center" style="padding-top: 7em;">
+                    <div class="w3-modal-content w3-animate-right w3-card-4" style="width: 30%;">
+                        <header class="w3-container w3-red w3-text-white">
+                            <h4><i class="fa fa-trash-o"></i> DELETE RECORD</h4>
+                        </header>
+                        <div class="w3-container">
+                    
+                            <h5>Are you sure?</h5>
+                            <p>You are about to delete a donor record.  This cannot be undone. <br>
+                                        Do you really want to do this?</p>
+                            <p class="w3-rigxht modal-btns">
+                                <button onclick="document.getElementById('delete-record-modal').style.display='none'" type="button" name="submit" value="Submit" class="w3-button w3-small 3-white w3-border">CANCEL</button> 
+
+                                <button type="submit" name="submit" value="Submit" class="w3-button w3-small w3-red w3-hover-black">YES - DELETE IT NOW!</button> 
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+
             </p>        
             </div>
         </div>
@@ -46,19 +67,19 @@
             </div>
             <div class="w3-container w3-center edit-block-content">
 
-                <p><button onclick="document.getElementById('id01').style.display='block'" class="w3-button w3-white w3-border">CREATE NEW COMMENT</button></p>
+                <p><button onclick="document.getElementById('create-comment-modal').style.display='block'" class="w3-button w3-white w3-border"><i class="fa fa-commenting-o"></i> CREATE NEW COMMENT</button></p>
 
-                <div id="id01" class="w3-modal" style="padding-top: 7em;">
-                    <div class="w3-modal-content w3-animate-bottom w3-card-4" style="width: 30%;">
+                <div id="create-comment-modal" class="w3-modal" style="padding-top: 7em;">
+                    <div class="w3-modal-content w3-animate-top w3-card-4" style="width: 30%;">
                         <header class="w3-container primary w3-text-white">
-                            <h4>CREATE NEW COMMENT</h4>
+                            <h4><i class="fa fa-commenting-o"></i> CREATE NEW COMMENT</h4>
                         </header>
                         <div class="w3-container">
                             <p>
-                                <textarea name="introduction" class="w3-input w3-border" placeholder="Enter introduction here..." ><?= $introduction ?></textarea>
+                                <textarea name="introduction" class="w3-input w3-border w3-sand" placeholder="Enter comment here..." ></textarea>
                             </p>
                             <p class="w3-right modal-btns">
-                                <button onclick="document.getElementById('id01').style.display='none'" type="button" name="submit" value="Submit" class="w3-button w3-small 3-white w3-border">CANCEL</button> 
+                                <button onclick="document.getElementById('create-comment-modal').style.display='none'" type="button" name="submit" value="Submit" class="w3-button w3-small 3-white w3-border">CANCEL</button> 
 
                                 <button type="submit" name="submit" value="Submit" class="w3-button w3-small primary">SUBMIT</button> 
                             </p>
@@ -66,15 +87,15 @@
                     </div>
                 </div>
 <script type="text/javascript">
-// Get the modal
-var modal = document.getElementById('id01');
+    var modals = document.getElementsByClassName("w3-modal");
 
-// When the user clicks anywhere outside of the modal, close it
-window.onclick = function(event) {
-  if (event.target == modal) {
-    modal.style.display = "none";
-  }
-}
+    window.onclick = function(event) {
+      for (var i = 0; i < modals.length; i++) {
+          if (event.target == modals[i]) {
+            modals[i].style.display = "none";
+          }
+      }
+    }
 </script>
 
 
