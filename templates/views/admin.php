@@ -166,6 +166,9 @@
   border-bottom-right-radius: 5px;
 }
 
+.w3-button {
+    text-transform: uppercase;
+}
 
 
 </style>

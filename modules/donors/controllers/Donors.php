@@ -168,15 +168,18 @@ class Donors extends Trongate {
             $data = $this->_fetch_data_from_post();
         }
 
+        $data['headline'] = $this->_get_page_headline($update_id, 'donor');
+
         if ($update_id>0) {
             $data['cancel_url'] = BASE_URL.'donors/edit/'.$update_id;
+            $data['btn_text'] = 'UPDATE DONOR DETAILS';
         } else {
             $data['cancel_url'] = BASE_URL.'donors/manage';
+            $data['btn_text'] = 'CREATE DONOR RECORD';
         }
 
         $data['form_location'] = BASE_URL.'donors/submit/'.$update_id;
         $data['update_id'] = $update_id;
-        $data['headline'] = $this->_get_page_headline($update_id, 'donor');
         $data['view_file'] = 'create';
         $this->template('admin', $data);
     }
@@ -184,26 +187,13 @@ class Donors extends Trongate {
     function _get_page_headline($update_id) {
         //figure out what the page headline should be (on the donors/create page)
         if (!is_numeric($update_id)) {
-            $headline = 'Create New Donor';
+            $headline = 'Create New Donor Record';
         } else {
             $headline = 'Update Donor Details';
         }
 
         return $headline;
     }
-
-/*
-    function _get_page_headline($update_id) {
-        //figure out what the page headline should be (on the donors/create page)
-        if (!is_numeric($update_id)) {
-            $headline = 'Create Donor';
-        } else {
-            $headline = 'Update Donor';
-        }
-
-        return $headline;
-    }
-*/
 
     function edit() {
         $this->module('security');
@@ -223,37 +213,6 @@ class Donors extends Trongate {
         $this->template('admin', $data);
     }
 
-
-
-
-    function viewX() {
-        $this->load->module('custom_pagination');
-        $this->load->module('flash_helper');
-        $this->load->module('site_security');
-        $this->load->module('tokens');
-        $this->site_security->_make_sure_is_admin();
-
-        $token = $this->tokens->_generate_and_fetch();
-        $update_id = $this->uri->segment(3);
-        $this_module_root = $this->get_this_module_root();
-
-        if ((!is_numeric($update_id)) && ($update_id != '')) {
-            redirect('donors/manage');
-        }
-
-        $data = $this->_get_data_from_db($update_id);
-        $data['form_location'] = $this_module_root.'submit/'.$update_id;
-        $data['token'] = $token;
-        $data['ng_app'] = 'app_donors';
-        $data['update_id'] = $update_id;
-        $data['this_module_root'] = $this_module_root;
-        $data['flash'] = $this->flash_helper->_get_flashdata();
-
-        $data['headline'] = 'Donor Information';
-        $data['view_file'] = 'view';
-        $this->load->module('templates');
-        $this->templates->admin($data);
-    }
 /*
     function search_results() {
         $this->load->module('custom_pagination');
@@ -340,99 +299,7 @@ class Donors extends Trongate {
         }
     }
 
-    function get($order_by) {
-        $this->load->model('mdl_donors');
-        $query = $this->mdl_donors->get($order_by);
-        return $query;
-    }
-
-    function get_with_limit($limit, $offset, $order_by) {
-        if ((!is_numeric($limit)) || (!is_numeric($offset))) {
-            die('Non-numeric variable!');
-        }
-
-        $this->load->model('mdl_donors');
-        $query = $this->mdl_donors->get_with_limit($limit, $offset, $order_by);
-        return $query;
-    }
-
-    function get_where($id) {
-        if (!is_numeric($id)) {
-            die('Non-numeric variable!');
-        }
-
-        $this->load->model('mdl_donors');
-        $query = $this->mdl_donors->get_where($id);
-        return $query;
-    }
-
-    function get_where_custom($col, $value) {
-        $this->load->model('mdl_donors');
-        $query = $this->mdl_donors->get_where_custom($col, $value);
-        return $query;
-    }
-
-    function _insert($data) {
-        $this->load->model('mdl_donors');
-        $this->mdl_donors->_insert($data);
-    }
-
-    function _update($id, $data) {
-        if (!is_numeric($id)) {
-            die('Non-numeric variable!');
-        }
-
-        $this->load->model('mdl_donors');
-        $this->mdl_donors->_update($id, $data);
-    }
-
-    function _delete($id) {
-        if (!is_numeric($id)) {
-            die('Non-numeric variable!');
-        }
-
-        $this->load->model('mdl_donors');
-        $this->mdl_donors->_delete($id);
-    }
-
-    function count_where($column, $value) {
-        $this->load->model('mdl_donors');
-        $count = $this->mdl_donors->count_where($column, $value);
-        return $count;
-    }
-
-    function get_max() {
-        $this->load->model('mdl_donors');
-        $max_id = $this->mdl_donors->get_max();
-        return $max_id;
-    }
-
-    function _custom_query($mysql_query) {
-        $this->load->model('mdl_donors');
-        $query = $this->mdl_donors->_custom_query($mysql_query);
-        return $query;
-    }
-
-    function get_target_pagination_base_url() {
-        $first_bit = $this->uri->segment(1);
-        $second_bit = $this->uri->segment(2);
-        $third_bit = $this->uri->segment(3);
-        $target_base_url = base_url().$first_bit."/".$second_bit;
-        return $target_base_url;
-    }
-
-    function _generate_query($use_limit) {
-
-        //NOTE: use_limit can be TRUE or FALSE
-        $mysql_query = "SELECT * from donors order by first_name";
-        if ($use_limit == TRUE) {
-            $limit = $this->get_limit();
-            $offset = $this->get_offset();
-            $mysql_query.= " limit ".$offset.", ".$limit;
-        }
-
-        return $mysql_query;
-    }
+    
 
     function _generate_search_query($code, $use_limit) {
 
@@ -457,7 +324,6 @@ class Donors extends Trongate {
         return $mysql_query;
     }
 */
-
     function _get_limit() {
         if (isset($_SESSION['limit_pref'])) {
             $limit = $_SESSION['limit_pref'];
@@ -477,14 +343,5 @@ class Donors extends Trongate {
 
         return $offset;
     }
-/*
-    function get_this_module_root() {
-        $this_module = $this->uri->segment(1);
-        $this_module_root = base_url().$this_module.'/';
-        return $this_module_root;
-    }
-*/
-
-
 
 }

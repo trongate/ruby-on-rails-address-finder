@@ -1,7 +1,7 @@
 <?php $cancel_url = ''; ?>
 <div class="w3-row">
     <div class="w3-container">   
-        <h1><?= $headline ?></h1>
+        <h1><?= $headline ?> <span style="margin-top: 1em;" class="w3-large w3-rigxht">(ID: <?= $update_id ?>)</span></h1>
         <?= flashdata() ?>
         <div class="w3-card-4">
             <div class="w3-container primary">
@@ -81,7 +81,7 @@
                             <p class="w3-right modal-btns">
                                 <button onclick="document.getElementById('create-comment-modal').style.display='none'" type="button" name="submit" value="Submit" class="w3-button w3-small 3-white w3-border">CANCEL</button> 
 
-                                <button type="submit" name="submit" value="Submit" class="w3-button w3-small primary">SUBMIT</button> 
+                                <button type="submit" name="submit" value="Submit" class="w3-button w3-small primary">SUBMIT COMMENT</button> 
                             </p>
                         </div>
                     </div>
