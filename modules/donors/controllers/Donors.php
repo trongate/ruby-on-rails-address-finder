@@ -1,39 +1,11 @@
 <?php
 class Donors extends Trongate {
-/*
+
+
     function test() {
-        echo 'hello';
+        $update_id = $this->model->get_max('donors');
+        echo $update_id; die();
     }
-
-    function _get_data_from_post() {
-        $data['first_name'] = $this->input->post('first_name');
-        $data['email'] = $this->input->post('email');
-        $data['introduction'] = $this->input->post('introduction');
-        $data['price'] = $this->input->post('price');
-        $data['date_of_birth'] = $this->input->post('date_of_birth');
-        $data['next_appointment'] = $this->input->post('next_appointment');
-        $data['active'] = $this->input->post('active');
-        return $data;
-    }
-
-    function _get_data_from_db($update_id) {
-        $query = $this->get_where($update_id);
-        foreach ($query->result() as $row) {
-            $data['first_name'] = $row->first_name;
-            $data['email'] = $row->email;
-            $data['introduction'] = $row->introduction;
-            $data['price'] = $row->price;
-            $data['date_of_birth'] = $row->date_of_birth;
-            $data['next_appointment'] = $row->next_appointment;
-            $data['active'] = $row->active;
-        }
-
-        $this->load->module('timedate');
-        $data['date_of_birth'] = $this->timedate->get_nice_date($data['date_of_birth'], 'datepicker');
-        $data['next_appointment'] = $this->timedate->get_nice_date($data['next_appointment'], 'dateandtimepicker');
-        return $data;
-    }
-*/
 
     function submit() {
         $this->module('security');
@@ -206,6 +178,18 @@ class Donors extends Trongate {
         }
 
         $data = $this->_fetch_data_from_db($update_id);
+
+        if ($data == false) {
+            redirect('donors/manage');
+        } else {
+            $this->module('trongate_tokens');
+            $tables = array('comments' => '*'); //token lets user write to 'comments' tbl
+            $token_information = array('tables' => $tables);
+            $token_data['information'] = json_encode($token_information);
+            $token_data['expiry_date'] = time()+3600; //token expires in one hour
+            $data['token'] = $this->trongate_tokens->_generate_token($token_data);
+        }
+
         $data['form_location'] = BASE_URL.'donors/submit/'.$update_id;
         $data['update_id'] = $update_id;
         $data['headline'] = 'Donor Information';

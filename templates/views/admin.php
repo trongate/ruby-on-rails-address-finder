@@ -109,12 +109,8 @@
         border: 1px #ddd solid !important;
     }
 
-    .edit-block {
-        height: 50vh;
-    }
-
     .edit-block-content {
-        height: 43vh; 
+        height: 50vh; 
         overflow: auto;
     }
 

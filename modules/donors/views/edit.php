@@ -32,8 +32,6 @@
                         </div>
                     </div>
                 </div>
-
-
             </p>        
             </div>
         </div>
@@ -48,13 +46,10 @@
             </div>
             <div class="edit-block-content">
             
-              <div class="w3-border-bottom"><b>First Name:</b> <span class="w3-right w3-text-grey">David Connelly</span></div>
-              <div class="w3-border-bottom"><b>Eve:</b> <span class="w3-right w3-text-grey">David Connelly</span></div>
-              <div class="w3-border-bottom"><b>Email:</b> <span class="w3-right w3-text-grey">David Connelly</span></div>
-              <div class="w3-border-bottom"><b>First Name:</b> <span class="w3-right w3-text-grey">David Connelly</span></div>
-              <div class="w3-border-bottom"><b>Eve:</b> <span class="w3-right w3-text-grey">David Connelly</span></div>
-              <div class="w3-border-bottom"><b>Email:</b> <span class="w3-right w3-text-grey">David Connelly</span></div>
-              <div class="w3-border-bottom"><b>Description:</b> <br><span class="w3-text-grey">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nam ea expedita numquam voluptatem alias eveniet, amet, repudiandae labore distinctio aliquam dicta at blanditiis facilis? Ad omnis, aliquam explicabo aspernatur illo.</span> </div>
+              <div class="w3-border-bottom"><b>First Name:</b> <span class="w3-right w3-text-grey"><?= $first_name ?></span></div>
+              <div class="w3-border-bottom"><b>Price:</b> <span class="w3-right w3-text-grey"><?= $price ?></span></div>
+              <div class="w3-border-bottom"><b>Email:</b> <span class="w3-right w3-text-grey"><?= $email ?></span></div>
+              <div class="w3-border-bottom"><b>Introduction:</b> <br><span class="w3-text-grey"><?= $introduction ?></span> </div>
 
             </div>
         </div>
@@ -76,61 +71,86 @@
                         </header>
                         <div class="w3-container">
                             <p>
-                                <textarea name="introduction" class="w3-input w3-border w3-sand" placeholder="Enter comment here..." ></textarea>
+                                <textarea name="comment" id="new-comment" class="w3-input w3-border w3-sand" placeholder="Enter comment here..." ></textarea>
                             </p>
                             <p class="w3-right modal-btns">
                                 <button onclick="document.getElementById('create-comment-modal').style.display='none'" type="button" name="submit" value="Submit" class="w3-button w3-small 3-white w3-border">CANCEL</button> 
 
-                                <button type="submit" name="submit" value="Submit" class="w3-button w3-small primary">ADD COMMENT</button> 
+                                <button onclick="submitNewComment()" type="button" name="submit" value="Submit" class="w3-button w3-small primary">ADD COMMENT</button> 
                             </p>
                         </div>
                     </div>
                 </div>
-<script type="text/javascript">
-    var modals = document.getElementsByClassName("w3-modal");
 
-    window.onclick = function(event) {
-      for (var i = 0; i < modals.length; i++) {
-          if (event.target == modals[i]) {
-            modals[i].style.display = "none";
-          }
-      }
-    }
-</script>
+                <script type="text/javascript">
+                    var modals = document.getElementsByClassName("w3-modal");
 
+                    window.onclick = function(event) {
+                      for (var i = 0; i < modals.length; i++) {
+                          if (event.target == modals[i]) {
+                            modals[i].style.display = "none";
+                          }
+                      }
+                    }
+                </script>
 
-
-                <p>No comments have been posted so far.</p>
-
-    <table class="w3-table w3-striped">
-        <tr>
-            <td>
-                <p class="w3-small">Thursday 20th November at 8:30pm</p>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Qui esse aut eveniet, adipisci, voluptatibus laboriosam deserunt. Suscipit porro, maxime? Ea fugit necessitatibus nihil magnam incidunt deleniti aut pariatur alias sint!</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <p class="w3-small">Thursday 20th November at 8:30pm</p>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Qui esse aut eveniet, adipisci, voluptatibus laboriosam deserunt. Suscipit porro, maxime? Ea fugit necessitatibus nihil magnam incidunt deleniti aut pariatur alias sint!</p>
-            </td>
-        </tr>
-        <tr>
-            <td>asdf</td>
-        </tr>
-        <tr>
-            <td>asdf</td>
-        </tr>
-        <tr>
-            <td>asdf</td>
-        </tr>
-        <tr>
-            <td>asdf</td>
-        </tr>
-    </table>
-
+                <div class="comments">
+                    <?= Modules::run('comments/_display_comments') ?>
+                </div>
 
             </div>
         </div>
     </div>
 </div>
+
+<script>
+function submitNewComment() {
+    document.getElementById('create-comment-modal').style.display='none';
+    var newComment = document.getElementById('new-comment').value;
+
+    if (newComment != '') {
+        
+        const params = {
+            token: '<?= $token ?>',
+            comment: newComment
+        }
+
+        document.getElementById('new-comment').value = '';
+
+        const http = new XMLHttpRequest()
+        http.open('POST', '<?= BASE_URL ?>comments-api/submit')
+        http.setRequestHeader('Content-type', 'application/json')
+        http.send(JSON.stringify(params)) // Make sure to stringify
+        http.onload = function() {
+            // Update the comments table
+            refreshComments();
+        }
+    }
+}
+
+function refreshComments() {
+    var commentsTblInnerHTML = '';
+
+    const params = {
+        token: '<?= $token ?>'
+    }
+
+    const http = new XMLHttpRequest()
+    http.open('POST', '<?= BASE_URL ?>comments-api/get')
+    http.setRequestHeader('Content-type', 'application/json')
+    http.send(JSON.stringify(params)) // Make sure to stringify
+    http.onload = function() {
+        // Display the comments
+        var comments = JSON.parse(http.responseText);
+
+        if (comments.length > 0) {
+            for (var i = 0; i < comments.length; i++) {
+                commentsTblInnerHTML+= '<tr><td><p class="w3-small">' + comments[i]['date_created'] + '</p><p>' + comments[i]['comment'] + '</p></td></tr>';
+            }
+        }
+
+        document.getElementById('comments-tbl').innerHTML = commentsTblInnerHTML;
+        document.getElementById('comments-info').style.display = 'none';
+    }
+}
+</script>
