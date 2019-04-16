@@ -1,4 +1,4 @@
-
+* get dates working (all variations)
 
 * only display btm pagination if num on page >=10  ?
 
