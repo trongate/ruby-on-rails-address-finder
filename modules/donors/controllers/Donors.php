@@ -3,7 +3,12 @@ class Donors extends Trongate {
 
 
     function test() {
-        $update_id = $this->model->get_max('donors');
+        $comments = false;
+        foreach ($comments as $key => $value) {
+            echo "Key of $key is $value<br>";
+        }
+
+        echo "finished"; die();
         echo $update_id; die();
     }
 
@@ -182,12 +187,13 @@ class Donors extends Trongate {
         if ($data == false) {
             redirect('donors/manage');
         } else {
+            $this->module('comments');
             $this->module('trongate_tokens');
             $tables = array('comments' => '*'); //token lets user write to 'comments' tbl
             $token_information = array('tables' => $tables);
             $token_data['user_id'] = $this->security->_get_user_id();
             $token_data['information'] = json_encode($token_information);
-            $token_data['expiry_date'] = time()+3600; //token expires in one hour
+            $token_data['expiry_date'] = $this->comments->_calc_expiry_date();
             $data['token'] = $this->trongate_tokens->_generate_token($token_data);
             $data['form_location'] = BASE_URL.'donors/submit/'.$update_id;
             $data['update_id'] = $update_id;
