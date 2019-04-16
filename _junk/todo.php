@@ -1,10 +1,4 @@
-* get structure of comments tbl perfect.
 
-* delete from trongate_tokens, once has been used.
-
-* regenerate token upon comment being created.
-
-* make displaying and posted of comments tied to a particular module and record. (db_table? update_id?)
 
 * only display btm pagination if num on page >=10  ?
 
@@ -15,6 +9,8 @@
 * Make sure it looks good on mobile devices and other browsers.
 
 * Beautify the code.
+
+* get delete item working.
 
 * INTEGRATE WITH CODE GENERATOR ~ TOTALLY GET IT WORKING
 
