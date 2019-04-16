@@ -95,62 +95,10 @@
                 </script>
 
                 <div class="comments">
-                    <?= Modules::run('comments/_display_comments') ?>
+                    <?= Modules::run('comments/_display_comments', $token) ?>
                 </div>
 
             </div>
         </div>
     </div>
 </div>
-
-<script>
-function submitNewComment() {
-    document.getElementById('create-comment-modal').style.display='none';
-    var newComment = document.getElementById('new-comment').value;
-
-    if (newComment != '') {
-        
-        const params = {
-            token: '<?= $token ?>',
-            comment: newComment
-        }
-
-        document.getElementById('new-comment').value = '';
-
-        const http = new XMLHttpRequest()
-        http.open('POST', '<?= BASE_URL ?>comments-api/submit')
-        http.setRequestHeader('Content-type', 'application/json')
-        http.send(JSON.stringify(params)) // Make sure to stringify
-        http.onload = function() {
-            // Update the comments table
-            refreshComments();
-        }
-    }
-}
-
-function refreshComments() {
-    var commentsTblInnerHTML = '';
-
-    const params = {
-        token: '<?= $token ?>'
-    }
-
-    const http = new XMLHttpRequest()
-    http.open('POST', '<?= BASE_URL ?>comments-api/get')
-    http.setRequestHeader('Content-type', 'application/json')
-    http.send(JSON.stringify(params)) // Make sure to stringify
-    http.onload = function() {
-        // Display the comments
-        var comments = JSON.parse(http.responseText);
-
-        if (comments.length > 0) {
-            for (var i = 0; i < comments.length; i++) {
-                commentsTblInnerHTML+= '<tr><td><p class="w3-small">' + comments[i]['date_created'] + '</p><p>' + comments[i]['comment'] + '</p></td></tr>';
-            }
-        }
-
-        document.getElementById('comments-tbl').innerHTML = commentsTblInnerHTML;
-        document.getElementById('comments-info').style.display = 'none';
-    }
-}
-</script>

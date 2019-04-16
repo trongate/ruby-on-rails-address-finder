@@ -16,6 +16,7 @@ class Trongate_tokens extends Trongate {
 
         /*
          * $data array may contain:
+         *                         user_id ~ int(11) : optional (will default to 0 if not submitted)
          *                         expiry_date ~ int(10) : optional
          *                         information ~ text : optional
          *                        

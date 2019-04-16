@@ -185,16 +185,16 @@ class Donors extends Trongate {
             $this->module('trongate_tokens');
             $tables = array('comments' => '*'); //token lets user write to 'comments' tbl
             $token_information = array('tables' => $tables);
+            $token_data['user_id'] = $this->security->_get_user_id();
             $token_data['information'] = json_encode($token_information);
             $token_data['expiry_date'] = time()+3600; //token expires in one hour
             $data['token'] = $this->trongate_tokens->_generate_token($token_data);
+            $data['form_location'] = BASE_URL.'donors/submit/'.$update_id;
+            $data['update_id'] = $update_id;
+            $data['headline'] = 'Donor Information';
+            $data['view_file'] = 'edit';
+            $this->template('admin', $data);
         }
-
-        $data['form_location'] = BASE_URL.'donors/submit/'.$update_id;
-        $data['update_id'] = $update_id;
-        $data['headline'] = 'Donor Information';
-        $data['view_file'] = 'edit';
-        $this->template('admin', $data);
     }
 
 /*
