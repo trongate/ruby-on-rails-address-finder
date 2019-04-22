@@ -1,12 +1,12 @@
 MONDAY GOALS
 
 
-* Change structure so that API is a part of the engine.
+* Change structure so that API is a part of the engine.                                     DONE
 
 * Change location of settings file.
-    -> every module gets an 'assets' folder.  The settings file should be called api.json.
+    -> every module gets an 'assets' folder.  The settings file should be called api.json.  DONE
 
-* Add feature to top right hand side for adding token to header.
+* Add feature to top right hand side for adding token to header.                            <---
 
 * Get 'bypass authorization' working.
 
