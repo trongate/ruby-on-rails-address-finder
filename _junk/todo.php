@@ -1,3 +1,25 @@
+* make 'token' a required field for the GET request.
+
+* leave params empty
+
+* get it working.
+
+* update the segments
+
+* get the result and display it on the server
+
+* allow user to pass variables across
+
+* allow user to bypass authentication
+
+
+ONE WORKS !!!!  THIS IS GOOD !!!!
+
+
+---------------------------------------------------------------
+
+
+
 * get dates working (all variations)
 
 * only display btm pagination if num on page >=10  ?

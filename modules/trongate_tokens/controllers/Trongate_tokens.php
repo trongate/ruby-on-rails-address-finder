@@ -12,25 +12,61 @@ class Trongate_tokens extends Trongate {
 
     private $default_token_lifespan = 86400; //one day
 
+    function _attempt_generate_bypass_token($token) {
+
+        $sql = 'SELECT trongate_user_levels.level_title, 
+                    trongate_users.id
+                FROM trongate_tokens INNER JOIN trongate_users ON trongate_tokens.user_id = trongate_users.id
+                     INNER JOIN trongate_user_levels ON trongate_users.user_level_id = trongate_user_levels.id
+                WHERE trongate_tokens.token = :token';
+
+        $data['token'] = $token;
+
+        $result = $this->model->query_bind($sql, $data, 'object');
+
+        if (isset($result[0])) {
+
+            $user = $result[0];
+            $user_id = $user->id;
+            $user_level = $user->level_title;
+
+            if ($user_level == 'admin') {
+                //create a new special token
+                $token_data['user_id'] = $user_id;
+                $token_data['code'] = '***';
+                $this->module('trongate_tokens');
+                $new_token = $this->trongate_tokens->_generate_token($token_data);
+                echo $new_token;
+            }
+
+        }
+
+
+    }
+
+    function clean() {
+        $sql = 'delete from trongate_tokens';
+        $this->model->query($sql);
+
+        $sql = 'delete from query_mem';
+        $this->model->query($sql);
+        echo 'cleaned';
+    }
+
     function _generate_token($data=NULL) {
 
         /*
          * $data array may contain:
-         *                         user_id ~ int(11) : optional (will default to 0 if not submitted)
-         *                         expiry_date ~ int(10) : optional
-         *                         information ~ text : optional
-         *                        
+         *                         user_id ~ int(11) : required
+         *                         expiry_date ~ int(10) : optional 
+         *                         code ~ varchar(4) : optional                                     
          *
          * 'expiry_date' (if submitted) should be a unix timestamp, set to some future date.
          * 
-         * 'information' can contain anything you like pertaining to how particular tokens may be used.
-         * For example, 'information' could contain a comma separated list of tables for which write access * is permitted.  Another possible example would be to store a JSON string containing user_ids 
-         * and other information that could potentially be useful.
-         *
          * How you choose to use this class is entirely up to you.
          */
 
-        $this->_delete_old_tokens();
+        $this->_delete_old_tokens($data['user_id']);
 
         //generate 64 digit random string
         $random_string = $this->_generate_rand_str();
@@ -42,13 +78,19 @@ class Trongate_tokens extends Trongate {
         
         $data['token'] = $random_string;
         $this->model->insert($data, 'trongate_tokens');
-        return $data['token'];
+
+        unset($data);
+        $data['query'] = "inserted ".$random_string;
+
+        $data['date_created'] = time();
+        $this->model->insert($data, 'query_mem');
+
+        return $random_string;
     }
 
     function _generate_rand_str() {
-        $token_length = 64;
-
-        $characters = '!@%&,*()[]{}.0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $token_length = 32;
+        $characters = '-_0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $random_string = '';
         for ($i = 0; $i < $token_length; $i++) {
             $random_string .= $characters[mt_rand(0, strlen($characters) - 1)];
@@ -83,10 +125,17 @@ class Trongate_tokens extends Trongate {
         }
     }
 
-    function _delete_old_tokens() {
-        $nowtime = time();
-        $sql = "delete from trongate_tokens where expiry_date<$nowtime";
-        $this->model->query($sql);
+    function _delete_old_tokens($user_id=NULL) {
+
+        $sql = 'delete from trongate_tokens where expiry_date < :nowtime';
+        $data['nowtime'] = time();
+
+        if (isset($user_id)) {
+            $sql.= ' or user_id = :user_id';
+            $data['user_id'] = $user_id;
+        }
+        
+        $this->model->query_bind($sql, $data);
     }
 
     function _delete_one_token($token) {

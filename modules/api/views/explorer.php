@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta charset="utf-8">
+  <title>Your page title here :)</title>
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- FONT
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+  <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="api_module/css/normalize.css">
+  <link rel="stylesheet" href="api_module/css/skeleton.css">
+  <link rel="stylesheet" href="api_module/css/api.css">
+
+  <!-- Favicon
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+
+
+</head>
+<body>
+
+
+
+  <!-- Primary Page Layout
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+
+<div class="top-row">
+    <div class="container">
+        <div class="row">
+            <div class="column logo">
+                Trongate API - Explorer
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.button.button-primary, 
+button.button-primary, 
+input[type="submit"].button-primary, 
+input[type="reset"].button-primary, 
+input[type="button"].button-primary {
+    padding: 0em 1em;
+    min-width: 94px;
+    font-size: 0.9em;
+    margin: 0;
+    padding: 0;
+}
+
+.purple {
+    background-color: #BB9FE0 !important;
+    border: 1px #BB9FE0 solid !important;
+}
+
+.purple:hover {
+    background-color: #a791c4 !important;
+    border: 1px #a791c4 solid !important;
+}
+
+.deep-purple {
+    background-color: #470B59 !important;
+    border: 1px #470B59 solid !important;
+}
+
+.deep-purple:hover {
+    background-color: #3b0a49 !important;
+    border: 1px #3b0a49 solid !important;
+}
+
+.green {
+    background-color: #0285A1 !important;
+    border: 1px #0285A1 solid !important;
+}
+
+.green:hover {
+    background-color: #02738c !important;
+    border: 1px #02738c solid !important;
+}
+
+td {
+    padding: 8px;
+    vertical-align: center !important;
+}
+
+.star {
+    font-size: 1.4em;
+}
+
+.generate-btn {
+    min-width: 180px !important;
+    margin-left: 1em !important;
+}
+
+.white-btn {
+    background-color: #fff !important;
+}
+
+.alt-font {
+    font-family: "Lucida Console", Monaco, monospace;
+}
+
+.w3-display-topright {
+    font-size: 2em;
+    padding: 0 0.6em;
+}
+
+</style>
+
+<div>
+    <div class="container" style="margin-top: 5em;">
+        <div class="row">
+            <div>
+                <h4>donors</h4>
+                <table class="u-full-width">
+                  <thead>
+                    <tr>
+                      <th class="go-left">Request Type</th>
+                      <th class="go-left">Endpoint Name</th>
+                      <th class="go-left">URL segments</th>
+                      <th class="go-right">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <?php
+                    foreach($endpoints as $endpoint_name => $endpoint) {
+
+                        $endpoint_json = json_encode($endpoint);
+
+                        if ($endpoint['request_type'] == 'GET') {
+                            $btn_theme = 'green';
+                        } else {
+                            $btn_theme = 'purple';
+                        }
+
+                        $endpoint_data = json_encode($endpoint);
+                        $ditch = '"';
+                        $replace = '&quot;';
+                        $endpoint_data = str_replace($ditch, $replace, $endpoint_data);
+
+                        $ditch = '}';
+                        $replace = '<span class="alt-font">}</span>';
+                        $endpoint['url_segments'] = str_replace($ditch, $replace, $endpoint['url_segments']);
+                        $ditch = '{';
+                        $replace = '<span class="alt-font">{</span>';
+                        $endpoint['url_segments'] = str_replace($ditch, $replace, $endpoint['url_segments']);
+                    ?>
+                    <tr>
+                      <td><input onclick="openModal('<?= $endpoint_name ?>', '<?= $endpoint_data ?>')" type="submit" value="<?= $endpoint['request_type'] ?>" class="button-primary <?= $btn_theme ?>"></td>
+                      <td><?= $endpoint_name ?></td>
+                      <td><?= $endpoint['url_segments'] ?></td>
+                      <td class="go-right"><?= $endpoint['description'] ?></td>
+                    </tr>
+                    <?php 
+                    } 
+                    ?>
+                  </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+<div id="id01" class="w3-modal">
+    <div class="w3-modal-content w3-animate-zoom w3-card-4">
+        <header id="modal-header" class="w3-container theme-b white-text">
+            <span onclick="document.getElementById('id01').style.display='none'" class="w3-button w3-display-topright">&times;</span>
+            <h2 id="endpointName"></h2>
+        </header>
+        <div id="modal-content" class="w3-container modal-content-alt">
+            <h4 style="margin-top: 0.4em;">Test Your API Endpoint</h4>
+
+            <form>
+                <div class="row">
+                    <div class="six columns">
+                        <div class="twelve columns">
+                            <label for="exampleMessage">Parameters</label>
+                            <textarea onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'   '+v.substring(e);this.selectionStart=this.selectionEnd=s+3;return false;}" class="u-full-width" placeholder="Enter parameters in JSON format" id="params"></textarea>
+                            <label class="example-send-yourself-copy">
+                                <input onclick="initBypassAuth()" type="checkbox" id="bypass" value="1">
+                                <span class="label-body">Bypass authorization</span>
+                            </label>
+                            <input onclick="submitRequest()" class="button-primary" type="button" value="Submit">
+                        </div>
+                    </div>
+                    <div class="six columns">
+                        <label for="exampleMessage">Server Response</label>
+                        <textarea disabled class="u-full-width server-response" id="serverResponse"></textarea>
+                        <p class="go-right">
+                            <input onclick="viewSettings()" class="button-default white-btn go-right" style="float-right; position: relative;" type="button" value="View Endpoint Settings">
+                            <input onclick="copyText()" class="button-default white-btn go-right" style="float-right; position: relative;" type="button" value="Copy Response">
+                        </p>
+                    </div>
+                </div>
+            </form>
+
+            <p style="font-size: 0.9em;"><b>URL Segments:</b> <span id="endpointUrl"></span>
+                <br>
+                <b>Required HTTP Request Type: </b> <span id="requestType"></span>
+                <br>
+                <b>Endpoing Settings: </b>
+                <?= $endpoint_settings_location ?>
+            </p>
+
+        </div>
+        <footer id="modal-footer">
+            <p style="text-align: center;">For full documentation and tutorials visit <a href="https://trongate.io/" target="_blank">Trongate.io</a></p>
+        </footer>
+    </div>
+
+</div>
+
+
+
+
+<script>
+
+var url_segments;
+var endpoint;
+
+function submitRequest() {
+    var params = document.getElementById('params').value;
+    addTokenToUrl();
+    var targetUrl = '<?= BASE_URL ?>' + document.getElementById('endpointUrl').innerHTML;
+
+    var params = {
+        code: '****',
+        token
+    }
+
+    const http = new XMLHttpRequest()
+    http.open('POST', targetUrl)
+    http.setRequestHeader('Content-type', 'application/json')
+    http.send(JSON.stringify(params)) // Make sure to stringify
+    http.onload = function() {
+        document.getElementById("serverResponse").disabled = false;
+        document.getElementById('serverResponse').value = http.responseText;
+    }
+
+}
+
+function addTokenToUrl() {
+
+    setTimeout(function(){
+        token = document.getElementById('auth-token').value;
+        url_segments = url_segments.replace('<span class="alt-font">{</span>token<span class="alt-font">}</span>', '');
+
+
+        if (token == '') {
+            document.getElementById('endpointUrl').innerHTML = url_segments + '<span class="alt-font">{</span>token<span class="alt-font">}</span>';
+        } else {
+            document.getElementById('endpointUrl').innerHTML = url_segments + token;
+        }
+
+    }, 100);
+
+}
+
+
+
+
+
+
+
+var endpoint_settings = '';
+
+function openModal(endpointName, endpoint_json) {
+
+    endpoint_data = JSON.parse(endpoint_json);
+    endpoint_settings = endpoint_json;
+    
+    url_segments = endpoint_data.url_segments.replace("{", "<span class=\"alt-font\">{</span>");
+    url_segments = url_segments.replace("}", "<span class=\"alt-font\">}</span>");
+
+
+    var requestType = endpoint_data.request_type;
+    var description = endpoint_data.description;
+
+    if (requestType == 'POST') {
+        document.getElementById('modal-header').className = 'w3-container theme-a white-text';
+        document.getElementById('modal-footer').className = 'w3-container theme-a white-text';
+        document.getElementById('modal-content').className = 'w3-container modal-content';
+    }
+
+    if (requestType == 'GET') {
+        document.getElementById('modal-header').className = 'w3-container theme-b white-text';
+        document.getElementById('modal-footer').className = 'w3-container theme-b white-text';
+        document.getElementById('modal-content').className = 'w3-container modal-content-alt';
+    }
+    
+    document.getElementById('id01').style.display='block';
+    document.getElementById('endpointName').innerHTML = endpointName;
+    document.getElementById('requestType').innerHTML = requestType;
+    document.getElementById('endpointUrl').innerHTML = '/' + url_segments;
+}
+
+function viewSettings() {
+    alert(endpoint_settings);
+}
+
+
+
+function copyText() {
+  /* Get the text field */
+  var copyText = document.getElementById("serverResponse");
+
+  /* Select the text field */
+  copyText.select();
+
+  /* Copy the text inside the text field */
+  document.execCommand("copy");
+
+  /* Alert the copied text */
+  alert("Copied the text: " + copyText.value);
+}
+    </script>
+
+
+
+
+<style>
+
+footer a:link { color: white; }
+footer a:active { color: white; }
+footer a:visited { color: white; }
+footer a:hover { color: white; }
+
+textarea {
+    min-height: 200px;
+    font-family: "Lucida Console", Monaco, monospace;
+}
+
+.server-response {
+    background: #fcfbe3;
+}
+
+.modal-content {
+    background: #f3f2ff;
+}
+
+.modal-content-alt {
+    background: #eaf9fc;
+}
+
+.theme-a p, .theme-b p {
+    padding: 1em 0;
+    margin: 0;
+}
+
+.w3-modal h2 {
+    padding: 0.2em 0em;
+    margin: 0;
+    font-size: 2em;
+}
+
+.theme-a {
+    background-color: #50459b;
+}
+
+.theme-b {
+    background-color: #0285A1;
+}
+
+.white-text {
+    color: #fff;
+}
+</style>
+
+
+
+<script>
+// Get the modal
+var modal = document.getElementById('id01');
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+
+<script>
+var token = '<?= $token ?>';
+
+function initBypassAuth() {
+
+    isChecked = document.getElementById('bypass').checked;
+    
+    if (isChecked == true) {
+
+        const params = {
+            code: '****',
+            token
+        }
+
+        const http = new XMLHttpRequest()
+        http.open('POST', '<?= BASE_URL ?>api/submit_bypass_auth')
+        http.setRequestHeader('Content-type', 'application/json')
+        http.send(JSON.stringify(params)) // Make sure to stringify
+        http.onload = function() {
+            //fetch new 'bypass' token
+            token = http.responseText;
+            document.getElementById("auth-token").value = token;
+            addTokenToUrl();
+        }
+
+    }
+
+}
+</script>
+
+
+
+
+
+
+
+<!-- End Document
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+</body>
+</html>

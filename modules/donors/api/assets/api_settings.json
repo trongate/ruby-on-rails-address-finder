@@ -1,0 +1,119 @@
+{  
+   "Get":{  
+      "url_segments":"api/donors/get/{token}",
+      "request_type":"GET",
+      "type":"banana",
+      "description":"Fetch rows from the table",
+      "required_fields": [
+        {"Token":"token"},
+        {"ID":"id"}
+      ],
+      "authorization":{  
+         "roles":[  
+            "admin"
+         ]
+      }
+   },
+   "Create":{  
+      "url_segments":"api/donors/create",
+      "request_type":"POST",
+      "description":"Insert database record by evaluating posting data",
+      "authorization":{  
+         "roles":[  
+            "admin"
+         ]
+      }
+   },
+   "Upsert":{  
+      "url_segments":"api/donors/upsert",
+      "request_type":"POST",
+      "description":"Attempt update a database record or create new record",
+      "authorization":{  
+         "roles":[  
+            "admin"
+         ]
+      }
+   },
+   "Update":{  
+      "url_segments":"api/donors/update",
+      "request_type":"POST",
+      "description":"Update a database record",
+      "authorization":{  
+         "roles":[  
+            "admin"
+         ]
+      }
+   },
+   "Find One":{  
+      "url_segments":"api/donors/get/{id}/{token}",
+      "request_type":"GET",
+      "type":"banana",
+      "description":"Fetch one row from database table",
+      "authorization":{  
+         "roles":[  
+            "admin"
+         ]
+      }
+   },
+   "Find By Post":{  
+      "url_segments":"api/donors/find",
+      "request_type":"POST",
+      "type":"banana",
+      "description":"Fetch rows from the table",
+      "authorization":{  
+         "roles":[  
+            "admin"
+         ]
+      }
+   },
+   "Destroy":{  
+      "url_segments":"api/donors/destroy",
+      "request_type":"POST",
+      "description":"Delete row or rows",
+      "authorization":{  
+         "roles":[  
+            "admin"
+         ]
+      }
+   },
+   "Destroy One":{  
+      "url_segments":"api/donors/delete/{id}/{token}",
+      "request_type":"GET",
+      "description":"Delete one row from database table",
+      "authorization":{  
+         "roles":[  
+            "admin"
+         ]
+      }
+   },
+   "Exists":{  
+      "url_segments":"api/donors/{id}/exists/{token}",
+      "request_type":"GET",
+      "description":"Check if instance exists",
+      "authorization":{  
+         "roles":[  
+            "admin"
+         ]
+      }
+   },
+   "Exists By Post":{  
+      "url_segments":"api/donors/exists",
+      "request_type":"POST",
+      "description":"Check if row(s) exists",
+      "authorization":{  
+         "roles":[  
+            "admin"
+         ]
+      }
+   },
+   "Custom":{  
+      "url_segments":"api/donors/exists",
+      "request_type":"GET",
+      "description":"Check if row(s) exists",
+      "authorization":{  
+         "roles":[  
+            "admin"
+         ]
+      }
+   }
+}

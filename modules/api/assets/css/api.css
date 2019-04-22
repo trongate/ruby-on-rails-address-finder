@@ -1,0 +1,29 @@
+.top-row {
+    background: #50459b;
+    color: #eee;
+    min-height: 5em;
+    line-height: 5em;
+}
+
+.header {
+    background: #50459b;
+}
+
+.logo {
+    font-size: 2em;
+    font-weight: bold;
+}
+
+.go-left {
+    text-align: left;
+    position: relative;
+}
+
+.go-right {
+    text-align: right;
+    position: relative;
+}
+
+h4 {
+    font-weight: bold;
+}
