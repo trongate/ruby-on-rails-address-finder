@@ -1,17 +1,7 @@
-.top-row {
-    background: #50459b;
-    color: #eee;
-    min-height: 5em;
-    line-height: 5em;
-}
+
 
 .header {
     background: #50459b;
-}
-
-.logo {
-    font-size: 2em;
-    font-weight: bold;
 }
 
 .go-left {

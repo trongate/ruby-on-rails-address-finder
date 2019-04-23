@@ -36,17 +36,80 @@
   <!-- Primary Page Layout
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
 
-<div class="top-row">
+
+
+<div class="top-row w3-row">
     <div class="container">
-        <div class="row">
-            <div class="column logo">
-                Trongate API - Explorer
-            </div>
-        </div>
+        <div class="w3-col s5 w3-center logo">Trongate API - Explorer</div>
+        <div class="w3-col s2 w3-center trhs"><p>Token Not Set!</p></div>
+        <div class="w3-col s3 w3-center trhs"><p>
+            <input class="w3-input w3-border" type="text" placeholder="Enter Authorization Token">
+        </p></div>
+        <div class="w3-col s2 w3-center trhs"><p>
+            <button class="w3-button button-primary default">Set Token</button>
+        </p></div>
     </div>
 </div>
 
+
+
+
+
 <style>
+
+.default:hover {
+    background: #22abd6 !important;
+    color: white !important;
+}
+
+.trhs {
+    top: 0.8em;
+    position: relative;
+}
+
+.logo {
+    font-size: 1.6em;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-weight: bold;
+}
+
+
+.top-row {
+    background: #50459b;
+    color: #eee;
+    min-height: 5em;
+    line-height: 5em;
+}
+
+.top-row .w3-button {
+    width: 96%;
+}
+
+.top-row > .container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+</style>
+
+
+
+
+
+<style>
+
+.w3-quarter {
+    min-height: 6em;
+    background: orange;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
 .button.button-primary, 
 button.button-primary, 
 input[type="submit"].button-primary, 
