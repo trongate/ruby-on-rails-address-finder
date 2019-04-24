@@ -12,7 +12,16 @@ class Trongate_tokens extends Trongate {
 
     private $default_token_lifespan = 86400; //one day
 
-    function _attempt_generate_bypass_token($token) {
+    function _attempt_generate_bypass_token() {
+        $data['token'] = $this->_generate_rand_str();
+        $token_data['user_id'] = 0;
+        $token_data['code'] = '***';
+        $this->module('trongate_tokens');
+        $new_token = $this->trongate_tokens->_generate_token($token_data);
+        echo $new_token;
+    }
+
+    function _attempt_generate_bypass_tokenOLD($token) {
 
         $sql = 'SELECT trongate_user_levels.level_title, 
                     trongate_users.id

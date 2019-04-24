@@ -1,5 +1,5 @@
 <?php
-class Api extends Trongate {
+class Api extends Trongate  DUFF ____ DO NOT USE!!!! {
 
     function get($module_name) {
         $rows = $this->model->get('id', 'donors');

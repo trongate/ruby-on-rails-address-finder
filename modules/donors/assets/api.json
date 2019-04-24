@@ -1,6 +1,6 @@
 {  
    "Get":{  
-      "url_segments":"api/donors/get/{token}",
+      "url_segments":"api/get/donors",
       "request_type":"GET",
       "type":"banana",
       "description":"Fetch rows from the table",
@@ -14,8 +14,18 @@
          ]
       }
    },
+   "Hello You":{  
+      "url_segments":"api/create/donors",
+      "request_type":"GET",
+      "description":"Insert database record by evaluating posting data",
+      "authorization":{  
+         "roles":[  
+            "admin"
+         ]
+      }
+   },
    "Create":{  
-      "url_segments":"api/donors/create",
+      "url_segments":"api/create/donors",
       "request_type":"POST",
       "description":"Insert database record by evaluating posting data",
       "authorization":{  
@@ -25,7 +35,7 @@
       }
    },
    "Upsert":{  
-      "url_segments":"api/donors/upsert",
+      "url_segments":"api/upsert/donors",
       "request_type":"POST",
       "description":"Attempt update a database record or create new record",
       "authorization":{  
@@ -35,7 +45,7 @@
       }
    },
    "Update":{  
-      "url_segments":"api/donors/update",
+      "url_segments":"api/update/donors",
       "request_type":"POST",
       "description":"Update a database record",
       "authorization":{  
@@ -45,7 +55,7 @@
       }
    },
    "Find One":{  
-      "url_segments":"api/donors/get/{id}/{token}",
+      "url_segments":"api/get/donors/{id}",
       "request_type":"GET",
       "type":"banana",
       "description":"Fetch one row from database table",
@@ -56,7 +66,7 @@
       }
    },
    "Find By Post":{  
-      "url_segments":"api/donors/find",
+      "url_segments":"api/find/donors",
       "request_type":"POST",
       "type":"banana",
       "description":"Fetch rows from the table",
@@ -67,7 +77,7 @@
       }
    },
    "Destroy":{  
-      "url_segments":"api/donors/destroy",
+      "url_segments":"api/destroy/donors",
       "request_type":"POST",
       "description":"Delete row or rows",
       "authorization":{  
@@ -77,7 +87,7 @@
       }
    },
    "Destroy One":{  
-      "url_segments":"api/donors/delete/{id}/{token}",
+      "url_segments":"api/delete/donors/{id}",
       "request_type":"GET",
       "description":"Delete one row from database table",
       "authorization":{  
@@ -87,7 +97,7 @@
       }
    },
    "Exists":{  
-      "url_segments":"api/donors/{id}/exists/{token}",
+      "url_segments":"api/exists/donors/{id}",
       "request_type":"GET",
       "description":"Check if instance exists",
       "authorization":{  
@@ -97,7 +107,7 @@
       }
    },
    "Exists By Post":{  
-      "url_segments":"api/donors/exists",
+      "url_segments":"api/exists/donors",
       "request_type":"POST",
       "description":"Check if row(s) exists",
       "authorization":{  
@@ -107,7 +117,7 @@
       }
    },
    "Custom":{  
-      "url_segments":"api/donors/exists",
+      "url_segments":"api/exists/donors",
       "request_type":"GET",
       "description":"Check if row(s) exists",
       "authorization":{  

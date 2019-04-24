@@ -7,92 +7,6 @@ class Api extends Trongate {
 
     function test() {
 
-        $module_name = 'donors';
-        $sql = 'select * from '.$module_name;
-
-        $params = '
-
-{
-    "name":"John",
-    "email":"info@bla.com"
-}
-
-        ';
-
-        $params = json_decode($params);
-        $params = get_object_vars($params);
-
-        //variables have been posted - start from here
-        $got_where = false;
-        foreach ($params as $key => $value) {
-            $param_type = $this->_get_param_type($module_name, $key);
-
-            if ($param_type == 'where') {
-                $where_conditions[$key] = $value;
-            }
-        }
-
-        //add where conditions
-        if (isset($where_conditions)) {
-            $where_condition_count = 0;
-            foreach ($where_conditions as $where_left_side => $where_value) {
-                $where_condition_count++;
-                //where_key    where_value
-                //manipulate the SQL query
-
-                $where_key = $this->_extract_where_key($where_left_side);
-                $where_start_word = $this->_extract_where_start_word($where_left_side, $where_condition_count);
-                $connective = $this->_extract_connective($where_left_side);
-
-                $new_where_condition = $where_start_word.' '.$where_key.' '.$connective.' :'.$where_key;
-                $sql = $sql.' '.$new_where_condition;
-                $data[$where_key] = $where_value;
-
-            }
-
-        }
-
-
-
-        //add order by
-        if (isset($params['orderBy'])) {
-            $data['order_by'] = $params['orderBy'];
-            $sql = $sql.' order by :order_by';
-        }
-
-        //add limit offset
-        if (isset($params['limit'])) {
-
-            $limit = $params['limit'];
-
-            //get the offset
-            if (isset($params['offset'])) {
-                $offset = $params['offset'];
-            } else {
-                $offset = 0;
-            }
-
-            if ((!is_numeric($limit)) || (!is_numeric($offset))) {
-                echo "non numeric limit and/or offset"; die();
-            }
-
-            $data['limit'] = $limit;
-            $data['offset'] = $offset;
-            $sql = $sql.= ' limit :offset, :limit';
-
-        }
-
-
-foreach ($data as $key => $value) {
-
-
-
-    echo "key of $key is $value<br>";
-}
-
-echo $sql; die();
-
-
 /*
                 * =         { "name":"John"}
                 * OR        { "OR age >" : 21}
@@ -133,99 +47,6 @@ echo $sql; die();
         }
 
 
-    }
-
-    function _extract_where_key($where_left_side) {
-
-        $where_left_side = trim($where_left_side);
-        $bits = explode(' ', $where_left_side);
-
-        $first_three = substr($where_left_side, 0, 3);
-        if ($first_three == 'OR ') {
-            $where_key = $bits[1];
-        } else {
-            $where_key = $bits[0];
-        }
-
-        return $where_key;
-    }
-
-    function _extract_where_start_word($where_left_side, $where_condition_count) {
-        //return WHERE, AND or OR
-        $where_start_word = 'WHERE';
-        $where_left_side = trim($where_left_side);
-
-        $first_three = substr($where_left_side, 0, 3);
-        if ($first_three == 'OR ') {
-            $where_start_word = 'OR';
-        } elseif ($where_condition_count>1) {
-            $where_start_word = 'AND';
-        }
-
-        return $where_start_word;        
-    }
-
-    function _extract_connective($where_left_side) {
-
-        /*
-            * =         { "name":"John"}
-            * OR        { "OR age >" : 21}
-            * !=        { "name !=": "John"}
-            * >         { "age >" : 21}
-            * <         { "age <" : 21}
-            * LIKE      { "name LIKE" : "e"}
-            * NOT LIKE  { "name NOT LIKE" : "e"}
-        */   
-
-
-
-        $where_left_side = trim($where_left_side);
-        $str_len = strlen($where_left_side);
-        $start = $str_len - 9;
-        $last_nine = substr($where_left_side, $start, $str_len);
-
-        if ($last_nine == ' NOT LIKE') {
-            $connective = 'NOT LIKE';
-        }
-
-        $ditch = ' NOT LIKE';
-        $replace = '';
-        $where_left_side = str_replace($ditch, $replace, $where_left_side);
-
-        if (!isset($connective)) {
-            $start = $str_len - 5;
-            $last_five = substr($where_left_side, $start, $str_len);
-
-            if ($last_five == ' LIKE') {
-                $connective = 'LIKE';
-            }            
-        }
-
-        $ditch = ' LIKE';
-        $replace = '';
-        $where_left_side = str_replace($ditch, $replace, $where_left_side);
-
-        if (!isset($connective)) {
-
-            $first_three = substr($where_left_side, 0, 3);
-            if ($first_three == 'OR ') {
-                $where_left_side = substr($where_left_side, 3, $str_len);
-            }
-
-            $bits = explode(' ', $where_left_side);
-            $num_bits = count($bits);
-
-            if ($num_bits>1) {
-                $target_index = count($bits)-1;
-                $connective = $bits[$target_index];
-            } else {
-                $connective = '=';
-            }
-
-        }
-
-        $connective = ltrim(trim($connective));
-        return $connective;
     }
 
     function submit_bypass_auth() {
@@ -334,49 +155,49 @@ echo $sql; die();
 
     }
 
-    // function _add_where_condition($data) {
-    //     //NOTE:  'LIKE' conditions should have % joined onto value.  For example, 'value%'
-    //     extract($data);
+    function _add_where_condition($data) {
+        //NOTE:  'LIKE' conditions should have % joined onto value.  For example, 'value%'
+        extract($data);
 
-    //     /*
-    //         * =         { "name":"John"}
-    //         * OR        { "OR age >" : 21}
-    //         * !=        { "name !=": "John"}
-    //         * >         { "age >" : 21}
-    //         * <         { "age <" : 21}
-    //         * LIKE      { "name LIKE" : "e"}
-    //         * NOT LIKE  { "name NOT LIKE" : "e"}
-    //     */
+        /*
+            * =         { "name":"John"}
+            * OR        { "OR age >" : 21}
+            * !=        { "name !=": "John"}
+            * >         { "age >" : 21}
+            * <         { "age <" : 21}
+            * LIKE      { "name LIKE" : "e"}
+            * NOT LIKE  { "name NOT LIKE" : "e"}
+        */
 
-    //     $key = trim($key);
-    //     $bits = explode(' ', $key);
-    //     if (count($bits)>1) {
-    //         $first_bit = $bits[0];
-    //         if ($first_bit == 'OR') {
-    //             $new_sql = $sql.' OR '.$bits[1].' ;connective; :'.$bits[1].' ';
-    //         }
-    //     }
+        $key = trim($key);
+        $bits = explode(' ', $key);
+        if (count($bits)>1) {
+            $first_bit = $bits[0];
+            if ($first_bit == 'OR') {
+                $new_sql = $sql.' OR '.$bits[1].' ;connective; :'.$bits[1].' ';
+            }
+        }
 
-    //     if (!isset($new_sql)) {
+        if (!isset($new_sql)) {
 
-    //         if ($got_where == true) {
-    //             $new_sql = $sql.' AND '.$key.' ;connective; :'.$key.' ';
-    //         } else {
-    //             $new_sql = $sql.' WHERE '.$key.' ;connective; :'.$key.' ';
-    //         }
+            if ($got_where == true) {
+                $new_sql = $sql.' AND '.$key.' ;connective; :'.$key.' ';
+            } else {
+                $new_sql = $sql.' WHERE '.$key.' ;connective; :'.$key.' ';
+            }
 
-    //     }
+        }
 
-    //     //let's figure out what the connective is
-    //     if (count($bits)>1) {
-    //         //slightly awkward (deserves its own function)
-    //         $replace = $this->_figure_out_connective($key, $bits);
-    //         $new_sql = str_replace(';connective;', $replace, $new_sql);
-    //     }
+        //let's figure out what the connective is
+        if (count($bits)>1) {
+            //slightly awkward (deserves its own function)
+            $replace = $this->_figure_out_connective($key, $bits);
+            $new_sql = str_replace(';connective;', $replace, $new_sql);
+        }
 
-    //     $new_sql = str_replace(';connective;', '=', $new_sql);
-    //     return $new_sql;
-    // }
+        $new_sql = str_replace(';connective;', '=', $new_sql);
+        return $new_sql;
+    }
 
     function _figure_out_connective($key, $bits) {
 

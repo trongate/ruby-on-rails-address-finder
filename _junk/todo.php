@@ -1,4 +1,35 @@
-MONDAY GOALS
+* Make sure the table exists (safely!)
+
+* Get submit params working
+
+            ---> get list of table columns
+
+            ---> if somebody submits 'orderBy' or 'order_by' then check for table column,
+                 to figure out how query should be modified
+
+            ---> PARAMS OPTIONS
+
+                * =         { "name":"John"}
+                * OR        { "OR age >" : 21}
+                * !=        { "name !=": "John"}
+                * >         { "age >" : 21}
+                * <         { "age <" : 21}
+                * LIKE      { "name LIKE" : "e"}
+                * NOT LIKE  { "name NOT LIKE" : "e"}
+                
+                and finally...
+
+                * custom    * In this instance they should build their own endpoint.
+
+        
+* Get before and after hooks working
+
+* Get custom hooks working
+
+
+---------------------------------------------------------------
+
+TUESDAY GOALS
 
 
 * Change structure so that API is a part of the engine.                                     DONE
@@ -6,16 +37,48 @@ MONDAY GOALS
 * Change location of settings file.
     -> every module gets an 'assets' folder.  The settings file should be called api.json.  DONE
 
-* Add feature to top right hand side for adding token to header.                            <---
+* Add feature to top right hand side for adding token to header.                            DONE
 
-* Get 'bypass authorization' working.
+* Get 'bypass authorization' working.                                                       DONE
 
-* Get one API endpoint working completely.
+* Get one API endpoint working completely.                                                  DONE
 
                                             YES YES YES!!!
 
 
 ---------------------------------------------------------------
+
+WEDNESDAY GOALS
+
+* get params working, including limit, offset and order by
+   (as well as WHERE conditions)
+
+* make the 'bypass' auth feature secure : USE THE FANCY VIBE
+
+* get the security working. Have the following options:
+
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 * make 'token' a required field for the GET request.
 

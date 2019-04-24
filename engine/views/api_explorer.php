@@ -41,17 +41,38 @@
 <div class="top-row w3-row">
     <div class="container">
         <div class="w3-col s5 w3-center logo">Trongate API - Explorer</div>
-        <div class="w3-col s2 w3-center trhs"><p>Token Not Set!</p></div>
+        <div class="w3-col s2 w3-center trhs"><p id="token-status">Token Not Set!</p></div>
         <div class="w3-col s3 w3-center trhs"><p>
-            <input class="w3-input w3-border" type="text" placeholder="Enter Authorization Token">
+            <input id="input-token" class="w3-input w3-border" type="text" placeholder="Enter Authorization Token">
         </p></div>
         <div class="w3-col s2 w3-center trhs"><p>
-            <button class="w3-button button-primary default">Set Token</button>
+            <button onclick="setToken()" class="w3-button button-primary default">Set Token</button>
         </p></div>
     </div>
 </div>
 
+<script>
+var token = '';
 
+function setToken() {
+    token = document.getElementById('input-token').value;
+    document.getElementById('token-value').innerHTML = token;
+
+    if (token == '') {
+        document.getElementById('token-status').innerHTML = 'Token Not Set!';    
+    } else {
+        document.getElementById('token-status').innerHTML = 'Token is set.';
+    }
+    
+}
+
+function getToken() {
+
+}
+
+
+
+</script>
 
 
 
@@ -274,12 +295,13 @@ td {
                 </div>
             </form>
 
-            <p style="font-size: 0.9em;"><b>URL Segments:</b> <span id="endpointUrl"></span>
+            <p style="font-size: 0.9em;"><b>URL Segments:</b> /<span id="endpointUrl"></span>
                 <br>
                 <b>Required HTTP Request Type: </b> <span id="requestType"></span>
                 <br>
                 <b>Endpoing Settings: </b>
-                <?= $endpoint_settings_location ?>
+                <?= $endpoint_settings_location ?><br>
+                <b>Your Current Token: </b><span id="token-value"></span>
             </p>
 
         </div>
@@ -300,17 +322,20 @@ var endpoint;
 
 function submitRequest() {
     var params = document.getElementById('params').value;
-    addTokenToUrl();
     var targetUrl = '<?= BASE_URL ?>' + document.getElementById('endpointUrl').innerHTML;
+
+    console.log(targetUrl);
 
     var params = {
         code: '****',
-        token
+        token,
+        params
     }
 
     const http = new XMLHttpRequest()
     http.open('POST', targetUrl)
     http.setRequestHeader('Content-type', 'application/json')
+    http.setRequestHeader('trongateToken', token)
     http.send(JSON.stringify(params)) // Make sure to stringify
     http.onload = function() {
         document.getElementById("serverResponse").disabled = false;
@@ -319,26 +344,12 @@ function submitRequest() {
 
 }
 
-function addTokenToUrl() {
-
-    setTimeout(function(){
-        token = document.getElementById('auth-token').value;
-        url_segments = url_segments.replace('<span class="alt-font">{</span>token<span class="alt-font">}</span>', '');
-
-
-        if (token == '') {
-            document.getElementById('endpointUrl').innerHTML = url_segments + '<span class="alt-font">{</span>token<span class="alt-font">}</span>';
-        } else {
-            document.getElementById('endpointUrl').innerHTML = url_segments + token;
-        }
-
-    }, 100);
-
+/*
+{
+   "name":"David",
+   "city":"Glasgow"
 }
-
-
-
-
+*/
 
 
 
@@ -371,7 +382,7 @@ function openModal(endpointName, endpoint_json) {
     document.getElementById('id01').style.display='block';
     document.getElementById('endpointName').innerHTML = endpointName;
     document.getElementById('requestType').innerHTML = requestType;
-    document.getElementById('endpointUrl').innerHTML = '/' + url_segments;
+    document.getElementById('endpointUrl').innerHTML = url_segments;
 }
 
 function viewSettings() {
@@ -470,7 +481,6 @@ window.onclick = function(event) {
 
 
 <script>
-var token = '<?= $token ?>';
 
 function initBypassAuth() {
 
@@ -478,10 +488,12 @@ function initBypassAuth() {
     
     if (isChecked == true) {
 
-        const params = {
-            code: '****',
-            token
-        }
+        // const params = {
+        //     code: '****',
+        //     token
+        // }
+
+        // console.log(params);
 
         const http = new XMLHttpRequest()
         http.open('POST', '<?= BASE_URL ?>api/submit_bypass_auth')
@@ -490,8 +502,9 @@ function initBypassAuth() {
         http.onload = function() {
             //fetch new 'bypass' token
             token = http.responseText;
-            document.getElementById("auth-token").value = token;
-            addTokenToUrl();
+            console.log(token);
+            document.getElementById("input-token").value = token;
+            document.getElementById("token-value").innerHTML = token;
         }
 
     }
