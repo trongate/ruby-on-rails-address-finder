@@ -13,11 +13,13 @@ class Api extends Trongate {
         $params = '
 
 {
-    "name":"John",
-    "email":"info@bla.com"
+    "name >":"John",
+    "email !=":"info@bla.com"
 }
 
         ';
+
+echo $params.'<hr>';
 
         $params = json_decode($params);
         $params = get_object_vars($params);
@@ -96,16 +98,16 @@ class Api extends Trongate {
                 * NOT LIKE  { "name NOT LIKE" : "e"}
 */
 
-        $key = 'name NOT LIKE';
-        $key = 'OR name > ';
-        $key = 'name LIKE';
+        // $key = 'name NOT LIKE';
+        // $key = 'OR name > ';
+        // $key = 'name LIKE';
 
-        $key = '';
-        $key = 'OR age';
-        $key = 'name !=';
-        $key = 'age <';
-        $key = 'name LIKE';
-        $key = 'name NOT LIKE';
+        // $key = '';
+        // $key = 'OR age';
+        // $key = 'name !=';
+        // $key = 'age <';
+        // $key = 'name LIKE';
+        // $key = 'name NOT LIKE';
 
 
 
@@ -114,16 +116,7 @@ class Api extends Trongate {
 
         $connective = $this->_figure_out_connective($key, $bits);
 
-        echo 'for <span style="color: blue;">'.$key.'</span> the connective is<br>';
-        echo $connective; die();
-
-        $key_len = strlen($key);
-
-        if ($key_len >= 10) {
-            $start = $key_len - 8;
-            $last_eight = substr($key, $start, $key_len);
-            echo $last_eight;
-        }
+echo $sql;
 
 
     }
@@ -509,7 +502,6 @@ class Api extends Trongate {
                 
                 if ($last_nine == ' NOT LIKE') {
                     $connective = 'NOT LIKE';
-                    echo $connective; die();
                     return $connective;
                 }
             }
