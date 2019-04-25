@@ -12,9 +12,11 @@ class Api extends Trongate {
 
         $params = '
 
+
+
 {
-    "name >":"John",
-    "email !=":"info@bla.com"
+   "first_name":"David",
+    "OR email NOT LIKE":"david@bla.com"
 }
 
         ';
@@ -83,41 +85,6 @@ echo $params.'<hr>';
             $sql = $sql.= ' limit :offset, :limit';
 
         }
-
-
-
-
-
-/*
-                * =         { "name":"John"}
-                * OR        { "OR age >" : 21}
-                * !=        { "name !=": "John"}
-                * >         { "age >" : 21}
-                * <         { "age <" : 21}
-                * LIKE      { "name LIKE" : "e"}
-                * NOT LIKE  { "name NOT LIKE" : "e"}
-*/
-
-        // $key = 'name NOT LIKE';
-        // $key = 'OR name > ';
-        // $key = 'name LIKE';
-
-        // $key = '';
-        // $key = 'OR age';
-        // $key = 'name !=';
-        // $key = 'age <';
-        // $key = 'name LIKE';
-        // $key = 'name NOT LIKE';
-
-
-
-        $key = trim($key);
-        $bits = explode(' ', $key);
-
-        $connective = $this->_figure_out_connective($key, $bits);
-
-echo $sql;
-
 
     }
 
@@ -243,8 +210,6 @@ echo $sql;
 
     function _add_params_to_query($module_name, $sql, $params) {
 
-        //$params = get_object_vars($params);
-
         //variables have been posted - start from here
         $got_where = false;
         foreach ($params as $key => $value) {
@@ -303,9 +268,7 @@ echo $sql;
 
         }
 
-        if (!isset($data)) {
-            $data = [];
-        }
+        echo $sql; die();
 
         $query_info['sql'] = $sql;
         $query_info['data'] = $data;
