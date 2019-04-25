@@ -2,6 +2,18 @@
 class Donors extends Trongate {
 
 
+    function custom() {
+        $post = file_get_contents('php://input');
+        $post = trim($post);
+        $decoded = json_decode($post, true);
+
+        $limit = $decoded['limit'];
+
+        echo "You want to query a table a column called limit";
+        echo " and you submitted a limit value of ".$limit;
+    }
+
+
     function test() {
         $comments = false;
         foreach ($comments as $key => $value) {

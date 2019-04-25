@@ -362,8 +362,12 @@ var fromObject = function(params, skipobjects, prefix) {
 
 function submitRequest() {
     var params = document.getElementById('params').value;
+    params = params.replace(">", "*!gt!*");
+    params = params.replace(">", "*!lt!*");
+    params = params.replace("=", "*!equalto!*");
+    params = params.replace("_", "*!underscore!*");
+
     var targetUrl = '<?= BASE_URL ?>' + document.getElementById('endpointUrl').innerHTML;
-    var params = document.getElementById('params').value;
 
     if (params != '') {
         isValidJson = myfunction(params);

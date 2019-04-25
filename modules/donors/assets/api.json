@@ -14,10 +14,10 @@
          ]
       }
    },
-   "Hello You":{  
-      "url_segments":"api/create/donors",
-      "request_type":"GET",
-      "description":"Insert database record by evaluating posting data",
+   "Custom":{  
+      "url_segments":"donors/custom",
+      "request_type":"POST",
+      "description":"Do something with a table that has a column called limit",
       "authorization":{  
          "roles":[  
             "admin"
@@ -109,16 +109,6 @@
    "Exists By Post":{  
       "url_segments":"api/exists/donors",
       "request_type":"POST",
-      "description":"Check if row(s) exists",
-      "authorization":{  
-         "roles":[  
-            "admin"
-         ]
-      }
-   },
-   "Custom":{  
-      "url_segments":"api/exists/donors",
-      "request_type":"GET",
       "description":"Check if row(s) exists",
       "authorization":{  
          "roles":[  

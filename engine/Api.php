@@ -5,6 +5,60 @@ class Api extends Trongate {
         parent::__construct();
     }
 
+    function test3() {
+
+
+        $params = '
+
+
+
+{
+   "first_name!=":"David",
+    "OR email NOT LIKE":"david@bla.com"
+}
+
+        ';
+
+
+        $data = [];
+        parse_str($params, $data);
+
+var_dump($data); die();
+
+        $params = json_decode($params);
+
+
+        $query = http_build_query($params, null, '&', PHP_QUERY_RFC3986);
+        echo $query;
+
+    }
+
+    function test2() {
+
+        $module_name = 'donors';
+        $sql = 'select * from '.$module_name;
+
+        $params = '
+
+
+
+{
+   "first_name":"David",
+    "OR email NOT LIKE":"david@bla.com"
+}
+
+        ';
+
+echo $params.'<hr>';
+
+        $params = json_decode($params);
+        $params = get_object_vars($params);
+
+
+        $query_info = $this->_add_params_to_query($module_name, $sql, $params);
+        echo $query_info['sql'];
+    }
+
     function test() {
 
         $module_name = 'donors';
@@ -268,8 +322,6 @@ echo $params.'<hr>';
 
         }
 
-        echo $sql; die();
-
         $query_info['sql'] = $sql;
         $query_info['data'] = $data;
         return $query_info;
@@ -278,15 +330,81 @@ echo $params.'<hr>';
     function _get_params_from_url($params_segment) {
         //params segment is where params might be passed
         $params_str = $this->url->segment($params_segment);
-
         $first_char = substr($params_str, 0, 1);
         if ($first_char == '?') {
             $params_str = substr($params_str, 1);
         }
 
+        $data = [];
+        parse_str($params_str, $data);
+
+        //convert into json
         $params = [];
-        parse_str($params_str, $params);
+        foreach ($data as $key => $value) {
+            $key = $this->_prep_key($key);           
+            $params[$key] = $value;
+        }
+
         return $params;
+    }
+
+    function _prep_key($key) { //php convert json into URL string
+
+        //get last char
+
+        $key = trim($key);
+        $str_len = strlen($key);
+        $last_char = substr($key, $str_len-1);
+        
+        if ($last_char == '!') {
+            $key = $key.'=';
+        }
+
+        $ditch = '*!underscore!*';
+        $replace = '_';
+        $key = str_replace($ditch, $replace, $key);
+
+        $ditch = '*!gt!*';
+        $replace = '>';
+        $key = str_replace($ditch, $replace, $key);
+
+        $ditch = '*!lt!*';
+        $replace = '<';
+        $key = str_replace($ditch, $replace, $key);
+
+        $ditch = '*!equalto!*';
+        $replace = '=';
+        $key = str_replace($ditch, $replace, $key);
+
+        $ditch = 'OR_';
+        $replace = 'OR ';
+        $key = str_replace($ditch, $replace, $key);
+
+        $ditch = '_NOT_LIKE';
+        $replace = ' NOT LIKE';
+        $key = str_replace($ditch, $replace, $key);
+
+        $ditch = '_LIKE';
+        $replace = ' LIKE';
+        $key = str_replace($ditch, $replace, $key);
+
+        $ditch = '_!=';
+        $replace = ' !=';
+        $key = str_replace($ditch, $replace, $key);
+
+        $ditch = 'AND_';
+        $replace = 'AND ';
+        $key = str_replace($ditch, $replace, $key);
+
+        $ditch = '_>';
+        $replace = ' >';
+        $key = str_replace($ditch, $replace, $key);
+
+        $ditch = '_<';
+        $replace = ' <';
+        $key = str_replace($ditch, $replace, $key);
+
+        return $key;
     }
 
     function _get_params_from_post() {
@@ -310,6 +428,11 @@ echo $params.'<hr>';
             echo $data;         
         } else {
             //params were posted
+            $sql = 'select * from '.$module_name;
+            $params = json_encode($params);
+            $params = ltrim($params);
+            $params = json_decode($params);
+            $params = get_object_vars($params);
             $query_info = $this->_add_params_to_query($module_name, $sql, $params);
 
             $sql = $query_info['sql'];
