@@ -316,33 +316,83 @@ td {
 
 
 <script>
-
+var requestType = 'GET';
 var url_segments;
 var endpoint;
+
+
+
+
+var isObj = function(a) {
+  if ((!!a) && (a.constructor === Object)) {
+    return true;
+  }
+  return false;
+};
+var _st = function(z, g) {
+  return "" + (g != "" ? "[" : "") + z + (g != "" ? "]" : "");
+};
+var fromObject = function(params, skipobjects, prefix) {
+  if (skipobjects === void 0) {
+    skipobjects = false;
+  }
+  if (prefix === void 0) {
+    prefix = "";
+  }
+  var result = "";
+  if (typeof(params) != "object") {
+    return prefix + "=" + encodeURIComponent(params) + "&";
+  }
+  for (var param in params) {
+    var c = "" + prefix + _st(param, prefix);
+    if (isObj(params[param]) && !skipobjects) {
+      result += fromObject(params[param], false, "" + c);
+    } else if (Array.isArray(params[param]) && !skipobjects) {
+      params[param].forEach(function(item, ind) {
+        result += fromObject(item, false, c + "[" + ind + "]");
+      });
+    } else {
+      result += c + "=" + encodeURIComponent(params[param]) + "&";
+    }
+  }
+
+  result = result.slice(0, -1); 
+  return result;
+};
 
 function submitRequest() {
     var params = document.getElementById('params').value;
     var targetUrl = '<?= BASE_URL ?>' + document.getElementById('endpointUrl').innerHTML;
+    var params = document.getElementById('params').value;
 
-    console.log(targetUrl);
+    if (params != '') {
+        isValidJson = myfunction(params);
 
-    var params = {
-        code: '****',
-        token,
-        params
+        if (isValidJson == false) {
+            alert("Invalid JSON");
+            return;
+        }
+    }
+
+    if ((requestType == 'GET') && (params != '')) { //
+        params = JSON.parse(params);
+        var extraUrlSegment = '/?' + fromObject(params);
+        targetUrl = targetUrl.concat(extraUrlSegment);
     }
 
     const http = new XMLHttpRequest()
-    http.open('POST', targetUrl)
+    http.open(requestType, targetUrl)
     http.setRequestHeader('Content-type', 'application/json')
     http.setRequestHeader('trongateToken', token)
-    http.send(JSON.stringify(params)) // Make sure to stringify
+    http.send(params)
     http.onload = function() {
         document.getElementById("serverResponse").disabled = false;
         document.getElementById('serverResponse').value = http.responseText;
     }
 
 }
+
+
 
 /*
 {
@@ -364,7 +414,7 @@ function openModal(endpointName, endpoint_json) {
     url_segments = url_segments.replace("}", "<span class=\"alt-font\">}</span>");
 
 
-    var requestType = endpoint_data.request_type;
+    requestType = endpoint_data.request_type;
     var description = endpoint_data.description;
 
     if (requestType == 'POST') {
@@ -379,6 +429,7 @@ function openModal(endpointName, endpoint_json) {
         document.getElementById('modal-content').className = 'w3-container modal-content-alt';
     }
     
+
     document.getElementById('id01').style.display='block';
     document.getElementById('endpointName').innerHTML = endpointName;
     document.getElementById('requestType').innerHTML = requestType;
@@ -510,6 +561,77 @@ function initBypassAuth() {
     }
 
 }
+
+
+
+
+
+
+
+
+
+    function myfunction(text){
+
+       //function for validating json string
+        function testJSON(text){
+            try{
+                if (typeof text!=="string"){
+                    return false;
+                }else{
+                    JSON.parse(text);
+                    return true;                            
+                }
+            }
+            catch (error){
+                return false;
+            }
+        }
+
+        //content of your real function   
+        if(testJSON(text)){
+            return true;
+        }else{
+            return false; //not valid json
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </script>
 
 

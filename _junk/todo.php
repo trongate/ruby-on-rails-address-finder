@@ -1,33 +1,51 @@
+NEXT UP
+
+* Do a friendly javascript alert when JSON not valid.       DONE
+
+* Get the query reading the posted json.     <---
+
 * Make sure the table exists (safely!)
 
-* Get submit params working
+* add the actual URL to the URL Segments section
 
-            ---> get list of table columns
+---------------------------------------------------------------
 
-            ---> if somebody submits 'orderBy' or 'order_by' then check for table column,
-                 to figure out how query should be modified
-
-            ---> PARAMS OPTIONS
-
-                * =         { "name":"John"}
-                * OR        { "OR age >" : 21}
-                * !=        { "name !=": "John"}
-                * >         { "age >" : 21}
-                * <         { "age <" : 21}
-                * LIKE      { "name LIKE" : "e"}
-                * NOT LIKE  { "name NOT LIKE" : "e"}
-                
-                and finally...
-
-                * custom    * In this instance they should build their own endpoint.
+TOMORROW
 
         
 * Get before and after hooks working
 
-* Get custom hooks working
+* Get custom endpoints working WITH HOOKS
 
 
 ---------------------------------------------------------------
+
+NEXT DAY
+
+* Finish all of the endpoints
+
+---------------------------------------------------------------
+
+AND FINALLY
+
+* bolster all of the security
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 TUESDAY GOALS
 

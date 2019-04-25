@@ -83,14 +83,7 @@ class Api extends Trongate {
         }
 
 
-foreach ($data as $key => $value) {
 
-
-
-    echo "key of $key is $value<br>";
-}
-
-echo $sql; die();
 
 
 /*
@@ -255,7 +248,124 @@ echo $sql; die();
 
     }
 
+    function _add_params_to_query($module_name, $sql, $params) {
+
+        //$params = get_object_vars($params);
+
+        //variables have been posted - start from here
+        $got_where = false;
+        foreach ($params as $key => $value) {
+            $param_type = $this->_get_param_type($module_name, $key);
+
+            if ($param_type == 'where') {
+                $where_conditions[$key] = $value;
+            }
+        }
+
+        //add where conditions
+        if (isset($where_conditions)) {
+            $where_condition_count = 0;
+            foreach ($where_conditions as $where_left_side => $where_value) {
+                $where_condition_count++;
+                //where_key    where_value
+                //manipulate the SQL query
+
+                $where_key = $this->_extract_where_key($where_left_side);
+                $where_start_word = $this->_extract_where_start_word($where_left_side, $where_condition_count);
+                $connective = $this->_extract_connective($where_left_side);
+
+                $new_where_condition = $where_start_word.' '.$where_key.' '.$connective.' :'.$where_key;
+                $sql = $sql.' '.$new_where_condition;
+                $data[$where_key] = $where_value;
+
+            }
+
+        }
+
+        //add order by
+        if (isset($params['orderBy'])) {
+            $data['order_by'] = $params['orderBy'];
+            $sql = $sql.' order by :order_by';
+        }
+
+        //add limit offset
+        if (isset($params['limit'])) {
+
+            $limit = $params['limit'];
+
+            //get the offset
+            if (isset($params['offset'])) {
+                $offset = $params['offset'];
+            } else {
+                $offset = 0;
+            }
+
+            if ((!is_numeric($limit)) || (!is_numeric($offset))) {
+                echo "non numeric limit and/or offset"; die();
+            }
+
+            $data['limit'] = $limit;
+            $data['offset'] = $offset;
+            $sql = $sql.= ' limit :offset, :limit';
+
+        }
+
+        if (!isset($data)) {
+            $data = [];
+        }
+
+        $query_info['sql'] = $sql;
+        $query_info['data'] = $data;
+        return $query_info;
+    }
+
+    function _get_params_from_url($params_segment) {
+        //params segment is where params might be passed
+        $params_str = $this->url->segment($params_segment);
+
+        $first_char = substr($params_str, 0, 1);
+        if ($first_char == '?') {
+            $params_str = substr($params_str, 1);
+        }
+
+        $params = [];
+        parse_str($params_str, $params);
+        return $params;
+    }
+
+    function _get_params_from_post() {
+        $post = file_get_contents('php://input');
+        $post = trim($post);
+        $params = json_decode($post, true);
+        return $params;
+    }
+
     function get() {
+        $this->_validate_token();
+        $module_name = $this->url->segment(3);
+        $sql = 'select * from '.$module_name;
+
+        $params = $this->_get_params_from_url(4);
+        $num_params = count($params);
+
+        if ($num_params < 1) { 
+            $rows = $this->model->get('id', $module_name);
+            $data = json_encode($rows);
+            echo $data;         
+        } else {
+            //params were posted
+            $query_info = $this->_add_params_to_query($module_name, $sql, $params);
+
+            $sql = $query_info['sql'];
+            $data = $query_info['data'];
+            $rows = $this->model->query_bind($sql, $data, 'object');
+            $result = json_encode($rows);
+            echo $result;
+        }
+        
+    }
+
+    function getOLD() {
         $this->_validate_token();
 
         //if user has made it past this point then token must be good
@@ -265,30 +375,32 @@ echo $sql; die();
 
         //let's check to see if any params were posted
         $post = file_get_contents('php://input');
-        $decoded = json_decode($post, true);
+        $post = trim($post);
 
-        if (isset($decoded['params'])) {
+        if ($post != '') {
 
-            $is_json = $this->is_json($decoded['params']);
+            $decoded = json_decode($post, true);
 
-            if ($is_json == false) {
-                echo "not valid json"; die();
+            if ($decoded == false) {
+                echo 'invalid JSON'; die();
             }
 
-            $params = json_decode($decoded['params']);
-            $sql = $this->_add_params_to_query($module_name, $sql, $params);
+            if (isset($decoded['params'])) {
+                echo 'yes'; die();
+                $query_info = $this->_add_params_to_query($sql, $decoded['params']);
+            } else {
+                echo 'no params set'; die();
+            }
+            
+            
         }
 
 
-        echo "you should not be here"; die();
+
+ echo "you should not be here"; die();
 
 
-        echo gettype($decoded);
 
-        foreach($decoded as $key => $value) {
-            echo "key is $key<br>";
-        }
-        die();
 
 
         $rows = $this->model->get('id', $data['module_name']);
@@ -296,43 +408,41 @@ echo $sql; die();
         echo $data;
     }
 
-    function is_json($string){
-        return is_string($string) && is_array(json_decode($string, true)) && (json_last_error() == JSON_ERROR_NONE) ? true : false;
-    }
 
-    function _add_params_to_query($module_name, $sql, $params) {
 
-        //php object properties
-        $params = get_object_vars($params);
-        $got_where = false;
-        foreach ($params as $key => $value) {
-            $param_type = $this->_get_param_type($module_name, $key);
+    // function _add_params_to_query($module_name, $sql, $params) {
 
-            if ($param_type == 'where') {
-                $data['module_name'] = $module_name;
-                $data['sql'] = $sql;
-                $data['key'] = $key;
-                $data['value'] = $value;
-                $data['got_where'] = $got_where;
-                $sql = $this->_add_where_condition($data);
-                $got_where = true;
-            }
-        }
+    //     //php object properties
+    //     $params = get_object_vars($params);
+    //     $got_where = false;
+    //     foreach ($params as $key => $value) {
+    //         $param_type = $this->_get_param_type($module_name, $key);
 
-        $sql = str_replace('  ', ' ', $sql);
+    //         if ($param_type == 'where') {
+    //             $data['module_name'] = $module_name;
+    //             $data['sql'] = $sql;
+    //             $data['key'] = $key;
+    //             $data['value'] = $value;
+    //             $data['got_where'] = $got_where;
+    //             $sql = $this->_add_where_condition($data);
+    //             $got_where = true;
+    //         }
+    //     }
 
-                        echo $sql; die();
+    //     $sql = str_replace('  ', ' ', $sql);
 
-        $data['module_name'] = $module_name;
-        $rows = $this->model->query($sql, $data, 'array');
+    //                     echo $sql; die();
+
+    //     $data['module_name'] = $module_name;
+    //     $rows = $this->model->query($sql, $data, 'array');
 
 
 
-        echo $sql; die();
+    //     echo $sql; die();
 
-        echo "adding params to $sql";
+    //     echo "adding params to $sql";
 
-    }
+    // }
 
     // function _add_where_condition($data) {
     //     //NOTE:  'LIKE' conditions should have % joined onto value.  For example, 'value%'
