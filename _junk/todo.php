@@ -1,24 +1,72 @@
-NEXT UP
 
-* Do a friendly javascript alert when JSON not valid.       DONE
 
-* Get the query reading the posted json.     <---
+    USER                   MIDDLEWARE    YOUR WEB APP       MIDDLEWARE
+
+    submitting request        ->          produces json     *->                USER
+
+    ---------------------------------------------------------------------------------
+
+    submitting request        **->          produces json
+
+
+
+
+
+
+**  Make sure either is EITHER admin or that member_id MATCHES member_id
+
+    THEN....
+
+    If ($user_level != 'admin') {
+            $allowed_update_cols[] = 'username';
+            $allowed_update_cols[] = 'phone_number';
+            $allowed_update_cols[] = 'email';
+
+            //$submitted_params
+            foreach($submitted_params as $key=>$column_name) {
+
+                if (!in_array($column_name, $allowed_update_col)) {
+                        echo 'not allowed'; die();
+                }
+
+
+            }
+
+    }
+
+
+
+
+
+
+
+* if user_level is not admin then do NOT return date_of_birth
+
+if ($user_level != 'admin') {
+    unset($data['date_of_birth']);
+    unset($data['password']);
+}
+
+
+
+
+
+
+
+
 
 * Make sure the table exists (safely!)
 
 * add the actual URL to the URL Segments section
 
----------------------------------------------------------------
-
-TOMORROW
-
+* Clean up code (for example, remove the 'order by' checks that are not being used)
         
 * Get before and after hooks working
 
 * Get custom endpoints working WITH HOOKS
 
+_______________________________________________________________
 
----------------------------------------------------------------
 
 NEXT DAY
 

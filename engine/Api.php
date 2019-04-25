@@ -296,8 +296,24 @@ echo $params.'<hr>';
 
         //add order by
         if (isset($params['orderBy'])) {
-            $data['order_by'] = $params['orderBy'];
-            $sql = $sql.' order by :order_by';
+
+            //make sure this column is on the table
+            $sql_t = 'describe '.$module_name;
+
+            $rows = $this->model->query($sql_t, 'array');
+            foreach ($rows as $row) {
+                $columns[] = $row['Field'];
+            }
+
+            $column_name = str_replace(' desc', '', $params['orderBy']);
+
+            if (!in_array($column_name, $columns)) {
+                //invalid order by
+                echo "invalid order by"; die();
+            }
+
+            $sql = $sql.' order by '.$params['orderBy'];
+            unset($params['orderBy']);
         }
 
         //add limit offset
@@ -316,10 +332,17 @@ echo $params.'<hr>';
                 echo "non numeric limit and/or offset"; die();
             }
 
+            settype($limit, "integer");
+            settype($offset, "integer");
+
             $data['limit'] = $limit;
             $data['offset'] = $offset;
             $sql = $sql.= ' limit :offset, :limit';
 
+        }
+
+        if (!isset($data)) {
+            $data = [];
         }
 
         $query_info['sql'] = $sql;
@@ -341,7 +364,8 @@ echo $params.'<hr>';
         //convert into json
         $params = [];
         foreach ($data as $key => $value) {
-            $key = $this->_prep_key($key);           
+            $key = $this->_prep_key($key); 
+            $value = $this->_remove_special_characters($value);          
             $params[$key] = $value;
         }
 
@@ -360,21 +384,7 @@ echo $params.'<hr>';
             $key = $key.'=';
         }
 
-        $ditch = '*!underscore!*';
-        $replace = '_';
-        $key = str_replace($ditch, $replace, $key);
-
-        $ditch = '*!gt!*';
-        $replace = '>';
-        $key = str_replace($ditch, $replace, $key);
-
-        $ditch = '*!lt!*';
-        $replace = '<';
-        $key = str_replace($ditch, $replace, $key);
-
-        $ditch = '*!equalto!*';
-        $replace = '=';
-        $key = str_replace($ditch, $replace, $key);
+        $key = $this->_remove_special_characters($key);
 
         $ditch = 'OR_';
         $replace = 'OR ';
@@ -407,6 +417,26 @@ echo $params.'<hr>';
         return $key;
     }
 
+    function _remove_special_characters($str) {
+        $ditch = '*!underscore!*';
+        $replace = '_';
+        $str = str_replace($ditch, $replace, $str);
+
+        $ditch = '*!gt!*';
+        $replace = '>';
+        $str = str_replace($ditch, $replace, $str);
+
+        $ditch = '*!lt!*';
+        $replace = '<';
+        $str = str_replace($ditch, $replace, $str);
+
+        $ditch = '*!equalto!*';
+        $replace = '=';
+        $str = str_replace($ditch, $replace, $str);
+
+        return $str;
+    }
+
     function _get_params_from_post() {
         $post = file_get_contents('php://input');
         $post = trim($post);
@@ -437,7 +467,19 @@ echo $params.'<hr>';
 
             $sql = $query_info['sql'];
             $data = $query_info['data'];
-            $rows = $this->model->query_bind($sql, $data, 'object');
+
+            if (count($data)<1) {
+                $rows = $this->model->query($sql, 'object');
+            } else {
+                $rows = $this->model->query_bind($sql, $data, 'object');
+            }
+
+// echo $sql;
+// var_dump($data); die();
+
+            
+
+            //$rows = $this->model->query_bind($sql, $data, 'object');
             $result = json_encode($rows);
             echo $result;
         }
