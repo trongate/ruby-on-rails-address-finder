@@ -1,69 +1,42 @@
 
 
-    USER                   MIDDLEWARE    YOUR WEB APP       MIDDLEWARE
+* make sure columns exist when where condition is passed                                            DONE
 
-    submitting request        ->          produces json     *->                USER
+* get http codes working and displaying on the API manager for ALL possible outcomes.               DONE
 
-    ---------------------------------------------------------------------------------
-
-    submitting request        **->          produces json
-
-
+http_response_code(422); //Unprocessable Entity
+http_response_code(401); //401 Unauthorized
+http_response_code(200); //OK
 
 
+    ---> make the status code go 'green' and beside the thing and right aligned.
 
+            for example;    Status: <green>200 OK</green>                                 <---      
 
-**  Make sure either is EITHER admin or that member_id MATCHES member_id
+* View Endpoint Settings goes to far left.
 
-    THEN....
+* Under top yellow textarea, add checkbox with 'Display Response Headers' (toggles headers info)
 
-    If ($user_level != 'admin') {
-            $allowed_update_cols[] = 'username';
-            $allowed_update_cols[] = 'phone_number';
-            $allowed_update_cols[] = 'email';
-
-            //$submitted_params
-            foreach($submitted_params as $key=>$column_name) {
-
-                if (!in_array($column_name, $allowed_update_col)) {
-                        echo 'not allowed'; die();
-                }
-
-
-            }
-
-    }
+* Change 'COPY RESPONSE' to 'COPY RESPONSE BODY'
 
 
 
+Then....
 
 
-
-
-* if user_level is not admin then do NOT return date_of_birth
-
-if ($user_level != 'admin') {
-    unset($data['date_of_birth']);
-    unset($data['password']);
-}
-
-
-
-
-
-
-
-
-
-* Make sure the table exists (safely!)
+* Make sure the table exists (safely!)                                                  DONE
 
 * add the actual URL to the URL Segments section
 
 * Clean up code (for example, remove the 'order by' checks that are not being used)
+
+------------------------------------------------------------------------------------ CHECKPOINT
         
-* Get before and after hooks working
+* Get before and after hooks working for GET
 
 * Get custom endpoints working WITH HOOKS
+
+                                                YES YES YES!!!!
 
 _______________________________________________________________
 
