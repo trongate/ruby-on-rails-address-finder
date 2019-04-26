@@ -1,9 +1,3 @@
-* add the actual URL to the URL Segments section                                                    DONE.
-
-* Clean up code (for example, remove the 'order by' checks that are not being used)
-
------------------------------------------------------------------------------------- CHECKPOINT
-        
 * Get before and after hooks working for GET
 
 * Get custom endpoints working WITH HOOKS
