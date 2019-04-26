@@ -79,8 +79,6 @@ class Api extends Trongate {
             * NOT LIKE  { "name NOT LIKE" : "e"}
         */   
 
-
-
         $where_left_side = trim($where_left_side);
         $str_len = strlen($where_left_side);
         $start = $str_len - 9;
@@ -138,8 +136,8 @@ class Api extends Trongate {
     }
 
     function _not_allowed_msg() {
-        http_response_code(401);
-        echo "Invalid token."; die();
+        //http_response_code(401);
+        //echo "Invalid token."; die();
     }
 
     function _validate_token() {
@@ -187,7 +185,6 @@ class Api extends Trongate {
                     echo $where_key.' is an invalid column name.';
                     die();
                 }
-
 
                 $where_start_word = $this->_extract_where_start_word($where_left_side, $where_condition_count);
                 $connective = $this->_extract_connective($where_left_side);
@@ -277,7 +274,6 @@ class Api extends Trongate {
     function _prep_key($key) { //php convert json into URL string
 
         //get last char
-
         $key = trim($key);
         $str_len = strlen($key);
         $last_char = substr($key, $str_len-1);
@@ -427,12 +423,9 @@ class Api extends Trongate {
 
             return $connective;
 
-
-
         } else {
 
             /*
-
                 must be one of the following formats:
                 * !=        { "name !=": "John"}
                 * >         { "age >" : 21}
@@ -461,10 +454,7 @@ class Api extends Trongate {
                 $type = 'offset';
                 break;
             case 'orderBy':
-                $type = $this->_check_order_by($module_name, $key);
-                break;
-            case 'order_by':
-                $type = $this->_check_order_by($module_name, $key);
+                $type = 'order by';
                 break;
             default:
                 $type = 'where';
@@ -474,26 +464,6 @@ class Api extends Trongate {
 
         return $type;
     }
-
-    function _check_order_by($module_name, $key) {
-
-        //user has submitted 'order_by' or 'orderBy'
-        //is this an order by request or a where condition?
-
-        $data['module_name'] = $module_name;
-        $columns = $this->_get_all_columns($module_name);
-        
-        if (in_array($key, $columns)) {
-            //the key is a column name!
-            $type = 'where';
-        } else {
-            $type = 'order by';
-        }
-
-        return $type;
-    }
-
-
 
     function explorer() {
         $this->module('security');
@@ -524,6 +494,5 @@ class Api extends Trongate {
         $endpoints = json_decode($settings, true);   
         return $endpoints;    
     }
-
 
 }

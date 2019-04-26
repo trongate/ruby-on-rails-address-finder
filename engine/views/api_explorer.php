@@ -416,10 +416,10 @@ var HTTP_STATUS_CODES = {
 
 function submitRequest() {
     var params = document.getElementById('params').value;
-    params = params.replace(">", "*!gt!*");
-    params = params.replace(">", "*!lt!*");
-    params = params.replace("=", "*!equalto!*");
-    params = params.replace("_", "*!underscore!*");
+    params = params.replace(/>/g, '*!gt!*');
+    params = params.replace(/</g, '*!lt!*');
+    params = params.replace(/=/g, '*!equalto!*');
+    params = params.replace(/_/g, '*!underscore!*');
 
     document.getElementById('endpointUrl').innerHTML = initialSegments;
 
@@ -434,15 +434,12 @@ function submitRequest() {
         }
     }
 
-
-
     if ((requestType == 'GET') && (params != '')) { //
         params = JSON.parse(params);
         var extraUrlSegment = '/?' + fromObject(params);
+        extraUrlSegment=extraUrlSegment.replace(/ /gi,'%20');
         targetUrl = targetUrl.concat(extraUrlSegment);
     }
-
-
 
     const http = new XMLHttpRequest()
     http.open(requestType, targetUrl)
@@ -481,8 +478,9 @@ function openModal(endpointName, endpoint_json) {
     endpoint_data = JSON.parse(endpoint_json);
     endpoint_settings = endpoint_json;
     
-    url_segments = endpoint_data.url_segments.replace("{", "<span class=\"alt-font\">{</span>");
-    url_segments = url_segments.replace("}", "<span class=\"alt-font\">}</span>");
+    url_segments = endpoint_data.url_segments.replace(/{/g, "<span class=\"alt-font\">{</span>");
+    url_segments = url_segments.replace(/}/g, "<span class=\"alt-font\">}</span>");
+
     initialSegments = url_segments;
 
     requestType = endpoint_data.request_type;
@@ -684,50 +682,7 @@ function displayHeaders() {
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 </script>
-
-
-
-
-
-
 
 <!-- End Document
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
