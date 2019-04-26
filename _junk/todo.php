@@ -1,31 +1,3 @@
-
-
-* make sure columns exist when where condition is passed                                            DONE
-
-* get http codes working and displaying on the API manager for ALL possible outcomes.               DONE
-
-http_response_code(422); //Unprocessable Entity
-http_response_code(401); //401 Unauthorized
-http_response_code(200); //OK
-
-
-    ---> make the status code go 'green' and beside the thing and right aligned.
-
-            for example;    Status: <green>200 OK</green>                                 <---      
-
-* View Endpoint Settings goes to far left.
-
-* Under top yellow textarea, add checkbox with 'Display Response Headers' (toggles headers info)
-
-* Change 'COPY RESPONSE' to 'COPY RESPONSE BODY'
-
-
-
-Then....
-
-
-* Make sure the table exists (safely!)                                                  DONE
-
 * add the actual URL to the URL Segments section
 
 * Clean up code (for example, remove the 'order by' checks that are not being used)
@@ -37,7 +9,7 @@ Then....
 * Get custom endpoints working WITH HOOKS
 
                                                 YES YES YES!!!!
-
+  
 _______________________________________________________________
 
 
@@ -50,6 +22,32 @@ NEXT DAY
 AND FINALLY
 
 * bolster all of the security
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -281,16 +281,27 @@ td {
                                 <input onclick="initBypassAuth()" type="checkbox" id="bypass" value="1">
                                 <span class="label-body">Bypass authorization</span>
                             </label>
-                            <input onclick="submitRequest()" class="button-primary" type="button" value="Submit">
+
+                            <input onclick="submitRequest()" class="button-primary" type="button" value="Submit"> 
+                            <input onclick="viewSettings()" class="button-default white-btn go-right" style="float-right; position: relative;" type="button" value="View Endpoint Settings">
                         </div>
                     </div>
                     <div class="six columns">
-                        <label for="exampleMessage">Server Response</label>
+                        <label for="exampleMessage">Server Response <span id="http-status-code"></span></label>
                         <textarea disabled class="u-full-width server-response" id="serverResponse"></textarea>
+                        <label class="example-send-yourself-copy">
+                            <input onclick="displayHeaders()" type="checkbox" id="display-headers-checkbox" value="1">
+                            <span class="label-body">Display Response Header Values</span>
+                        </label>
+
+                        <p id="header-info"></p>
                         <p class="go-right">
-                            <input onclick="viewSettings()" class="button-default white-btn go-right" style="float-right; position: relative;" type="button" value="View Endpoint Settings">
-                            <input onclick="copyText()" class="button-default white-btn go-right" style="float-right; position: relative;" type="button" value="Copy Response">
+                            <input onclick="copyText()" class="button-default white-btn go-right" style="float-right; position: relative;" type="button" value="Copy Response BODY">
                         </p>
+
+                        
+
+                        
                     </div>
                 </div>
             </form>
@@ -360,6 +371,49 @@ var fromObject = function(params, skipobjects, prefix) {
   return result;
 };
 
+
+var HTTP_STATUS_CODES = {
+        'CODE_200' : 'OK',
+        'CODE_201' : 'Created',
+        'CODE_202' : 'Accepted',
+        'CODE_203' : 'Non-Authoritative Information',
+        'CODE_204' : 'No Content',
+        'CODE_205' : 'Reset Content',
+        'CODE_206' : 'Partial Content',
+        'CODE_300' : 'Multiple Choices',
+        'CODE_301' : 'Moved Permanently',
+        'CODE_302' : 'Found',
+        'CODE_303' : 'See Other',
+        'CODE_304' : 'Not Modified',
+        'CODE_305' : 'Use Proxy',
+        'CODE_307' : 'Temporary Redirect',
+        'CODE_400' : 'Bad Request',
+        'CODE_401' : 'Unauthorized',
+        'CODE_402' : 'Payment Required',
+        'CODE_403' : 'Forbidden',
+        'CODE_404' : 'Not Found',
+        'CODE_405' : 'Method Not Allowed',
+        'CODE_406' : 'Not Acceptable',
+        'CODE_407' : 'Proxy Authentication Required',
+        'CODE_408' : 'Request Timeout',
+        'CODE_409' : 'Conflict',
+        'CODE_410' : 'Gone',
+        'CODE_411' : 'Length Required',
+        'CODE_412' : 'Precondition Failed',
+        'CODE_413' : 'Request Entity Too Large',
+        'CODE_414' : 'Request-URI Too Long',
+        'CODE_415' : 'Unsupported Media Type',
+        'CODE_416' : 'Requested Range Not Satisfiable',
+        'CODE_422' : 'Unprocessable Entity',
+        'CODE_417' : 'Expectation Failed',
+        'CODE_500' : 'Internal Server Error',
+        'CODE_501' : 'Not Implemented',
+        'CODE_502' : 'Bad Gateway',
+        'CODE_503' : 'Service Unavailable',
+        'CODE_504' : 'Gateway Timeout',
+        'CODE_505' : 'HTTP Version Not Supported'
+    };
+
 function submitRequest() {
     var params = document.getElementById('params').value;
     params = params.replace(">", "*!gt!*");
@@ -390,6 +444,24 @@ function submitRequest() {
     http.setRequestHeader('trongateToken', token)
     http.send(params)
     http.onload = function() {
+
+        responseHeaders = http.getAllResponseHeaders();
+        responseHeaders = responseHeaders.replace(/(?:\r\n|\r|\n)/g, '<br>');
+        headerInfo = '<p style="font-weight: bold;">HTTP Header Values </p><span style="font-size: 0.8em;">' + responseHeaders + '</span>';
+
+        var showHeaders = document.getElementById('display-headers-checkbox').checked;
+
+        if (showHeaders == true) {
+            document.getElementById("header-info").innerHTML = headerInfo;        
+        }
+
+        if (http.status == 200) {
+            document.getElementById("http-status-code").style.color = "green";
+        } else {
+            document.getElementById("http-status-code").style.color = "purple";
+        }
+
+        document.getElementById("http-status-code").innerHTML = http.status + ' ' + HTTP_STATUS_CODES['CODE_' + http.status];
         document.getElementById("serverResponse").disabled = false;
         document.getElementById('serverResponse').value = http.responseText;
     }
@@ -466,6 +538,14 @@ function copyText() {
 
 <style>
 
+#http-status-code {
+    color: green;
+}
+
+#header-info p {
+    margin: 0;
+}
+
 footer a:link { color: white; }
 footer a:active { color: white; }
 footer a:visited { color: white; }
@@ -536,6 +616,7 @@ window.onclick = function(event) {
 
 
 <script>
+var headerInfo = '';
 
 function initBypassAuth() {
 
@@ -566,7 +647,16 @@ function initBypassAuth() {
 
 }
 
+function displayHeaders() {
+    isChecked = document.getElementById('display-headers-checkbox').checked;
 
+    if (isChecked == true) {
+        document.getElementById("header-info").innerHTML = headerInfo;
+    } else {
+        document.getElementById("header-info").innerHTML = "";
+    }
+
+}
 
 
 
