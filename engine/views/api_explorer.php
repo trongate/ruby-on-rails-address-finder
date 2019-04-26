@@ -421,6 +421,8 @@ function submitRequest() {
     params = params.replace("=", "*!equalto!*");
     params = params.replace("_", "*!underscore!*");
 
+    document.getElementById('endpointUrl').innerHTML = initialSegments;
+
     var targetUrl = '<?= BASE_URL ?>' + document.getElementById('endpointUrl').innerHTML;
 
     if (params != '') {
@@ -432,11 +434,15 @@ function submitRequest() {
         }
     }
 
+
+
     if ((requestType == 'GET') && (params != '')) { //
         params = JSON.parse(params);
         var extraUrlSegment = '/?' + fromObject(params);
         targetUrl = targetUrl.concat(extraUrlSegment);
     }
+
+
 
     const http = new XMLHttpRequest()
     http.open(requestType, targetUrl)
@@ -444,7 +450,7 @@ function submitRequest() {
     http.setRequestHeader('trongateToken', token)
     http.send(params)
     http.onload = function() {
-
+        document.getElementById('endpointUrl').innerHTML = targetUrl.replace('<?= BASE_URL ?>', '');
         responseHeaders = http.getAllResponseHeaders();
         responseHeaders = responseHeaders.replace(/(?:\r\n|\r|\n)/g, '<br>');
         headerInfo = '<p style="font-weight: bold;">HTTP Header Values </p><span style="font-size: 0.8em;">' + responseHeaders + '</span>';
@@ -468,19 +474,8 @@ function submitRequest() {
 
 }
 
-
-
-/*
-{
-   "name":"David",
-   "city":"Glasgow"
-}
-*/
-
-
-
 var endpoint_settings = '';
-
+var initialSegments = '';
 function openModal(endpointName, endpoint_json) {
 
     endpoint_data = JSON.parse(endpoint_json);
@@ -488,7 +483,7 @@ function openModal(endpointName, endpoint_json) {
     
     url_segments = endpoint_data.url_segments.replace("{", "<span class=\"alt-font\">{</span>");
     url_segments = url_segments.replace("}", "<span class=\"alt-font\">}</span>");
-
+    initialSegments = url_segments;
 
     requestType = endpoint_data.request_type;
     var description = endpoint_data.description;

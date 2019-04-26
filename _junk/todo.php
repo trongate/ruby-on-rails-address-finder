@@ -1,4 +1,4 @@
-* add the actual URL to the URL Segments section
+* add the actual URL to the URL Segments section                                                    DONE.
 
 * Clean up code (for example, remove the 'order by' checks that are not being used)
 
