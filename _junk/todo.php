@@ -1,4 +1,4 @@
-* Get before and after hooks working for GET
+* Get before DONE and after hooks working for GET
 
 * Get custom endpoints working WITH HOOKS
 

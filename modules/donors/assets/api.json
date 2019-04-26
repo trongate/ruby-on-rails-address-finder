@@ -13,7 +13,7 @@
             "admin"
          ]
       },
-      "beforeHook":"hello"
+      "afterHook":"goodbye"
    },
    "Custom":{  
       "url_segments":"donors/custom",

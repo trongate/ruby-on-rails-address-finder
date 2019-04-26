@@ -342,12 +342,9 @@ class Api extends Trongate {
         return $params;
     }
 
-    function _attempt_invoke_before_hook($input) {
+    function _attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint) {
+
         //check API settings & find out which method (if any) to invoke
-        $module_endpoints = $this->_fetch_endpoints($input['module_name']);
-
-        $target_endpoint = $module_endpoints[$input['endpoint']];
-
         if (isset($target_endpoint['beforeHook'])) {
             //invoke the before hook
             $module_name = $input['module_name'];
@@ -357,6 +354,50 @@ class Api extends Trongate {
 
         return $input;
     }
+
+    function _attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint) {
+        //check API settings & find out which method (if any) to invoke
+
+        if (isset($target_endpoint['afterHook'])) {
+            //invoke the after hook
+            $module_name = $output['module_name'];
+            $code = $output['code'];
+            $target_method = $target_endpoint['afterHook'];
+
+            $output = $this->_clean_output($output);
+
+            //ONLY output['body'] and output['code'] is being used at this point
+            $output = Modules::run($module_name.'/'.$target_method, $output);
+
+        } else {
+            $output = $this->_clean_output($output);
+        }
+
+        return $output;
+    }
+
+    function _clean_output($output) {
+        //remove unwanted output properties
+        foreach ($output as $key => $value) {
+
+            if (($key != 'body') && ($key != 'code')) {
+                unset($output[$key]);
+            }
+        }
+
+        return $output;
+    }
+
+
+
+
+        // //attempt invoke 'before' hook
+        // $input['params'] = $params;
+        // $input['module_name'] = $module_name;
+        // $input['endpoint'] = 'Get';
+        // $input = $this->_attempt_invoke_before_hook($input);
+        // extract($input);
+
 
     function get() {
         $this->_validate_token();
@@ -371,16 +412,29 @@ class Api extends Trongate {
         $input['params'] = $params;
         $input['module_name'] = $module_name;
         $input['endpoint'] = 'Get';
-        $input = $this->_attempt_invoke_before_hook($input);
+
+        $module_endpoints = $this->_fetch_endpoints($input['module_name']);
+        $target_endpoint = $module_endpoints[$input['endpoint']];
+        $input = $this->_attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint);
         extract($input);
 
         $num_params = count($params);
 
         if ($num_params < 1) { 
             $rows = $this->model->get('id', $module_name);
-            $data = json_encode($rows);
-            http_response_code(200);
-            echo $data;         
+            $output['body'] = json_encode($rows);
+            $output['code'] = 200;
+
+            $output['body'] = json_encode($rows);
+            $output['code'] = 200;
+            $output['module_name'] = $module_name;
+
+            $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+            
+            $code = $output['code'];
+            http_response_code($code);
+            echo $output['body'];
+
         } else {
             //params were posted
             $sql = 'select * from '.$module_name;
@@ -399,9 +453,15 @@ class Api extends Trongate {
                 $rows = $this->model->query_bind($sql, $data, 'object');
             }
 
-            $result = json_encode($rows);
-            http_response_code(200);
-            echo $result;
+            $output['body'] = json_encode($rows);
+            $output['code'] = 200;
+            $output['module_name'] = $module_name;
+
+            $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+            
+            $code = $output['code'];
+            http_response_code($code);
+            echo $output['body'];
         }
         
     }

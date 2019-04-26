@@ -17,6 +17,20 @@ class Donors extends Trongate {
         return $input;
     }
 
+    function goodbye($output) {
+
+        $output['code'] = 422;
+        //$output['body'] = 'yes';
+
+        $body_obj = json_decode($output['body']);
+
+        unset($body_obj[0]->id);
+        unset($body_obj[0]->email);
+        $output['body'] = json_encode($body_obj);
+
+        return $output;
+    }
+
     function test() {
         $comments = false;
         foreach ($comments as $key => $value) {
