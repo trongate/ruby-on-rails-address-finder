@@ -1,7 +1,6 @@
 <?php
 class Donors extends Trongate {
 
-
     function custom() {
         $post = file_get_contents('php://input');
         $post = trim($post);
@@ -13,6 +12,10 @@ class Donors extends Trongate {
         echo " and you submitted a limit value of ".$limit;
     }
 
+    function hello($input) {
+        $input['params']['first_name'] = 'David';
+        return $input;
+    }
 
     function test() {
         $comments = false;

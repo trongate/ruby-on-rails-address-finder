@@ -12,7 +12,8 @@
          "roles":[  
             "admin"
          ]
-      }
+      },
+      "beforeHook":"hello"
    },
    "Custom":{  
       "url_segments":"donors/custom",

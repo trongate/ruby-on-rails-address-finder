@@ -342,13 +342,38 @@ class Api extends Trongate {
         return $params;
     }
 
+    function _attempt_invoke_before_hook($input) {
+        //check API settings & find out which method (if any) to invoke
+        $module_endpoints = $this->_fetch_endpoints($input['module_name']);
+
+        $target_endpoint = $module_endpoints[$input['endpoint']];
+
+        if (isset($target_endpoint['beforeHook'])) {
+            //invoke the before hook
+            $module_name = $input['module_name'];
+            $target_method = $target_endpoint['beforeHook'];
+            $input = Modules::run($module_name.'/'.$target_method, $input);
+        }
+
+        return $input;
+    }
+
     function get() {
         $this->_validate_token();
         $module_name = $this->url->segment(3);
         $this->_make_sure_table_exists($module_name);
+
         $sql = 'select * from '.$module_name;
 
         $params = $this->_get_params_from_url(4);
+
+        //attempt invoke 'before' hook
+        $input['params'] = $params;
+        $input['module_name'] = $module_name;
+        $input['endpoint'] = 'Get';
+        $input = $this->_attempt_invoke_before_hook($input);
+        extract($input);
+
         $num_params = count($params);
 
         if ($num_params < 1) { 
