@@ -1,5 +1,5 @@
 <?php
-class Api extends Trongate  DUFF ____ DO NOT USE!!!! {
+class DUFF!!!!!   Api extends Trongate  DUFF ____ DO NOT USE!!!! {
 
     function get($module_name) {
         $rows = $this->model->get('id', 'donors');
@@ -10,15 +10,6 @@ class Api extends Trongate  DUFF ____ DO NOT USE!!!! {
         $module_name = 'donors';
         $this->get($module_name);
     }
-
-
-    function test() {
-        $this->module('security');
-        $this->module('trongate_tokens');
-
-        $token_data['user_id'] = $this->security->_get_user_id();
-        $data['token'] = $this->trongate_tokens->_generate_token($token_data);
-    }    
 
     function explorer() {
         $this->module('security');
@@ -47,15 +38,6 @@ class Api extends Trongate  DUFF ____ DO NOT USE!!!! {
         $module_name = $this->url->segment(3);
         $file_path = APPPATH.'modules/'.$module_name.'/api/assets/api_settings.json';
         $settings = file_get_contents($file_path);
-
-                        // $ditch = '}';
-                        // $replace = '<span class=&quot;alt-font&quot;>}</span>';
-                        // $settings = str_replace($ditch, $replace, $settings);
-                        // $ditch = '{';
-                        // $replace = '<span class=&quot;alt-font&quot;>{</span>';
-                        // $settings = str_replace($ditch, $replace, $settings);
-
-
         $endpoints = json_decode($settings, true);   
         return $endpoints;    
     }
@@ -78,7 +60,5 @@ class Api extends Trongate  DUFF ____ DO NOT USE!!!! {
         unset($settings['Exists By Post']);
         return $settings;
     }
-
-   
 
 }

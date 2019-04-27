@@ -1,22 +1,40 @@
-* Get before DONE and after hooks working for GET
-
-* Get custom endpoints working WITH HOOKS
+* Get before DONE and after hooks working for GET                       DONE
 
                                                 YES YES YES!!!!
   
+
+QUESTION:  Should the header('token') be passed into before and after hooks?
+   (probably!)
+ 
+
+ Yeah!
 _______________________________________________________________
 
 
-NEXT DAY
+* Get custom endpoints working WITH HOOKS
+
+SUNDAY, MONDAY, TUESDAY.
+
+_______________________________________________________________
+
+
+
+
+NEXT DAY (Wednesday)
 
 * Finish all of the endpoints
 
 ---------------------------------------------------------------
 
-AND FINALLY
+AND FINALLY (Thursday)
 
 * bolster all of the security
 
+---------------------------------------------------------------
+
+Friday
+
+Make video demo for Speed Coding Academy and upload.
 
 
 

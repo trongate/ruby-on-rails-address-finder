@@ -136,8 +136,8 @@ class Api extends Trongate {
     }
 
     function _not_allowed_msg() {
-        //http_response_code(401);
-        //echo "Invalid token."; die();
+        http_response_code(401);
+        echo "Invalid token."; die();
     }
 
     function _validate_token() {
@@ -154,6 +154,7 @@ class Api extends Trongate {
             }
         }
 
+        return $token;
     }
 
     function _add_params_to_query($module_name, $sql, $params) {
@@ -400,7 +401,7 @@ class Api extends Trongate {
 
 
     function get() {
-        $this->_validate_token();
+        $input['token'] = $this->_validate_token();
         $module_name = $this->url->segment(3);
         $this->_make_sure_table_exists($module_name);
 

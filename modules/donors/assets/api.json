@@ -2,7 +2,6 @@
    "Get":{  
       "url_segments":"api/get/donors",
       "request_type":"GET",
-      "type":"banana",
       "description":"Fetch rows from the table",
       "required_fields": [
         {"Token":"token"},
@@ -13,6 +12,7 @@
             "admin"
          ]
       },
+      "beforeHook":"hello",
       "afterHook":"goodbye"
    },
    "Custom":{  
