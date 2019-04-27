@@ -13,11 +13,16 @@ class Donors extends Trongate {
     }
 
     function hello($input) {
+
+        echo "input knows that your token is ".$input['token'];
+
         //$input['params']['first_name'] = 'David';
         return $input;
     }
 
     function goodbye($output) {
+
+        echo "output knows that your token is ".$output['token']; die();
 
         // $output['code'] = 422;
         // //$output['body'] = 'yes';

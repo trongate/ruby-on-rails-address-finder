@@ -381,7 +381,7 @@ class Api extends Trongate {
         //remove unwanted output properties
         foreach ($output as $key => $value) {
 
-            if (($key != 'body') && ($key != 'code')) {
+            if (($key != 'body') && ($key != 'code') && ($key != 'token')) {
                 unset($output[$key]);
             }
         }
@@ -402,6 +402,7 @@ class Api extends Trongate {
 
     function get() {
         $input['token'] = $this->_validate_token();
+        $output['token'] = $input['token'];
         $module_name = $this->url->segment(3);
         $this->_make_sure_table_exists($module_name);
 
