@@ -283,7 +283,7 @@ td {
                             </label>
 
                             <input onclick="submitRequest()" class="button-primary" type="button" value="Submit"> 
-                            <input onclick="viewSettings()" class="button-default white-btn go-right" style="float-right; position: relative;" type="button" value="View Endpoint Settings">
+                            
                         </div>
                     </div>
                     <div class="six columns">
@@ -296,6 +296,7 @@ td {
 
                         <p id="header-info"></p>
                         <p class="go-right">
+                            <input onclick="viewSettings()" class="button-default white-btn go-right" style="float-right; position: relative;" type="button" value="View Settings">
                             <input onclick="copyText()" class="button-default white-btn go-right" style="float-right; position: relative;" type="button" value="Copy Response BODY">
                         </p>
 

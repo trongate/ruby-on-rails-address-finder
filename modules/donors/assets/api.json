@@ -7,31 +7,26 @@
          "roles":[  
             "admin"
          ]
-      },
-      "beforeHook":"hello",
-      "afterHook":"goodbye"
+      }
    },
-   "Create":{  
-      "url_segments":"api/create/donors",
-      "request_type":"POST",
-      "description":"Insert database record by evaluating posting data",
+   "Find One":{  
+      "url_segments":"api/get/donors/{id}",
+      "request_type":"GET",
+      "description":"Fetch one row from database table",
+      "required_fields": [
+        {
+           "name": "id",
+           "label": "ID" 
+        }
+      ],
+      "beforeHook":"nailIt",
       "authorization":{  
          "roles":[  
             "admin"
          ]
       }
    },
-   "Upsert":{  
-      "url_segments":"api/upsert/donors",
-      "request_type":"POST",
-      "description":"Attempt update a database record or create new record",
-      "authorization":{  
-         "roles":[  
-            "admin"
-         ]
-      }
-   },
-   "Update":{  
+      "Update":{  
       "url_segments":"api/update/donors",
       "request_type":"POST",
       "description":"Update a database record",
@@ -41,20 +36,22 @@
          ]
       }
    },
-   "Find One":{  
-      "url_segments":"api/get/donors/{id}",
-      "request_type":"GET",
-      "description":"Fetch one row from database table",
+   "Create":{  
+      "url_segments":"api/create/donors",
+      "request_type":"POST",
+      "description":"Insert database record by evaluating posting data",
       "authorization":{  
          "roles":[  
             "admin"
          ]
-      }
+      },
+            "beforeHook":"hello",
+      "afterHook":"goodbye"
    },
-   "Find By Post":{  
-      "url_segments":"api/find/donors",
+   "Upsert":{  
+      "url_segments":"api/upsert/donors",
       "request_type":"POST",
-      "description":"Fetch rows from the table",
+      "description":"Attempt update a database record or create new record",
       "authorization":{  
          "roles":[  
             "admin"
@@ -85,16 +82,6 @@
       "url_segments":"api/exists/donors/{id}",
       "request_type":"GET",
       "description":"Check if instance exists",
-      "authorization":{  
-         "roles":[  
-            "admin"
-         ]
-      }
-   },
-   "Exists By Post":{  
-      "url_segments":"api/exists/donors",
-      "request_type":"POST",
-      "description":"Check if row(s) exists",
       "authorization":{  
          "roles":[  
             "admin"
