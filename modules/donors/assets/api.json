@@ -28,10 +28,16 @@
          ]
       }
    },
-      "Exists":{  
+   "Exists":{  
       "url_segments":"api/exists/donors/{id}",
       "request_type":"GET",
       "description":"Check if instance exists",
+      "required_fields": [
+        {
+           "name": "id",
+           "label": "ID" 
+        }
+      ],
       "authorization":{  
          "roles":[  
             "admin"

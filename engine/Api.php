@@ -389,6 +389,53 @@ class Api extends Trongate {
         return $output;
     }
 
+    function exists() {
+        $input['token'] = $this->_validate_token();
+        $output['token'] = $input['token'];
+        $module_name = $this->url->segment(3);
+        $this->_make_sure_table_exists($module_name);
+
+        $update_id = $this->url->segment(4);
+
+        if (!is_numeric($update_id)) {
+            http_response_code(422);
+            echo "Non numeric ID"; die();
+        } else {
+
+            //attempt invoke 'before' hook
+            $input['token'] = $input['token'];
+            $input['params'] = [];
+            $input['module_name'] = $module_name;   
+            $input['endpoint'] = 'Exists'; 
+
+            $module_endpoints = $this->_fetch_endpoints($input['module_name']);
+            $target_endpoint = $module_endpoints[$input['endpoint']];
+            $input = $this->_attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint);
+            extract($input);
+
+            $result = $this->model->get_where($update_id, $module_name);
+
+            if ($result == false) {
+                $result = 'false';
+            } else {
+                $result = 'true';
+            }
+
+            $output['body'] = $result;
+            $output['code'] = 200;
+            $output['module_name'] = $module_name;
+
+            $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+            
+            $code = $output['code'];
+            http_response_code($code);
+            echo $output['body'];            
+
+
+        }
+
+    }
+
     function _find_one($module_name, $update_id, $token) {
 
         //attempt invoke 'before' hook
@@ -431,8 +478,6 @@ class Api extends Trongate {
         }
 
         $sql = 'select * from '.$module_name;
-
-        
 
         //attempt invoke 'before' hook
         $input['params'] = $params;
