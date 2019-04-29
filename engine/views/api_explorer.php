@@ -474,7 +474,13 @@ function submitRequest() {
 
 var endpoint_settings = '';
 var initialSegments = '';
+
 function openModal(endpointName, endpoint_json) {
+
+    document.getElementById("serverResponse").value = '';
+    document.getElementById("http-status-code").innerHTML = '';
+    document.getElementById("header-info").innerHTML = '';
+    
 
     endpoint_data = JSON.parse(endpoint_json);
     endpoint_settings = endpoint_json;
