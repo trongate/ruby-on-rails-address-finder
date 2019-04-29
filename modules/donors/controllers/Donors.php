@@ -12,6 +12,19 @@ class Donors extends Trongate {
         echo " and you submitted a limit value of ".$limit;
     }
 
+    function rambo() {
+
+        $this->module('trongate_tokens');
+        $input['token'] = $this->trongate_tokens->_validate_token();
+        $output['token'] = $input['token'];
+
+
+
+        echo "If you want a war I'll give you a war you won't believe.";
+        echo " Your token number is ".$input['token'];
+        die();
+    }
+
     function hello($input) {
 
         echo "input knows that your token is ".$input['token'];

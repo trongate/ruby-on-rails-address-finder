@@ -19,7 +19,7 @@ class DUFF!!!!!   Api extends Trongate  DUFF ____ DO NOT USE!!!! {
         $data['token'] = $this->trongate_tokens->_generate_token($token_data);
         $data['endpoints'] = $this->_fetch_endpoints();
         $target_module = $this->url->segment(3);
-        $data['endpoint_settings_location'] = '/modules/'.$target_module.'/api/assets/api_settings.json';
+        $data['endpoint_settings_location'] = '/modules/'.$target_module.'/assets/api.json';
 
         $this->view('explorer', $data);
     }
@@ -36,7 +36,7 @@ class DUFF!!!!!   Api extends Trongate  DUFF ____ DO NOT USE!!!! {
 
     function _fetch_endpoints() {
         $module_name = $this->url->segment(3);
-        $file_path = APPPATH.'modules/'.$module_name.'/api/assets/api_settings.json';
+        $file_path = APPPATH.'modules/'.$module_name.'/assets/api.json';
         $settings = file_get_contents($file_path);
         $endpoints = json_decode($settings, true);   
         return $endpoints;    
@@ -44,7 +44,7 @@ class DUFF!!!!!   Api extends Trongate  DUFF ____ DO NOT USE!!!! {
 
     function _attempt_fetch_custom_endpoints() {
         $module_name = $this->url->segment(3);
-        $file_path = APPPATH.'modules/'.$module_name.'/api/assets/api_settings.json';
+        $file_path = APPPATH.'modules/'.$module_name.'/assets/api.json';
         $settings = file_get_contents($file_path);
         $settings = json_decode($settings, true);
 

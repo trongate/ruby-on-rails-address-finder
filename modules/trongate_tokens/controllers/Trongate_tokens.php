@@ -21,36 +21,21 @@ class Trongate_tokens extends Trongate {
         echo $new_token;
     }
 
-    function _attempt_generate_bypass_tokenOLD($token) {
+    function _validate_token() {
 
-        $sql = 'SELECT trongate_user_levels.level_title, 
-                    trongate_users.id
-                FROM trongate_tokens INNER JOIN trongate_users ON trongate_tokens.user_id = trongate_users.id
-                     INNER JOIN trongate_user_levels ON trongate_users.user_level_id = trongate_user_levels.id
-                WHERE trongate_tokens.token = :token';
+        if (!isset($_SERVER['HTTP_TRONGATETOKEN'])) {
+            $this->_not_allowed_msg();
+        } else {
+            $token = $_SERVER['HTTP_TRONGATETOKEN'];
+            $this->module('trongate_tokens');
+            $valid = $this->trongate_tokens->_is_token_valid($token); //returns true if num rows>0
 
-        $data['token'] = $token;
-
-        $result = $this->model->query_bind($sql, $data, 'object');
-
-        if (isset($result[0])) {
-
-            $user = $result[0];
-            $user_id = $user->id;
-            $user_level = $user->level_title;
-
-            if ($user_level == 'admin') {
-                //create a new special token
-                $token_data['user_id'] = $user_id;
-                $token_data['code'] = '***';
-                $this->module('trongate_tokens');
-                $new_token = $this->trongate_tokens->_generate_token($token_data);
-                echo $new_token;
+            if ($valid == false) {
+                $this->_not_allowed_msg();
             }
-
         }
 
-
+        return $token;
     }
 
     function clean() {

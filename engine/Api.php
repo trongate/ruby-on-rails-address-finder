@@ -562,7 +562,7 @@ class Api extends Trongate {
         // $data['token'] = $this->trongate_tokens->_generate_token($token_data);
         
         $data['endpoints'] = $this->_fetch_endpoints($target_module);
-        $data['endpoint_settings_location'] = '/modules/'.$target_module.'/api/assets/api_settings.json';
+        $data['endpoint_settings_location'] = '/modules/'.$target_module.'/assets/api.json';
 
         $view_file = $file_path = APPPATH.'engine/views/api_explorer.php';
         extract($data);

@@ -3,10 +3,6 @@
       "url_segments":"api/get/donors",
       "request_type":"GET",
       "description":"Fetch rows from the table",
-      "required_fields": [
-        {"Token":"token"},
-        {"ID":"id"}
-      ],
       "authorization":{  
          "roles":[  
             "admin"
@@ -14,16 +10,6 @@
       },
       "beforeHook":"hello",
       "afterHook":"goodbye"
-   },
-   "Custom":{  
-      "url_segments":"donors/custom",
-      "request_type":"POST",
-      "description":"Do something with a table that has a column called limit",
-      "authorization":{  
-         "roles":[  
-            "admin"
-         ]
-      }
    },
    "Create":{  
       "url_segments":"api/create/donors",
@@ -58,7 +44,6 @@
    "Find One":{  
       "url_segments":"api/get/donors/{id}",
       "request_type":"GET",
-      "type":"banana",
       "description":"Fetch one row from database table",
       "authorization":{  
          "roles":[  
@@ -69,7 +54,6 @@
    "Find By Post":{  
       "url_segments":"api/find/donors",
       "request_type":"POST",
-      "type":"banana",
       "description":"Fetch rows from the table",
       "authorization":{  
          "roles":[  
