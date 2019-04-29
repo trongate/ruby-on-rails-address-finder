@@ -12,6 +12,11 @@ class Donors extends Trongate {
         echo " and you submitted a limit value of ".$limit;
     }
 
+    function nail_it($input) {
+        echo "nailing it";
+        return $input;
+    }
+
     function rambo() {
 
         $this->module('trongate_tokens');
@@ -31,6 +36,11 @@ class Donors extends Trongate {
 
         //$input['params']['first_name'] = 'David';
         return $input;
+    }
+
+    function cheerio($output) {
+        echo "cheerio";
+        return $output;
     }
 
     function goodbye($output) {

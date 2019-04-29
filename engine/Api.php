@@ -389,16 +389,32 @@ class Api extends Trongate {
         return $output;
     }
 
+    function _find_one($module_name, $update_id, $token) {
+
+        //attempt invoke 'before' hook
+        $input['token'] = $token;
+        $input['params'] = [];
+        $input['module_name'] = $module_name;   
+        $input['endpoint'] = 'Find One'; 
+
+        $module_endpoints = $this->_fetch_endpoints($input['module_name']);
+        $target_endpoint = $module_endpoints[$input['endpoint']];
+        $input = $this->_attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint);
+        extract($input);
 
 
+        $result = $this->model->get_where($update_id, $module_name);
 
-        // //attempt invoke 'before' hook
-        // $input['params'] = $params;
-        // $input['module_name'] = $module_name;
-        // $input['endpoint'] = 'Get';
-        // $input = $this->_attempt_invoke_before_hook($input);
-        // extract($input);
+        $output['body'] = json_encode($result);
+        $output['code'] = 200;
+        $output['module_name'] = $module_name;
 
+        $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+        
+        $code = $output['code'];
+        http_response_code($code);
+        echo $output['body'];
+    }
 
     function get() {
         $input['token'] = $this->_validate_token();
@@ -406,9 +422,17 @@ class Api extends Trongate {
         $module_name = $this->url->segment(3);
         $this->_make_sure_table_exists($module_name);
 
+        $fourth_bit = $this->url->segment(4);
+
+        if (is_numeric($fourth_bit)) {
+            $this->_find_one($module_name, $fourth_bit, $input['token']);
+        } else {
+            $params = $this->_get_params_from_url(4);
+        }
+
         $sql = 'select * from '.$module_name;
 
-        $params = $this->_get_params_from_url(4);
+        
 
         //attempt invoke 'before' hook
         $input['params'] = $params;
@@ -424,9 +448,6 @@ class Api extends Trongate {
 
         if ($num_params < 1) { 
             $rows = $this->model->get('id', $module_name);
-            $output['body'] = json_encode($rows);
-            $output['code'] = 200;
-
             $output['body'] = json_encode($rows);
             $output['code'] = 200;
             $output['module_name'] = $module_name;

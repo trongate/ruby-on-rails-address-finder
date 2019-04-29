@@ -21,7 +21,8 @@
         }
       ],
       "enableParams": false,
-      "beforeHook":"nailIt",
+      "beforeHook":"nail_it",
+      "afterHook":"cheerio",
       "authorization":{  
          "roles":[  
             "admin"
