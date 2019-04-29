@@ -20,7 +20,6 @@
            "label": "ID" 
         }
       ],
-      "enableParams": false,
       "beforeHook":"nail_it",
       "afterHook":"cheerio",
       "authorization":{  
@@ -31,8 +30,14 @@
    },
       "Update":{  
       "url_segments":"api/update/donors",
-      "request_type":"POST",
+      "request_type":"PUT",
       "description":"Update a database record",
+      "required_fields": [
+        {
+           "name": "id",
+           "label": "ID" 
+        }
+      ],
       "authorization":{  
          "roles":[  
             "admin"
@@ -63,7 +68,7 @@
    },
    "Destroy":{  
       "url_segments":"api/destroy/donors",
-      "request_type":"POST",
+      "request_type":"DELETE",
       "description":"Delete row or rows",
       "authorization":{  
          "roles":[  
@@ -73,7 +78,7 @@
    },
    "Destroy One":{  
       "url_segments":"api/delete/donors/{id}",
-      "request_type":"GET",
+      "request_type":"DELETE",
       "description":"Delete one row from database table",
       "authorization":{  
          "roles":[  

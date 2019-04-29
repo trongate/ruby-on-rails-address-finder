@@ -173,6 +173,16 @@ input[type="button"].button-primary {
     border: 1px #02738c solid !important;
 }
 
+.red {
+    background-color: #a11e02 !important;
+    border: 1px #a11e02 solid !important;
+}
+
+.red:hover {
+    background-color: #6f1501 !important;
+    border: 1px #6f1501 solid !important;
+}
+
 td {
     padding: 8px;
     vertical-align: center !important;
@@ -218,14 +228,31 @@ td {
                   </thead>
                   <tbody>
                     <?php
+
+
+
+
                     foreach($endpoints as $endpoint_name => $endpoint) {
 
                         $endpoint_json = json_encode($endpoint);
 
-                        if ($endpoint['request_type'] == 'GET') {
+
+                        switch($endpoint['request_type']) {
+                          case 'GET':
                             $btn_theme = 'green';
-                        } else {
+                            break;
+                          case 'POST':
                             $btn_theme = 'purple';
+                            break;
+                          case 'PUT':
+                            $btn_theme = 'deep-purple';
+                            break;
+                          case 'DELETE':
+                            $btn_theme = 'red';
+                            break;
+                          default:
+                            $btn_theme = 'green';
+                            break;
                         }
 
                         $endpoint_data = json_encode($endpoint);
