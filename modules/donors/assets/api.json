@@ -3,6 +3,7 @@
       "url_segments":"api/get/donors",
       "request_type":"GET",
       "description":"Fetch rows from the table",
+      "enableParams": true,
       "authorization":{  
          "roles":[  
             "admin"
@@ -19,6 +20,7 @@
            "label": "ID" 
         }
       ],
+      "enableParams": false,
       "beforeHook":"nailIt",
       "authorization":{  
          "roles":[  

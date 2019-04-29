@@ -275,6 +275,7 @@ td {
                 <div class="row">
                     <div class="six columns">
                         <div class="twelve columns">
+                            <div id="extra-required-fields"></div>
                             <label for="exampleMessage">Parameters</label>
                             <textarea onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'   '+v.substring(e);this.selectionStart=this.selectionEnd=s+3;return false;}" class="u-full-width" placeholder="Enter parameters in JSON format" id="params"></textarea>
                             <label class="example-send-yourself-copy">
@@ -331,7 +332,8 @@ td {
 var requestType = 'GET';
 var url_segments;
 var endpoint;
-
+var extraFieldsHtml = '';
+var extraRequiredFields = [];
 
 
 
@@ -442,6 +444,8 @@ function submitRequest() {
         targetUrl = targetUrl.concat(extraUrlSegment);
     }
 
+    targetUrl = targetUrl.replace(/<(.|\n)*?>/g, '');
+
     const http = new XMLHttpRequest()
     http.open(requestType, targetUrl)
     http.setRequestHeader('Content-type', 'application/json')
@@ -472,6 +476,26 @@ function submitRequest() {
 
 }
 
+function drawRequiredFields(required_fields) {
+    extraFieldsHtml = '';
+    for (var i = 0; i < required_fields.length; i++) {
+        var fieldName = required_fields[i]['name'];
+        var fieldLabel = required_fields[i]['label'];
+        extraFieldsHtml = extraFieldsHtml.concat('<label for="text_field">' + fieldLabel + '</label>');
+        extraFieldsHtml = extraFieldsHtml.concat('<input type="text" name="' + fieldName + '" id="text_field" class="u-full-width" placeholder="Enter ' + fieldLabel + ' here">');
+
+        var extraField = {
+            "name": fieldName,
+            "label": fieldLabel
+        }
+
+        extraRequiredFields.push(extraField);
+
+    }
+
+    document.getElementById("extra-required-fields").innerHTML = extraFieldsHtml;
+}
+
 var endpoint_settings = '';
 var initialSegments = '';
 
@@ -480,10 +504,31 @@ function openModal(endpointName, endpoint_json) {
     document.getElementById("serverResponse").value = '';
     document.getElementById("http-status-code").innerHTML = '';
     document.getElementById("header-info").innerHTML = '';
+    document.getElementById("extra-required-fields").innerHTML = '';
+    extraRequiredFields = [];
     
-
     endpoint_data = JSON.parse(endpoint_json);
     endpoint_settings = endpoint_json;
+
+
+    if (endpoint_data.enableParams == true) {
+        document.getElementById("params").disabled = false;
+        document.getElementById("params").style.backgroundColor = '#fff';
+        document.getElementById("params").style.minHeight = '200px';
+    } else {
+        document.getElementById("params").value = '';
+        document.getElementById("params").disabled = true;
+        document.getElementById("params").style.backgroundColor = '#ddd';
+        document.getElementById("params").style.minHeight = '118px';
+    }
+
+    if (endpoint_data.required_fields) {
+        setTimeout(drawRequiredFields, 100, endpoint_data.required_fields);
+    }
+
+    console.log(endpointName);
+    console.log(endpoint_data);
+    console.log(endpoint_settings);
     
     url_segments = endpoint_data.url_segments.replace(/{/g, "<span class=\"alt-font\">{</span>");
     url_segments = url_segments.replace(/}/g, "<span class=\"alt-font\">}</span>");
