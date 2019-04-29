@@ -183,7 +183,7 @@ class Api extends Trongate {
                 $columns = $this->_get_all_columns($module_name);
                 if (!in_array($where_key, $columns)) {
                     http_response_code(422);
-                    echo $where_key.' is an invalid column name.';
+                    echo $where_key.' is not a valid variable type or column name.';
                     die();
                 }
 
