@@ -374,6 +374,29 @@ var fromObject = function(params, skipobjects, prefix) {
   return result;
 };
 
+function replacePlaceholders(targetUrl) {
+
+    for (var i = 0; i < extraRequiredFields.length; i++) {
+        var targetId = 'extra-required-field-' + extraRequiredFields[i].name;
+        var fieldValue = document.getElementById(targetId).value;
+
+        fieldValue = fieldValue.replace(/ /g, '');
+        if (fieldValue == '') {
+            alert("You did not enter a value for " + extraRequiredFields[i].name);
+            document.getElementById(targetId).value = '';
+            return false;
+        } else {
+            var ditch = '{' + extraRequiredFields[i].name + '}';
+            var replace = fieldValue;
+            targetUrl = targetUrl.replace(ditch, replace);
+            console.log(targetUrl);
+        }
+
+    }
+
+    return targetUrl;
+}
+
 
 var HTTP_STATUS_CODES = {
         'CODE_200' : 'OK',
@@ -445,6 +468,11 @@ function submitRequest() {
     }
 
     targetUrl = targetUrl.replace(/<(.|\n)*?>/g, '');
+    targetUrl = replacePlaceholders(targetUrl);
+
+    if (targetUrl == false) {
+        return; //user left out a required field, so end this
+    }
 
     const http = new XMLHttpRequest()
     http.open(requestType, targetUrl)
@@ -482,7 +510,7 @@ function drawRequiredFields(required_fields) {
         var fieldName = required_fields[i]['name'];
         var fieldLabel = required_fields[i]['label'];
         extraFieldsHtml = extraFieldsHtml.concat('<label for="text_field">' + fieldLabel + '</label>');
-        extraFieldsHtml = extraFieldsHtml.concat('<input type="text" name="' + fieldName + '" id="text_field" class="u-full-width" placeholder="Enter ' + fieldLabel + ' here">');
+        extraFieldsHtml = extraFieldsHtml.concat('<input type="text" name="' + fieldName + '" id="extra-required-field-' + fieldName + '" class="u-full-width" placeholder="Enter ' + fieldLabel + ' here">');
 
         var extraField = {
             "name": fieldName,
