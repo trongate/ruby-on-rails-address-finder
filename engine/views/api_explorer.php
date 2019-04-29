@@ -295,7 +295,7 @@ td {
             <span onclick="document.getElementById('id01').style.display='none'" class="w3-button w3-display-topright">&times;</span>
             <h2 id="endpointName"></h2>
         </header>
-        <div id="modal-content" class="w3-container modal-content-alt">
+        <div id="modal-content" class="w3-container modal-content-get">
             <h4 style="margin-top: 0.4em;">Test Your API Endpoint</h4>
 
             <form>
@@ -602,7 +602,19 @@ function openModal(endpointName, endpoint_json) {
     if (requestType == 'GET') {
         document.getElementById('modal-header').className = 'w3-container theme-b white-text';
         document.getElementById('modal-footer').className = 'w3-container theme-b white-text';
-        document.getElementById('modal-content').className = 'w3-container modal-content-alt';
+        document.getElementById('modal-content').className = 'w3-container modal-content-get';
+    }
+
+    if (requestType == 'PUT') {
+        document.getElementById('modal-header').className = 'w3-container theme-c white-text';
+        document.getElementById('modal-footer').className = 'w3-container theme-c white-text';
+        document.getElementById('modal-content').className = 'w3-container modal-content-put';
+    }
+
+    if (requestType == 'DELETE') {
+        document.getElementById('modal-header').className = 'w3-container theme-d white-text';
+        document.getElementById('modal-footer').className = 'w3-container theme-d white-text';
+        document.getElementById('modal-content').className = 'w3-container modal-content-delete';
     }
     
 
@@ -664,11 +676,19 @@ textarea {
     background: #f3f2ff;
 }
 
-.modal-content-alt {
+.modal-content-get {
     background: #eaf9fc;
 }
 
-.theme-a p, .theme-b p {
+.modal-content-put {
+    background: #f7eff9;
+}
+
+.modal-content-delete {
+    background: #fff;
+}
+
+.theme-a p, .theme-b p, .theme-c p, .theme-d p {
     padding: 1em 0;
     margin: 0;
 }
@@ -685,6 +705,14 @@ textarea {
 
 .theme-b {
     background-color: #0285A1;
+}
+
+.theme-c {
+    background-color: #470B59;
+}
+
+.theme-d {
+    background-color: #a11e02;
 }
 
 .white-text {
