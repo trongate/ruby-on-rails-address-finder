@@ -183,7 +183,7 @@ class Api extends Trongate {
                 $columns = $this->_get_all_columns($module_name);
                 if (!in_array($where_key, $columns)) {
                     http_response_code(422);
-                    echo $where_key.' is not a valid variable type or column name.';
+                    echo $where_key.' is not a valid value or column name.';
                     die();
                 }
 
@@ -272,6 +272,17 @@ class Api extends Trongate {
         return $params;
     }
 
+    function _get_params_from_post($decoded) {
+        $params = [];
+        foreach ($decoded as $key => $value) {
+            $key = $this->_prep_key($key); 
+            $value = $this->_remove_special_characters($value);          
+            $params[$key] = $value;
+        }
+
+        return $params;
+    }
+
     function _prep_key($key) { //php convert json into URL string
 
         //get last char
@@ -336,12 +347,12 @@ class Api extends Trongate {
         return $str;
     }
 
-    function _get_params_from_post() {
-        $post = file_get_contents('php://input');
-        $post = trim($post);
-        $params = json_decode($post, true);
-        return $params;
-    }
+    // function _get_params_from_post() {
+    //     $post = file_get_contents('php://input');
+    //     $post = trim($post);
+    //     $params = json_decode($post, true);
+    //     return $params;
+    // }
 
     function _attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint) {
 
@@ -461,6 +472,7 @@ class Api extends Trongate {
         $code = $output['code'];
         http_response_code($code);
         echo $output['body'];
+        die();
     }
 
     function get() {
@@ -532,6 +544,155 @@ class Api extends Trongate {
             echo $output['body'];
         }
         
+    }
+
+    function count() {
+        $input['token'] = $this->_validate_token();
+        $output['token'] = $input['token'];
+        $module_name = $this->url->segment(3);
+        $this->_make_sure_table_exists($module_name);
+        $params = $this->_get_params_from_url(4);
+        
+        $sql = 'select * from '.$module_name;
+
+        //attempt invoke 'before' hook
+        $input['params'] = $params;
+        $input['module_name'] = $module_name;
+        $input['endpoint'] = 'Get';
+
+        $module_endpoints = $this->_fetch_endpoints($input['module_name']);
+        $target_endpoint = $module_endpoints[$input['endpoint']];
+        $input = $this->_attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint);
+        extract($input);
+
+        $num_params = count($params);
+
+        if ($num_params < 1) { 
+            $rows = $this->model->get('id', $module_name);
+            $output['body'] = count($rows);
+            $output['code'] = 200;
+            $output['module_name'] = $module_name;
+
+            $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+            
+            $code = $output['code'];
+            http_response_code($code);
+            echo $output['body'];
+
+        } else {
+            //params were posted
+            $sql = 'select * from '.$module_name;
+            $params = json_encode($params);
+            $params = ltrim($params);
+            $params = json_decode($params);
+            $params = get_object_vars($params);
+            $query_info = $this->_add_params_to_query($module_name, $sql, $params);
+
+            $sql = $query_info['sql'];
+            $data = $query_info['data'];
+
+            if (count($data)<1) {
+                $rows = $this->model->query($sql, 'object');
+            } else {
+                $rows = $this->model->query_bind($sql, $data, 'object');
+            }
+
+            $output['body'] = count($rows);
+            $output['code'] = 200;
+            $output['module_name'] = $module_name;
+
+            $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+            
+            $code = $output['code'];
+            http_response_code($code);
+            echo $output['body'];
+        }
+        
+    }
+
+    function _make_sure_columns_exist($module_name, $params) {
+        //make sure this column exists on the table
+        $invalid_columns = [];
+        $columns = $this->_get_all_columns($module_name);
+
+        foreach ($params as $key => $value) {
+            if (!in_array($key,$columns)) {
+                $invalid_columns[] = $key;
+            }
+        }
+
+        if (count($invalid_columns)) {
+            $error_count = 0;
+            http_response_code(422);
+
+            $msg = "The following fields are not valid; ";
+
+            if (count($invalid_columns)==1) {
+                $msg = str_replace('fields are', 'field is', $msg);
+            }
+
+            echo $msg;
+
+            foreach ($invalid_columns as $invalid_field) {
+                $error_count++;
+                echo $invalid_field;
+
+                if ($error_count<count($invalid_columns)) {
+                    echo ", ";
+                }
+
+                echo '.';
+            }
+            die();
+        }
+
+    }
+
+    function create() {
+
+        $input['token'] = $this->_validate_token();
+        $output['token'] = $input['token'];
+        $module_name = $this->url->segment(3);
+        $this->_make_sure_table_exists($module_name);
+
+        $post = file_get_contents('php://input');
+        $decoded = json_decode($post, true);
+
+        if (count($decoded)>0) {
+            $params = $this->_get_params_from_post($decoded);
+        } else {
+            $params = [];
+        }
+        
+        //attempt invoke 'before' hook
+        $input['params'] = $params;
+        $input['module_name'] = $module_name;
+        $input['endpoint'] = 'Create';
+
+        $module_endpoints = $this->_fetch_endpoints($input['module_name']);
+        $target_endpoint = $module_endpoints[$input['endpoint']];
+        $input = $this->_attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint);
+        extract($input);
+
+        if (count($params)>0) {
+            //make sure params are valid
+            $this->_make_sure_columns_exist($module_name, $params);
+            $new_id = $this->model->insert($params, $module_name);
+            $result = $this->model->get_where($new_id, $module_name);
+            $output['code'] = 200;
+            $output['body'] = json_encode($result);
+        } else {
+            $output['code'] = 422;
+            $output['body'] = '';
+        }
+
+        $output['module_name'] = $module_name;
+        $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+
+        $code = $output['code'];
+        http_response_code($code);
+        echo $output['body'];
+
     }
 
     function _figure_out_connective($key, $bits) {

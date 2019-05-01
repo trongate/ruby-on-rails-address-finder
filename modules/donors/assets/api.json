@@ -20,8 +20,6 @@
            "label": "ID" 
         }
       ],
-      "beforeHook":"nail_it",
-      "afterHook":"cheerio",
       "authorization":{  
          "roles":[  
             "admin"
@@ -32,6 +30,8 @@
       "url_segments":"api/exists/donors/{id}",
       "request_type":"GET",
       "description":"Check if instance exists",
+      "beforeHook":"start",
+      "afterHook":"end",
       "required_fields": [
         {
            "name": "id",
@@ -45,9 +45,10 @@
       }
    },
    "Count":{  
-      "url_segments":"api/exists/donors",
+      "url_segments":"api/count/donors",
       "request_type":"GET",
       "description":"Count number of records",
+      "enableParams": true,
       "authorization":{  
          "roles":[  
             "admin"
@@ -58,13 +59,12 @@
       "url_segments":"api/create/donors",
       "request_type":"POST",
       "description":"Insert database record",
+      "enableParams": true,
       "authorization":{  
          "roles":[  
             "admin"
          ]
-      },
-            "beforeHook":"hello",
-      "afterHook":"goodbye"
+      }
    },
    "Insert Batch":{  
       "url_segments":"api/batch/donors",
@@ -75,13 +75,14 @@
             "admin"
          ]
       },
-            "beforeHook":"hello",
+      "beforeHook":"banana",
       "afterHook":"goodbye"
    },
       "Update":{  
       "url_segments":"api/update/donors",
       "request_type":"PUT",
       "description":"Update a database record",
+      "enableParams": true,
       "required_fields": [
         {
            "name": "id",

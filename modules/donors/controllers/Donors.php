@@ -45,18 +45,45 @@ class Donors extends Trongate {
 
     function goodbye($output) {
 
-        echo "output knows that your token is ".$output['token']; die();
+        //$user_level = 'admin';
+        $user_level = 'member';
 
-        // $output['code'] = 422;
-        // //$output['body'] = 'yes';
+        // if ($user_level != 'admin') {
+        //     $body_obj = json_decode($output['body']);
 
-        // $body_obj = json_decode($output['body']);
+        //     $num_rows = count($body_obj);
 
-        // unset($body_obj[0]->id);
-        // unset($body_obj[0]->email);
-        // $output['body'] = json_encode($body_obj);
+        //     for ($i=0; $i < $num_rows; $i++) { 
+        //         unset($body_obj[$i]->email);
+        //         unset($body_obj[$i]->date_of_birth);
+        //         unset($body_obj[$i]->address);                
+        //     }
+
+        // }
+
+        $output['code'] = 501;
+
 
         return $output;
+    }
+
+    function start($input) {
+        return $input;
+    }
+
+    function end($output) {
+        $this->_step_one();
+        return $output;
+    }
+
+    function _step_one() {
+        echo "step one";
+        $this->_step_two();
+    }
+
+    function _step_two() {
+        echo "step two";
+        
     }
 
     function test() {
