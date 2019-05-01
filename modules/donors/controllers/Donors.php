@@ -32,6 +32,10 @@ class Donors extends Trongate {
 
     function hello($input) {
 
+
+
+
+
         echo "input knows that your token is ".$input['token'];
 
         //$input['params']['first_name'] = 'David';
@@ -87,13 +91,17 @@ class Donors extends Trongate {
     }
 
     function test() {
-        $comments = false;
-        foreach ($comments as $key => $value) {
-            echo "Key of $key is $value<br>";
-        }
 
-        echo "finished"; die();
-        echo $update_id; die();
+        $row_data['first_name'] = 'David';
+        $row_data['email'] = 'info@bla.com';
+        $data[] = $row_data;
+
+        $row_data['first_name'] = 'Joe';
+        $row_data['email'] = 'bloggs@joe.com';
+        $data[] = $row_data;
+
+        echo json_encode($data);
+
     }
 
     function submit() {

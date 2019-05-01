@@ -481,6 +481,8 @@ margin: 1em 0;
         $stmt = $this->dbh->prepare($sql);
         $stmt->execute($values);
 
+        $count = $stmt->rowCount();
+        return $count;
     }
 
     public function exec($sql) {

@@ -347,13 +347,6 @@ class Api extends Trongate {
         return $str;
     }
 
-    // function _get_params_from_post() {
-    //     $post = file_get_contents('php://input');
-    //     $post = trim($post);
-    //     $params = json_decode($post, true);
-    //     return $params;
-    // }
-
     function _attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint) {
 
         //check API settings & find out which method (if any) to invoke
@@ -693,6 +686,54 @@ class Api extends Trongate {
         http_response_code($code);
         echo $output['body'];
 
+    }
+
+    function batch() {
+
+        $input['token'] = $this->_validate_token();
+        $output['token'] = $input['token'];
+        $module_name = $this->url->segment(3);
+        $this->_make_sure_table_exists($module_name);
+
+        $post = file_get_contents('php://input');
+        $decoded = json_decode($post, true);
+        $data = [];
+
+        if (count($decoded)>0) {
+
+            foreach ($decoded as $key => $value) {
+                $row_data = $this->_get_params_from_post($value);
+                $data[] = $row_data;
+            }
+
+        }
+        
+        $input['params'] = $data;
+        $input['module_name'] = $module_name;
+        $input['endpoint'] = 'Insert Batch';
+
+        $module_endpoints = $this->_fetch_endpoints($input['module_name']);
+        $target_endpoint = $module_endpoints[$input['endpoint']];
+        $input = $this->_attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint);
+        extract($input);
+
+        if (count($data)>0) {
+            //execute batch insert and return num rows inserted
+            $row_count = $this->model->insert_batch($module_name, $data);
+            $output['body'] = $row_count;
+            $output['code'] = 200;
+        } else {
+            $output['code'] = 422;
+            $output['body'] = '0';
+        }
+
+        //attempt invoke 'after' hook
+        $output['module_name'] = $module_name;
+        $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+
+        $code = $output['code'];
+        http_response_code($code);
+        echo $output['body'];
     }
 
     function _figure_out_connective($key, $bits) {

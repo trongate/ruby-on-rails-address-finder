@@ -70,13 +70,12 @@
       "url_segments":"api/batch/donors",
       "request_type":"POST",
       "description":"Insert multiple records",
+      "enableParams": true,
       "authorization":{  
          "roles":[  
             "admin"
          ]
-      },
-      "beforeHook":"banana",
-      "afterHook":"goodbye"
+      }
    },
       "Update":{  
       "url_segments":"api/update/donors",
