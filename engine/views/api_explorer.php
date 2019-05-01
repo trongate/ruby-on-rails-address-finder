@@ -499,11 +499,6 @@ var HTTP_STATUS_CODES = {
 
 function submitRequest() {
     var params = document.getElementById('params').value;
-    params = params.replace(/>/g, '*!gt!*');
-    params = params.replace(/</g, '*!lt!*');
-    params = params.replace(/=/g, '*!equalto!*');
-    params = params.replace(/_/g, '*!underscore!*');
-
     document.getElementById('endpointUrl').innerHTML = initialSegments;
 
     var targetUrl = '<?= BASE_URL ?>' + document.getElementById('endpointUrl').innerHTML;
@@ -518,6 +513,12 @@ function submitRequest() {
     }
 
     if ((requestType == 'GET') && (params != '')) { //
+
+        params = params.replace(/>/g, '*!gt!*');
+        params = params.replace(/</g, '*!lt!*');
+        params = params.replace(/=/g, '*!equalto!*');
+        params = params.replace(/_/g, '*!underscore!*');
+        
         params = JSON.parse(params);
         var extraUrlSegment = '/?' + fromObject(params);
         extraUrlSegment=extraUrlSegment.replace(/ /gi,'%20');

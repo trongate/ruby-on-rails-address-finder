@@ -30,8 +30,6 @@
       "url_segments":"api/exists/donors/{id}",
       "request_type":"GET",
       "description":"Check if instance exists",
-      "beforeHook":"start",
-      "afterHook":"end",
       "required_fields": [
         {
            "name": "id",

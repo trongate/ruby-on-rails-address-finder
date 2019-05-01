@@ -273,6 +273,7 @@ return true;
     }
 
     function _get_params_from_post($decoded) {
+
         $params = [];
         foreach ($decoded as $key => $value) {
             $key = $this->_prep_key($key); 
@@ -736,14 +737,7 @@ return true;
         if (count($data)>0) {
             //execute batch insert and return num rows inserted
             $row_count = $this->model->insert_batch($module_name, $data);
-
-            if ($row_count == 1) {
-                $msg = '1 row inserted.';
-            } else {
-                $msg = $row_count.' rows inserted.';
-            }
-
-            $output['body'] = $msg;
+            $output['body'] = $row_count;
             $output['code'] = 200;
         } else {
             $output['code'] = 422;
@@ -854,12 +848,12 @@ return true;
 
         if ($result == false) {
             http_response_code(422);
-            echo 'Record '.$update_id.' does not exist.';
+            echo 'false';
             die();
         } else {
 
             $this->model->delete($update_id, $module_name);
-            $output['body'] = 'Record '.$update_id.' was successfully deleted.';
+            $output['body'] = 'true';
             $output['code'] = 200;
             $output['module_name'] = $module_name;
             $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
@@ -943,11 +937,7 @@ return true;
 
         }   
 
-        if ($num_rows_affected == 1) {
-            $msg = "1 row deleted.";
-        } else {
-            $msg = $num_rows_affected.' rows deleted.';
-        }
+        $msg = $num_rows_affected;
 
         if ($num_rows_affected>0) {
 
