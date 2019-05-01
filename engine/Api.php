@@ -479,7 +479,23 @@ return true;
         if (is_numeric($fourth_bit)) {
             $this->_find_one($module_name, $fourth_bit, $input['token']);
         } else {
-            $params = $this->_get_params_from_url(4);
+
+            if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+                $params = $this->_get_params_from_url(4);
+            } else {
+
+                //let's allow posted params too!
+                $post = file_get_contents('php://input');
+                $decoded = json_decode($post, true);
+
+                if (count($decoded)>0) {
+                    $params = $this->_get_params_from_post($decoded);
+                } else {
+                    $params = [];
+                }
+
+            }
+  
         }
 
         $sql = 'select * from '.$module_name;
