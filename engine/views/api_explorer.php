@@ -52,6 +52,28 @@
 </div>
 
 <script>
+
+
+
+function clearParams() {
+
+    //isChecked = document.getElementById('bypass').checked;
+    alert("hello");
+}
+
+function clearContent()
+{
+    document.getElementById("params").value='';
+
+    setTimeout(function(){
+      document.getElementById("clearParams").checked = false;
+    }, 600);
+
+
+}
+
+
+
 var token = '';
 
 function setToken() {
@@ -69,6 +91,9 @@ function setToken() {
 function getToken() {
 
 }
+
+
+
 
 
 
@@ -305,10 +330,15 @@ td {
                             <div id="extra-required-fields"></div>
                             <label for="exampleMessage">Parameters</label>
                             <textarea onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'   '+v.substring(e);this.selectionStart=this.selectionEnd=s+3;return false;}" class="u-full-width" placeholder="Enter parameters in JSON format" id="params"></textarea>
-                            <label class="example-send-yourself-copy">
-                                <input onclick="initBypassAuth()" type="checkbox" id="bypass" value="1">
-                                <span class="label-body">Bypass authorization</span>
-                            </label>
+                             
+                                <div class="w3-row">
+                                  <div class="w3-col s6">
+                                    Bypass authorization <input onclick="initBypassAuth()" type="checkbox" id="bypass" value="1">
+                                  </div>
+                                  <div class="w3-col s6 w3-center" id="clearParamsBox">
+                                    Clear Parameters <input onclick="clearContent()" type="checkbox" id="clearParams" value="1">
+                                  </div>
+                                </div>
 
                             <input onclick="submitRequest()" class="button-primary" type="button" value="Submit"> 
                             
@@ -501,11 +531,6 @@ function submitRequest() {
         return; //user left out a required field, so end this
     }
 
-    // if (requestType == 'DELETE') {
-    //     params  = { id:document.getElementById("extra-required-field-id").value };
-    //     params = JSON.stringify(params);
-    // }
-
     const http = new XMLHttpRequest()
     http.open(requestType, targetUrl)
     http.setRequestHeader('Content-type', 'application/json')
@@ -565,6 +590,7 @@ function openModal(endpointName, endpoint_json) {
     document.getElementById("http-status-code").innerHTML = '';
     document.getElementById("header-info").innerHTML = '';
     document.getElementById("extra-required-fields").innerHTML = '';
+    document.getElementById("bypass").checked = false;
     extraRequiredFields = [];
     
     endpoint_data = JSON.parse(endpoint_json);
@@ -575,11 +601,13 @@ function openModal(endpointName, endpoint_json) {
         document.getElementById("params").disabled = false;
         document.getElementById("params").style.backgroundColor = '#fff';
         document.getElementById("params").style.minHeight = '200px';
+        document.getElementById("clearParamsBox").style.display = 'inline';
     } else {
         document.getElementById("params").value = '';
         document.getElementById("params").disabled = true;
         document.getElementById("params").style.backgroundColor = '#ddd';
         document.getElementById("params").style.minHeight = '118px';
+        document.getElementById("clearParamsBox").style.display = 'none';
     }
 
     if (endpoint_data.required_fields) {
@@ -750,6 +778,7 @@ window.onclick = function(event) {
 
 <script>
 var headerInfo = '';
+
 
 function initBypassAuth() {
 

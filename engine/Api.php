@@ -620,7 +620,7 @@ return true;
     }
 
     function _make_sure_columns_exist($module_name, $params) {
-        //make sure this column exists on the table
+        //make sure columns exists on the table
         $invalid_columns = [];
         $columns = $this->_get_all_columns($module_name);
 
@@ -736,11 +736,18 @@ return true;
         if (count($data)>0) {
             //execute batch insert and return num rows inserted
             $row_count = $this->model->insert_batch($module_name, $data);
-            $output['body'] = $row_count;
+
+            if ($row_count == 1) {
+                $msg = '1 row inserted.';
+            } else {
+                $msg = $row_count.' rows inserted.';
+            }
+
+            $output['body'] = $msg;
             $output['code'] = 200;
         } else {
             $output['code'] = 422;
-            $output['body'] = '0';
+            $output['body'] = 'No rows were inserted.';
         }
 
         //attempt invoke 'after' hook
@@ -863,6 +870,106 @@ return true;
 
         }
 
+    }
+
+    function destroy() {
+
+        $input['token'] = $this->_validate_token();
+        $output['token'] = $input['token'];
+        $module_name = $this->url->segment(3);
+        $this->_make_sure_table_exists($module_name);
+
+        $fourth_bit = $this->url->segment(4);
+
+        if (is_numeric($fourth_bit)) {
+            $this->_find_one($module_name, $fourth_bit, $input['token']);
+        } else {
+
+            if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+                $params = $this->_get_params_from_url(4);
+            } else {
+
+                //let's allow posted params too!
+                $post = file_get_contents('php://input');
+                $decoded = json_decode($post, true);
+
+                if (count($decoded)>0) {
+                    $params = $this->_get_params_from_post($decoded);
+                } else {
+                    $params = [];
+                }
+
+            }
+  
+        }
+
+        $sql = 'select * from '.$module_name;
+
+        //attempt invoke 'before' hook
+        $input['params'] = $params;
+        $input['module_name'] = $module_name;
+        $input['endpoint'] = 'Destroy';
+
+        $module_endpoints = $this->_fetch_endpoints($input['module_name']);
+        $target_endpoint = $module_endpoints[$input['endpoint']];
+        $input = $this->_attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint);
+        extract($input);
+
+        $num_params = count($params);
+
+        if ($num_params < 1) { 
+            $rows = $this->model->get('id', $module_name);
+            $num_rows_affected = count($rows);
+
+        } else {
+            //params were posted
+            $sql = 'select * from '.$module_name;
+            $params = json_encode($params);
+            $params = ltrim($params);
+            $params = json_decode($params);
+            $params = get_object_vars($params);
+            $query_info = $this->_add_params_to_query($module_name, $sql, $params);
+
+            $sql = $query_info['sql'];
+            $data = $query_info['data'];
+
+            if (count($data)<1) {
+                $rows = $this->model->query($sql, 'object');
+            } else {
+                $rows = $this->model->query_bind($sql, $data, 'object');
+            }
+
+            $num_rows_affected = count($rows);
+
+        }   
+
+        if ($num_rows_affected == 1) {
+            $msg = "1 row deleted.";
+        } else {
+            $msg = $num_rows_affected.' rows deleted.';
+        }
+
+        if ($num_rows_affected>0) {
+
+            $sql = substr($sql, 13, strlen($sql));
+            $sql = 'delete from'.$sql;
+
+            if (!isset($data)) {
+                $this->model->query($sql);
+            } else {
+                $this->model->query_bind($sql, $data);
+            }            
+        }
+
+        $output['body'] = $msg;
+        $output['code'] = 200;
+        $output['module_name'] = $module_name;
+
+        $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+        
+        $code = $output['code'];
+        http_response_code($code);
+        echo $output['body'];
     }
 
     function _figure_out_connective($key, $bits) {
