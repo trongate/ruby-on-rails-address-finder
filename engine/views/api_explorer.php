@@ -242,7 +242,7 @@ td {
         <div class="row">
             <div>
                 <h4>donors</h4>
-                <table class="u-full-width">
+                <table class="u-full-width" style="font-size: 1.4em;">
                   <thead>
                     <tr>
                       <th class="go-left">Request Type</th>
@@ -293,7 +293,7 @@ td {
                         $endpoint['url_segments'] = str_replace($ditch, $replace, $endpoint['url_segments']);
                     ?>
                     <tr>
-                      <td><input onclick="openModal('<?= $endpoint_name ?>', '<?= $endpoint_data ?>')" type="submit" value="<?= $endpoint['request_type'] ?>" class="button-primary <?= $btn_theme ?>"></td>
+                      <td style="font-size: 0.8em;"><input onclick="openModal('<?= $endpoint_name ?>', '<?= $endpoint_data ?>')" type="submit" value="<?= $endpoint['request_type'] ?>" class="button-primary <?= $btn_theme ?>"></td>
                       <td><?= $endpoint_name ?></td>
                       <td><?= $endpoint['url_segments'] ?></td>
                       <td class="go-right"><?= $endpoint['description'] ?></td>
