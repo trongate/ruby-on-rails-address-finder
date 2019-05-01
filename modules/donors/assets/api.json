@@ -78,7 +78,7 @@
       }
    },
       "Update":{  
-      "url_segments":"api/update/donors",
+      "url_segments":"api/update/donors/{id}",
       "request_type":"PUT",
       "description":"Update a database record",
       "enableParams": true,
@@ -88,6 +88,7 @@
            "label": "ID" 
         }
       ],
+      "beforeHook":"hello"
       "authorization":{  
          "roles":[  
             "admin"

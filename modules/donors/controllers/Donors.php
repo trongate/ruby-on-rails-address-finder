@@ -33,7 +33,7 @@ class Donors extends Trongate {
     function hello($input) {
 
 
-
+echo 'hi'; die();
 
 
         echo "input knows that your token is ".$input['token'];
@@ -43,7 +43,7 @@ class Donors extends Trongate {
     }
 
     function cheerio($output) {
-        echo "cheerio";
+        echo "cheerioCHEERIO";
         return $output;
     }
 
