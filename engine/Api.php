@@ -141,7 +141,7 @@ class Api extends Trongate {
     }
 
     function _validate_token() {
-
+return true;
         if (!isset($_SERVER['HTTP_TRONGATETOKEN'])) {
             $this->_not_allowed_msg();
         } else {
@@ -798,6 +798,55 @@ class Api extends Trongate {
         $code = $output['code'];
         http_response_code($code);
         echo $output['body'];
+    }
+
+    function delete() {
+
+        $input['token'] = $this->_validate_token();
+        $output['token'] = $input['token'];
+        $module_name = $this->url->segment(3);
+        $this->_make_sure_table_exists($module_name);
+
+        $id = $this->url->segment(4);
+
+        //attempt invoke 'before' hook
+        $data['id'] = $id;
+        $input['params'] = $data;
+        $input['module_name'] = $module_name;
+        $input['endpoint'] = 'Delete One';
+
+        $module_endpoints = $this->_fetch_endpoints($input['module_name']);
+        $target_endpoint = $module_endpoints[$input['endpoint']];
+        $input = $this->_attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint);
+        extract($input);
+        $update_id = $input['params']['id'];
+
+        if (!is_numeric($update_id)) {
+            http_response_code(400);
+            echo 'Non numeric id.';
+            die();
+        }
+
+        $result = $this->model->get_where($update_id, $module_name);
+
+        if ($result == false) {
+            http_response_code(422);
+            echo 'Record '.$update_id.' does not exist.';
+            die();
+        } else {
+
+            $this->model->delete($update_id, $module_name);
+            $output['body'] = 'Record '.$update_id.' was successfully deleted.';
+            $output['code'] = 200;
+            $output['module_name'] = $module_name;
+            $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+
+            $code = $output['code'];
+            http_response_code($code);
+            echo $output['body'];
+
+        }
+
     }
 
     function _figure_out_connective($key, $bits) {

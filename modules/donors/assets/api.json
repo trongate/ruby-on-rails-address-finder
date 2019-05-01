@@ -88,7 +88,8 @@
            "label": "ID" 
         }
       ],
-      "beforeHook":"hello"
+      "beforeHook":"hello",
+      "afterHook":"cheerio",
       "authorization":{  
          "roles":[  
             "admin"
@@ -109,6 +110,12 @@
       "url_segments":"api/delete/donors/{id}",
       "request_type":"DELETE",
       "description":"Delete one row",
+      "required_fields": [
+        {
+           "name": "id",
+           "label": "ID" 
+        }
+      ],
       "authorization":{  
          "roles":[  
             "admin"

@@ -501,6 +501,11 @@ function submitRequest() {
         return; //user left out a required field, so end this
     }
 
+    // if (requestType == 'DELETE') {
+    //     params  = { id:document.getElementById("extra-required-field-id").value };
+    //     params = JSON.stringify(params);
+    // }
+
     const http = new XMLHttpRequest()
     http.open(requestType, targetUrl)
     http.setRequestHeader('Content-type', 'application/json')
