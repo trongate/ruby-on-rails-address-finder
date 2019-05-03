@@ -1,26 +1,35 @@
-{
-   "first_name":"updated firstname yeah"
-}
+* Have the endpoint passed onto the validation function.
+
+* Figure out what the permissions are for the endpoint.
+
+* Figure out the current user's ID and level.
+
+* Figure out if the user is allowed to be here, based on their ID and user level.
 
 
-{"id":"31","url_string":null,"first_name":"We will rock you","email":"","introduction":"","price":"0.00","date_of_birth":"0","next_appointment":"0","active":null}
 
----------------------------------------------------------------
+TOUCH UP
 
-* Finish all of the endpoints     
+*  Delete API module and pass all styling directly onto page.
 
----------------------------------------------------------------
 
-AND FINALLY (Thursday)
+FINISH!!!!!
 
-* bolster all of the security
 
----------------------------------------------------------------
 
-Friday
 
-Make video demo for Speed Coding Academy and upload.
 
+
+
+
+
+    6.  Enable security throughout API system.
+
+                -> user level.
+
+                -> user Id.
+
+    7.  Test test TEST!!!
 
 
 

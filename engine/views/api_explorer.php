@@ -5,7 +5,7 @@
   <!-- Basic Page Needs
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   <meta charset="utf-8">
-  <title>Your page title here :)</title>
+  <title>API Explorer</title>
   <meta name="description" content="">
   <meta name="author" content="">
 
@@ -27,20 +27,18 @@
   <!-- Favicon
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
 
-
 </head>
 <body>
-
-
 
   <!-- Primary Page Layout
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
 
-
-
 <div class="top-row w3-row">
-    <div class="container">
-        <div class="w3-col s5 w3-center logo">Trongate API - Explorer</div>
+    <div class="container" id="top-block">
+        <div class="w3-col s5 w3-center logo">Trongate API - Explorer
+<div id="show-golden-token"></div>
+<div id="show-current-token"></div>
+        </div>
         <div class="w3-col s2 w3-center trhs"><p id="token-status">Token Not Set!</p></div>
         <div class="w3-col s3 w3-center trhs"><p>
             <input id="input-token" class="w3-input w3-border" type="text" placeholder="Enter Authorization Token">
@@ -53,10 +51,7 @@
 
 <script>
 
-
-
 function clearParams() {
-
     //isChecked = document.getElementById('bypass').checked;
     alert("hello");
 }
@@ -68,13 +63,11 @@ function clearContent()
     setTimeout(function(){
       document.getElementById("clearParams").checked = false;
     }, 600);
-
-
 }
 
-
-
+var golden_token = '<?= $golden_token ?>';
 var token = '';
+
 
 function setToken() {
     token = document.getElementById('input-token').value;
@@ -84,13 +77,10 @@ function setToken() {
         document.getElementById('token-status').innerHTML = 'Token Not Set!';    
     } else {
         document.getElementById('token-status').innerHTML = 'Token is set.';
-    }
-    
-}
-
-function getToken() {
+    }   
 
 }
+
 
 
 
@@ -238,7 +228,7 @@ td {
 </style>
 
 <div>
-    <div class="container" style="margin-top: 5em;">
+    <div class="container" id="stage" style="margin-top: 5em;">
         <div class="row">
             <div>
                 <h4>donors</h4>
@@ -253,14 +243,8 @@ td {
                   </thead>
                   <tbody>
                     <?php
-
-
-
-
                     foreach($endpoints as $endpoint_name => $endpoint) {
-
                         $endpoint_json = json_encode($endpoint);
-
 
                         switch($endpoint['request_type']) {
                           case 'GET':
@@ -307,12 +291,6 @@ td {
         </div>
     </div>
 </div>
-
-
-
-
-
-
 
 <div id="id01" class="w3-modal">
     <div class="w3-modal-content w3-animate-zoom w3-card-4">
@@ -379,11 +357,7 @@ td {
             <p style="text-align: center;">For full documentation and tutorials visit <a href="https://trongate.io/" target="_blank">Trongate.io</a></p>
         </footer>
     </div>
-
 </div>
-
-
-
 
 <script>
 var requestType = 'GET';
@@ -392,7 +366,18 @@ var endpoint;
 var extraFieldsHtml = '';
 var extraRequiredFields = [];
 
+//setTimeout(expiredGoldenToken, 2000);
 
+function expiredGoldenToken() {
+    document.getElementById("stage").innerHTML = '';
+    var altConent = '<h4 style="text-align:center;">Login Expired</h4>';
+    altConent = altConent.concat('<p style="text-align:center;">Your session has expired.  Please login again.</p>');
+
+    document.getElementById("stage").innerHTML = altConent;
+    document.getElementById("top-block").innerHTML = '<div class="w3-col s5 w3-center logo">Trongate API - Explorer</div>';
+    document.getElementById("top-block").style.minHeight = '6.66em';
+    document.getElementById("id01").style.display = 'none';
+}
 
 var isObj = function(a) {
   if ((!!a) && (a.constructor === Object)) {
@@ -500,6 +485,15 @@ var HTTP_STATUS_CODES = {
 function submitRequest() {
     var params = document.getElementById('params').value;
     document.getElementById('endpointUrl').innerHTML = initialSegments;
+
+    setTimeout(function(){
+      document.getElementById("bypass").checked = false;
+
+      if (token == golden_token) {
+        token = '';
+      }
+
+    }, 600);
 
     var targetUrl = '<?= BASE_URL ?>' + document.getElementById('endpointUrl').innerHTML;
 
@@ -787,23 +781,30 @@ function initBypassAuth() {
     
     if (isChecked == true) {
 
-        // const params = {
-        //     code: '****',
-        //     token
-        // }
+        token = golden_token;
 
-        // console.log(params);
+        var expiry = new Date();
+        expiry.setHours(expiry.getHours() + 4);
+        expiryDate = Date.parse(expiry)/1000;
 
         const http = new XMLHttpRequest()
-        http.open('POST', '<?= BASE_URL ?>api/submit_bypass_auth')
+        http.open('POST', '<?= BASE_URL ?>trongate_tokens/regenerate/' + token + '/' + expiryDate);
         http.setRequestHeader('Content-type', 'application/json')
         http.send(JSON.stringify(params)) // Make sure to stringify
         http.onload = function() {
             //fetch new 'bypass' token
-            token = http.responseText;
-            console.log(token);
-            document.getElementById("input-token").value = token;
-            document.getElementById("token-value").innerHTML = token;
+
+            if (http.responseText == 'false') {
+                expiredGoldenToken();
+            } else {
+
+                token = http.responseText;
+                golden_token = token;
+                document.getElementById("input-token").value = token;
+                document.getElementById("token-value").innerHTML = token;
+
+            }
+
         }
 
     }

@@ -141,7 +141,7 @@ class Api extends Trongate {
     }
 
     function _validate_token() {
-return true;
+//return true;
         if (!isset($_SERVER['HTTP_TRONGATETOKEN'])) {
             $this->_not_allowed_msg();
         } else {
@@ -1050,10 +1050,12 @@ return true;
         $this->module('security');
         $target_module = $this->url->segment(3);
         $this->_make_sure_table_exists($target_module);
-        // $this->module('trongate_tokens');
+        $this->module('trongate_tokens');
 
-        // $token_data['user_id'] = $this->security->_get_user_id();
-        // $data['token'] = $this->trongate_tokens->_generate_token($token_data);
+        $token_data['user_id'] = $this->security->_get_user_id();
+        $token_data['code'] = 'aaa';
+        $token_data['expiry_date'] = time() + 7200; //two hours
+        $data['golden_token'] = $this->trongate_tokens->_generate_token($token_data);
         
         $data['endpoints'] = $this->_fetch_endpoints($target_module);
         $data['endpoint_settings_location'] = '/modules/'.$target_module.'/assets/api.json';

@@ -12,13 +12,28 @@ class Trongate_tokens extends Trongate {
 
     private $default_token_lifespan = 86400; //one day
 
-    function _attempt_generate_bypass_token() {
-        $data['token'] = $this->_generate_rand_str();
-        $token_data['user_id'] = 0;
-        $token_data['code'] = '***';
-        $this->module('trongate_tokens');
-        $new_token = $this->trongate_tokens->_generate_token($token_data);
-        echo $new_token;
+    function test() {
+        $token = $this->url->segment(3);
+
+
+        $result = $this->model->get_one_where('token', $token, 'trongate_tokens');
+
+        if ($result == false) {
+            //invalid token
+            echo 'invalid token';
+        } else {
+            $user_id = $result->user_id;
+            echo "hello $user_id";
+        }
+
+
+
+        // $data['token'] = $token;
+        // $sql = 'select * from trongate_tokens where token = :token';
+        // $tokens = $this->model->query_bind($sql, $data, 'object');
+        // $num_rows = count($tokens);
+
+        // echo $num_rows;
     }
 
     function _validate_token() {
@@ -27,8 +42,7 @@ class Trongate_tokens extends Trongate {
             $this->_not_allowed_msg();
         } else {
             $token = $_SERVER['HTTP_TRONGATETOKEN'];
-            $this->module('trongate_tokens');
-            $valid = $this->trongate_tokens->_is_token_valid($token); //returns true if num rows>0
+            $this->_is_token_valid($token);
 
             if ($valid == false) {
                 $this->_not_allowed_msg();
@@ -62,7 +76,7 @@ class Trongate_tokens extends Trongate {
 
         $this->_delete_old_tokens($data['user_id']);
 
-        //generate 64 digit random string
+        //generate 32 digit random string
         $random_string = $this->_generate_rand_str();
 
         //build data array variables (required for table insert)
@@ -72,12 +86,6 @@ class Trongate_tokens extends Trongate {
         
         $data['token'] = $random_string;
         $this->model->insert($data, 'trongate_tokens');
-
-        unset($data);
-        $data['query'] = "inserted ".$random_string;
-
-        $data['date_created'] = time();
-        $this->model->insert($data, 'query_mem');
 
         return $random_string;
     }
@@ -90,6 +98,38 @@ class Trongate_tokens extends Trongate {
             $random_string .= $characters[mt_rand(0, strlen($characters) - 1)];
         }
         return $random_string;
+    }
+
+    function regenerate() {
+        $old_token = $this->url->segment(3);
+        $expiry_date = $this->url->segment(4);
+
+        if (!is_numeric($expiry_date)) {
+            die();
+        } elseif ($expiry_date<time()) {
+            die();
+        }
+
+        $data['token'] = $old_token;
+        $sql = 'select * from trongate_tokens where token = :token';
+        $tokens = $this->model->query_bind($sql, $data, 'object');
+        $num_rows = count($tokens);
+
+        if ($num_rows>0) {
+            $this_token = $tokens[0];
+            $update_id = $this_token->id;
+            $new_token = $this->_generate_rand_str();
+
+            $new_data['user_id'] = $this_token->user_id;
+            $new_data['code'] = $this_token->code;
+            $new_data['expiry_date'] = $expiry_date;
+            $new_data['token'] = $new_token;
+            $this->model->update($update_id, $new_data, 'trongate_tokens');
+            echo $new_token;
+        } else {
+            echo 'false';
+        }
+
     }
 
     function _fetch_token_obj($token) {
@@ -106,7 +146,28 @@ class Trongate_tokens extends Trongate {
 
     }
 
-    function _is_token_valid($token) {
+    function _is_token_valid($token, $endpoint) {
+
+        //returns true, false or an array with a required column and match
+
+        $this->_delete_old_tokens();
+
+        $result = $this->model->get_one_where('token', $token, 'trongate_tokens');
+
+        if ($result == false) {
+            //invalid token
+            return false;
+        } else {
+            $user_id = $result->user_id;
+
+            //check to see if this user is allowed to access this endpoint
+        }
+
+
+
+
+
+        
         $data['token'] = $token;
         $sql = 'select * from trongate_tokens where token = :token';
         $tokens = $this->model->query_bind($sql, $data, 'object');

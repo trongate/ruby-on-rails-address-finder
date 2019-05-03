@@ -6,7 +6,10 @@
       "enableParams": true,
       "authorization":{  
          "roles":[  
-            "admin"
+            "admin", "member", "customer"
+         ],
+         "match":[
+            "output", "user_id", 88
          ]
       }
    },
@@ -20,6 +23,7 @@
            "label": "ID" 
         }
       ],
+      "afterHook": "something",
       "authorization":{  
          "roles":[  
             "admin"

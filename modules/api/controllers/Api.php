@@ -12,6 +12,11 @@ class DUFF!!!!!   Api extends Trongate  DUFF ____ DO NOT USE!!!! {
     }
 
     function explorer() {
+
+echo time().'<br>';
+echo '1556892387000'; die();
+
+
         $this->module('security');
         $this->module('trongate_tokens');
 
@@ -25,13 +30,16 @@ class DUFF!!!!!   Api extends Trongate  DUFF ____ DO NOT USE!!!! {
     }
 
     function submit_bypass_auth() {
-
+//DUFF  -  DO NOT USE!!!!!
+        die();
         $post = file_get_contents('php://input');
         $decoded = json_decode($post, true);
         $token = $decoded['token'];
 
         $this->module('trongate_tokens');
-        $this->trongate_tokens->_attempt_generate_bypass_token($token);
+        //set the expiry time to three minutes
+
+
     }
 
     function _fetch_endpoints() {
