@@ -15,7 +15,15 @@ Wrap everything up.
 
 
 
+EXAMPLE AUTH (for open endpoint):
 
+   "Get":{  
+      "url_segments":"api/get/donors",
+      "request_type":"GET",
+      "description":"Fetch rows from the table",
+      "enableParams": true,
+      "authorization":"*"
+   },
 
 
 

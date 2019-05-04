@@ -140,14 +140,15 @@ class Api extends Trongate {
         echo "Invalid token."; die();
     }
 
-    function _validate_token($endpoint) {
+    function _validate_token($token_validation_data) {
 
         if (!isset($_SERVER['HTTP_TRONGATETOKEN'])) {
             $this->_not_allowed_msg();
         } else {
             $token = $_SERVER['HTTP_TRONGATETOKEN'];
             $this->module('trongate_tokens');
-            $valid = $this->trongate_tokens->_is_token_valid($token, $endpoint);
+            $token_validation_data['token'] = $token;
+            $valid = $this->trongate_tokens->_is_token_valid($token_validation_data);
 
             if ($valid == false) {
                 $this->_not_allowed_msg();
@@ -470,11 +471,16 @@ class Api extends Trongate {
     }
 
     function get() {
-        $input['token'] = $this->_validate_token('Get');
-        $output['token'] = $input['token'];
         $module_name = $this->url->segment(3);
         $this->_make_sure_table_exists($module_name);
+        $module_endpoints = $this->_fetch_endpoints($module_name);
 
+        $token_validation_data['endpoint'] = 'Get';
+        $token_validation_data['module_name'] = $module_name;
+        $token_validation_data['module_endpoints'] = $module_endpoints;
+        $input['token'] = $this->_validate_token($token_validation_data);
+
+        $output['token'] = $input['token'];
         $fourth_bit = $this->url->segment(4);
 
         if (is_numeric($fourth_bit)) {
@@ -506,7 +512,6 @@ class Api extends Trongate {
         $input['module_name'] = $module_name;
         $input['endpoint'] = 'Get';
 
-        $module_endpoints = $this->_fetch_endpoints($input['module_name']);
         $target_endpoint = $module_endpoints[$input['endpoint']];
         $input = $this->_attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint);
         extract($input);

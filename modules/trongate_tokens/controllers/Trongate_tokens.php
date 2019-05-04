@@ -12,30 +12,6 @@ class Trongate_tokens extends Trongate {
 
     private $default_token_lifespan = 86400; //one day
 
-    function test() {
-        $token = $this->url->segment(3);
-
-
-        // $result = $this->model->get_one_where('token', $token, 'trongate_tokens');
-
-        // if ($result == false) {
-        //     //invalid token
-        //     echo 'invalid token';
-        // } else {
-        //     $user_id = $result->user_id;
-        //     echo "hello $user_id";
-        // }
-
-
-
-        // // $data['token'] = $token;
-        // // $sql = 'select * from trongate_tokens where token = :token';
-        // // $tokens = $this->model->query_bind($sql, $data, 'object');
-        // // $num_rows = count($tokens);
-
-        // // echo $num_rows;
-    }
-
     function _validate_token() {
 
         if (!isset($_SERVER['HTTP_TRONGATETOKEN'])) {
@@ -146,40 +122,92 @@ class Trongate_tokens extends Trongate {
 
     }
 
-    function _is_token_valid($token, $endpoint) {
+    function _fetch_authorization_rules($endpoint, $module_endpoints) {
 
-        //returns true or false
-        $this->_delete_old_tokens();
+        if (isset($module_endpoints[$endpoint]["authorization"])) {
+            $authorization_rules = $module_endpoints[$endpoint]["authorization"];
+            return $authorization_rules;
+        } else {
+            return false; //no authorization rules could be found
+        }
 
+    }
+
+    function _is_token_valid($token_validation_data) {
+        extract($token_validation_data);
+        $authorization_rules = $this->_fetch_authorization_rules($endpoint, $module_endpoints);
+
+        if ($authorization_rules == false) {
+            //invalid token
+            return false;            
+        }
+
+        if ($authorization_rules == '*') {
+            return true; //open endpoint
+        }
+
+        //If we have reached here then the endpoint requires authorization
+        $this->_delete_old_tokens(); //housekeeping
+
+        //try admin ('aaa') authentication
         $result = $this->model->get_one_where('token', $token, 'trongate_tokens');
 
         if ($result == false) {
             //invalid token
             return false;
         } else {
+
             $user_id = $result->user_id;
             $code = $result->code;
 
             if ($code == 'aaa') {
-                return true;
+                return true;  //must be admin
             }
 
-            echo "you should not be here"; die();
+            //from here, the validation MUST require EITHER a certain role OR a certain user_id
 
-            //check to see if this user is allowed to access this endpoint
+            //test for user role
+            if (isset($authorization_rules['roles'])) {
+                $test_result = $this->_test_for_user_role($authorization_rules['roles'], $user_id);
+
+                if ($test_result == true) {
+                    return true; //user has the correct role
+                }
+
+            }
+
+            //test for user ID
+            if (isset($authorization_rules['userIds'])) {
+                $test_result = $this->_test_for_user_id($authorization_rules['userIds'], $user_id);
+
+                if ($test_result == true) {
+                    return true; //user has an allowed correct id
+                }
+
+            }
+
         }
 
+        return false; //token has failed all of the tests
 
+    }
 
+    function _test_for_user_role($role_rules, $user_id) {
+  
+        //fetch the role (user_level) for this user
+        $this->module('trongate_users-trongate_user_levels');
+        $user_level = $this->trongate_user_levels->_get_user_level($user_id);
 
+        if (in_array($user_level, $role_rules)) {
+            return true;
+        } else {
+            return false;
+        }
 
-        
-        $data['token'] = $token;
-        $sql = 'select * from trongate_tokens where token = :token';
-        $tokens = $this->model->query_bind($sql, $data, 'object');
-        $num_rows = count($tokens);
+    }
 
-        if ($num_rows>0) {
+    function _test_for_user_id($id_rules, $user_id) {
+        if (in_array($user_id, $id_rules)) {
             return true;
         } else {
             return false;

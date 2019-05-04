@@ -5,11 +5,11 @@
       "description":"Fetch rows from the table",
       "enableParams": true,
       "authorization":{  
-         "roles":[  
-            "admin", "member", "customer"
+         "roles": [
+            "rock star", "Pope", "cool dude", "baker", "butcher"
          ],
-         "match":[
-            "output", "user_id", 88
+         "userIds": [
+            3,1,6,9
          ]
       }
    },
