@@ -6,7 +6,6 @@ require_once '../config/custom_routing.php';
 require_once '../config/database.php';
 require_once '../config/site_owner.php';
 require_once 'get_segments.php';
-require_once 'db.php';
 
 spl_autoload_register(function($class_name) {
 
