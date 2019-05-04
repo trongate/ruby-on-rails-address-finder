@@ -16,24 +16,24 @@ class Trongate_tokens extends Trongate {
         $token = $this->url->segment(3);
 
 
-        $result = $this->model->get_one_where('token', $token, 'trongate_tokens');
+        // $result = $this->model->get_one_where('token', $token, 'trongate_tokens');
 
-        if ($result == false) {
-            //invalid token
-            echo 'invalid token';
-        } else {
-            $user_id = $result->user_id;
-            echo "hello $user_id";
-        }
+        // if ($result == false) {
+        //     //invalid token
+        //     echo 'invalid token';
+        // } else {
+        //     $user_id = $result->user_id;
+        //     echo "hello $user_id";
+        // }
 
 
 
-        // $data['token'] = $token;
-        // $sql = 'select * from trongate_tokens where token = :token';
-        // $tokens = $this->model->query_bind($sql, $data, 'object');
-        // $num_rows = count($tokens);
+        // // $data['token'] = $token;
+        // // $sql = 'select * from trongate_tokens where token = :token';
+        // // $tokens = $this->model->query_bind($sql, $data, 'object');
+        // // $num_rows = count($tokens);
 
-        // echo $num_rows;
+        // // echo $num_rows;
     }
 
     function _validate_token() {
@@ -148,8 +148,7 @@ class Trongate_tokens extends Trongate {
 
     function _is_token_valid($token, $endpoint) {
 
-        //returns true, false or an array with a required column and match
-
+        //returns true or false
         $this->_delete_old_tokens();
 
         $result = $this->model->get_one_where('token', $token, 'trongate_tokens');
@@ -159,6 +158,13 @@ class Trongate_tokens extends Trongate {
             return false;
         } else {
             $user_id = $result->user_id;
+            $code = $result->code;
+
+            if ($code == 'aaa') {
+                return true;
+            }
+
+            echo "you should not be here"; die();
 
             //check to see if this user is allowed to access this endpoint
         }

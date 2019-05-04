@@ -140,14 +140,14 @@ class Api extends Trongate {
         echo "Invalid token."; die();
     }
 
-    function _validate_token() {
-//return true;
+    function _validate_token($endpoint) {
+
         if (!isset($_SERVER['HTTP_TRONGATETOKEN'])) {
             $this->_not_allowed_msg();
         } else {
             $token = $_SERVER['HTTP_TRONGATETOKEN'];
             $this->module('trongate_tokens');
-            $valid = $this->trongate_tokens->_is_token_valid($token); //returns true if num rows>0
+            $valid = $this->trongate_tokens->_is_token_valid($token, $endpoint);
 
             if ($valid == false) {
                 $this->_not_allowed_msg();
@@ -470,7 +470,7 @@ class Api extends Trongate {
     }
 
     function get() {
-        $input['token'] = $this->_validate_token();
+        $input['token'] = $this->_validate_token('Get');
         $output['token'] = $input['token'];
         $module_name = $this->url->segment(3);
         $this->_make_sure_table_exists($module_name);

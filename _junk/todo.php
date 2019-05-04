@@ -1,3 +1,59 @@
+Test get request without token.                 DONE
+
+Test get request with bypass option enabled.    DONE   
+
+Build authentication for 'normal' token holders.
+
+Minifify the JS that goes on the explorer file.
+
+Beautify/minify the CSS for that page.
+
+Add all styles and js to the explorer file.
+
+Wrap everything up.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 * Have the endpoint passed onto the validation function.
 
 * Figure out what the permissions are for the endpoint.

@@ -51,6 +51,12 @@
 
 <script>
 
+function showTokens() {
+    console.log('showing tokens is running and we have golden token of ' + golden_token + ' along with ' + token);
+    document.getElementById("show-golden-token").innerHTML = golden_token;
+    document.getElementById("show-current-token").innerHTML = token;
+}
+
 function clearParams() {
     //isChecked = document.getElementById('bypass').checked;
     alert("hello");
@@ -77,7 +83,9 @@ function setToken() {
         document.getElementById('token-status').innerHTML = 'Token Not Set!';    
     } else {
         document.getElementById('token-status').innerHTML = 'Token is set.';
-    }   
+    }  
+
+    showTokens(); 
 
 }
 
@@ -482,7 +490,33 @@ var HTTP_STATUS_CODES = {
         'CODE_505' : 'HTTP Version Not Supported'
     };
 
+function generateNewGoldenToken(old_golden_token) {
+
+    var expiry = new Date();
+    expiry.setHours(expiry.getHours() + 4);
+    expiryDate = Date.parse(expiry)/1000;
+
+    const http = new XMLHttpRequest()
+    http.open('POST', '<?= BASE_URL ?>trongate_tokens/regenerate/' + old_golden_token + '/' + expiryDate);
+    http.setRequestHeader('Content-type', 'application/json')
+    http.send(JSON.stringify(params)) // Make sure to stringify
+    http.onload = function() {
+        //fetch new 'bypass' token
+
+        if (http.responseText == 'false') {
+            expiredGoldenToken();
+        } else {
+            golden_token = http.responseText;
+        }
+
+    }
+
+}
+
 function submitRequest() {
+
+console.log(`the golden token is ${golden_token} and the token is ${token}`);
+
     var params = document.getElementById('params').value;
     document.getElementById('endpointUrl').innerHTML = initialSegments;
 
@@ -491,6 +525,8 @@ function submitRequest() {
 
       if (token == golden_token) {
         token = '';
+        generateNewGoldenToken(golden_token);
+        setTimeout(showTokens, 1000);
       }
 
     }, 600);
@@ -552,6 +588,9 @@ function submitRequest() {
         document.getElementById("http-status-code").innerHTML = http.status + ' ' + HTTP_STATUS_CODES['CODE_' + http.status];
         document.getElementById("serverResponse").disabled = false;
         document.getElementById('serverResponse').value = http.responseText;
+
+
+        showTokens();
     }
 
 }
@@ -795,6 +834,7 @@ function initBypassAuth() {
             //fetch new 'bypass' token
 
             if (http.responseText == 'false') {
+                alert('Invalid token! we have golden token of ' + golden_token + ' along with ' + token);
                 expiredGoldenToken();
             } else {
 
@@ -802,7 +842,7 @@ function initBypassAuth() {
                 golden_token = token;
                 document.getElementById("input-token").value = token;
                 document.getElementById("token-value").innerHTML = token;
-
+                showTokens();
             }
 
         }
@@ -852,6 +892,10 @@ function displayHeaders() {
             return false; //not valid json
         }
     }
+
+
+
+showTokens();
 
 </script>
 
