@@ -249,7 +249,6 @@ function replacePlaceholders(targetUrl) {
             var ditch = '{' + extraRequiredFields[i].name + '}';
             var replace = fieldValue;
             targetUrl = targetUrl.replace(ditch, replace);
-            console.log(targetUrl);
         }
 
     }
@@ -309,10 +308,8 @@ function generateNewGoldenToken(old_golden_token) {
     const http = new XMLHttpRequest()
     http.open('POST', '<?= BASE_URL ?>trongate_tokens/regenerate/' + old_golden_token + '/' + expiryDate);
     http.setRequestHeader('Content-type', 'application/json')
-    http.send(JSON.stringify(params)) // Make sure to stringify
+    http.send(JSON.stringify(params))
     http.onload = function() {
-        //fetch new 'bypass' token
-
         if (http.responseText == 'false') {
             expiredGoldenToken();
         } else {
@@ -324,8 +321,6 @@ function generateNewGoldenToken(old_golden_token) {
 }
 
 function submitRequest() {
-
-console.log(`the golden token is ${golden_token} and the token is ${token}`);
 
     var params = document.getElementById('params').value;
     document.getElementById('endpointUrl').innerHTML = initialSegments;
@@ -343,7 +338,7 @@ console.log(`the golden token is ${golden_token} and the token is ${token}`);
     var targetUrl = '<?= BASE_URL ?>' + document.getElementById('endpointUrl').innerHTML;
 
     if (params != '') {
-        isValidJson = myfunction(params);
+        isValidJson = validateJson(params);
 
         if (isValidJson == false) {
             alert("Invalid JSON");
@@ -351,7 +346,7 @@ console.log(`the golden token is ${golden_token} and the token is ${token}`);
         }
     }
 
-    if ((requestType == 'GET') && (params != '')) { //
+    if ((requestType == 'GET') && (params != '')) {
 
         params = params.replace(/>/g, '*!gt!*');
         params = params.replace(/</g, '*!lt!*');
@@ -456,10 +451,6 @@ function openModal(endpointName, endpoint_json) {
     if (endpoint_data.required_fields) {
         setTimeout(drawRequiredFields, 100, endpoint_data.required_fields);
     }
-
-    console.log(endpointName);
-    console.log(endpoint_data);
-    console.log(endpoint_settings);
     
     url_segments = endpoint_data.url_segments.replace(/{/g, "<span class=\"alt-font\">{</span>");
     url_segments = url_segments.replace(/}/g, "<span class=\"alt-font\">}</span>");
@@ -507,16 +498,9 @@ function viewSettings() {
 
 
 function copyText() {
-  /* Get the text field */
   var copyText = document.getElementById("serverResponse");
-
-  /* Select the text field */
   copyText.select();
-
-  /* Copy the text inside the text field */
   document.execCommand("copy");
-
-  /* Alert the copied text */
   alert("Copied the text: " + copyText.value);
 }
 
@@ -549,12 +533,9 @@ function initBypassAuth() {
         const http = new XMLHttpRequest()
         http.open('POST', '<?= BASE_URL ?>trongate_tokens/regenerate/' + token + '/' + expiryDate);
         http.setRequestHeader('Content-type', 'application/json')
-        http.send(JSON.stringify(params)) // Make sure to stringify
+        http.send(JSON.stringify(params))
         http.onload = function() {
-            //fetch new 'bypass' token
-
             if (http.responseText == 'false') {
-                alert('Invalid token! we have golden token of ' + golden_token + ' along with ' + token);
                 expiredGoldenToken();
             } else {
 
@@ -562,7 +543,6 @@ function initBypassAuth() {
                 golden_token = token;
                 document.getElementById("input-token").value = token;
                 document.getElementById("token-value").innerHTML = token;
-     
             }
 
         }
@@ -583,9 +563,8 @@ function displayHeaders() {
 }
 
 
-    function myfunction(text){
+    function validateJson(text){
 
-       //function for validating json string
         function testJSON(text){
             try{
                 if (typeof text!=="string"){
@@ -600,11 +579,10 @@ function displayHeaders() {
             }
         }
 
-        //content of your real function   
         if(testJSON(text)){
-            return true;
+            return true; //valid
         }else{
-            return false; //not valid json
+            return false; //not valid
         }
     }
 
