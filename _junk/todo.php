@@ -1,3 +1,60 @@
+
+//1. DC Style
+function _hello() {
+    if ($name == 'hello') {
+        echo 'hello';
+    }
+}
+
+
+//2. Traversy Style
+private function hello(){
+  if ($name=='hello'){
+    echo 'hello';
+  }
+}
+
+//3. PSR style
+private function hello()
+{
+    if ($name == 'hello') {
+        echo 'hello';
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Test get request without token.                 DONE
 
 Test get request with bypass option enabled.    DONE   

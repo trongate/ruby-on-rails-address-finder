@@ -1,56 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-  <!-- Basic Page Needs
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <meta charset="utf-8">
-  <title>API Explorer</title>
-  <meta name="description" content="">
-  <meta name="author" content="">
-
-  <!-- Mobile Specific Metas
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <!-- FONT
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
-
-  <!-- CSS
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-  <link rel="stylesheet" href="api_module/css/normalize.css">
-  <link rel="stylesheet" href="api_module/css/skeleton.css">
-  <link rel="stylesheet" href="api_module/css/api.css">
-
-  <!-- Favicon
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-
+    <meta charset="utf-8">
+    <title>API Explorer</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="api_module/css/skeleton.css">
+    <link rel="stylesheet" href="api_module/css/api.css">
 </head>
 <body>
-
-  <!-- Primary Page Layout
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-
 <div class="top-row w3-row">
     <div class="container" id="top-block">
-        <div class="w3-col s5 w3-center logo">Trongate API - Explorer
-<div id="show-golden-token"></div>
-<div id="show-current-token"></div>
-        </div>
+        <div class="w3-col s5 w3-center logo">Trongate API - Explorer</div>
         <div class="w3-col s2 w3-center trhs"><p id="token-status">Token Not Set!</p></div>
-        <div class="w3-col s3 w3-center trhs"><p>
-            <input id="input-token" class="w3-input w3-border" type="text" placeholder="Enter Authorization Token">
-        </p></div>
-        <div class="w3-col s2 w3-center trhs"><p>
-            <button onclick="setToken()" class="w3-button button-primary default">Set Token</button>
-        </p></div>
+        <div class="w3-col s3 w3-center trhs">
+            <p>
+                <input id="input-token" class="w3-input w3-border" type="text" placeholder="Enter Authorization Token">
+            </p>
+        </div>
+        <div class="w3-col s2 w3-center trhs">
+            <p>
+                <button onclick="setToken()" class="w3-button button-primary default">Set Token</button>
+            </p>
+        </div>
     </div>
 </div>
 
 <script>
-
 function showTokens() {
     console.log('showing tokens is running and we have golden token of ' + golden_token + ' along with ' + token);
     document.getElementById("show-golden-token").innerHTML = golden_token;
@@ -74,7 +53,6 @@ function clearContent()
 var golden_token = '<?= $golden_token ?>';
 var token = '';
 
-
 function setToken() {
     token = document.getElementById('input-token').value;
     document.getElementById('token-value').innerHTML = token;
@@ -89,151 +67,7 @@ function setToken() {
 
 }
 
-
-
-
-
-
-
 </script>
-
-
-
-<style>
-
-.default:hover {
-    background: #22abd6 !important;
-    color: white !important;
-}
-
-.trhs {
-    top: 0.8em;
-    position: relative;
-}
-
-.logo {
-    font-size: 1.6em;
-    margin: 0 !important;
-    padding: 0 !important;
-    font-weight: bold;
-}
-
-
-.top-row {
-    background: #50459b;
-    color: #eee;
-    min-height: 5em;
-    line-height: 5em;
-}
-
-.top-row .w3-button {
-    width: 96%;
-}
-
-.top-row > .container {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-}
-
-
-</style>
-
-
-
-
-
-<style>
-
-.w3-quarter {
-    min-height: 6em;
-    background: orange;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.button.button-primary, 
-button.button-primary, 
-input[type="submit"].button-primary, 
-input[type="reset"].button-primary, 
-input[type="button"].button-primary {
-    padding: 0em 1em;
-    min-width: 94px;
-    font-size: 0.9em;
-    margin: 0;
-    padding: 0;
-}
-
-.purple {
-    background-color: #BB9FE0 !important;
-    border: 1px #BB9FE0 solid !important;
-}
-
-.purple:hover {
-    background-color: #a791c4 !important;
-    border: 1px #a791c4 solid !important;
-}
-
-.deep-purple {
-    background-color: #470B59 !important;
-    border: 1px #470B59 solid !important;
-}
-
-.deep-purple:hover {
-    background-color: #3b0a49 !important;
-    border: 1px #3b0a49 solid !important;
-}
-
-.green {
-    background-color: #0285A1 !important;
-    border: 1px #0285A1 solid !important;
-}
-
-.green:hover {
-    background-color: #02738c !important;
-    border: 1px #02738c solid !important;
-}
-
-.red {
-    background-color: #a11e02 !important;
-    border: 1px #a11e02 solid !important;
-}
-
-.red:hover {
-    background-color: #6f1501 !important;
-    border: 1px #6f1501 solid !important;
-}
-
-td {
-    padding: 8px;
-    vertical-align: center !important;
-}
-
-.star {
-    font-size: 1.4em;
-}
-
-.generate-btn {
-    min-width: 180px !important;
-    margin-left: 1em !important;
-}
-
-.white-btn {
-    background-color: #fff !important;
-}
-
-.alt-font {
-    font-family: "Lucida Console", Monaco, monospace;
-}
-
-.w3-display-topright {
-    font-size: 2em;
-    padding: 0 0.6em;
-}
-
-</style>
 
 <div>
     <div class="container" id="stage" style="margin-top: 5em;">
@@ -241,35 +75,35 @@ td {
             <div>
                 <h4>donors</h4>
                 <table class="u-full-width" style="font-size: 1.4em;">
-                  <thead>
-                    <tr>
-                      <th class="go-left">Request Type</th>
-                      <th class="go-left">Endpoint Name</th>
-                      <th class="go-left">URL segments</th>
-                      <th class="go-right">Description</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <?php
-                    foreach($endpoints as $endpoint_name => $endpoint) {
-                        $endpoint_json = json_encode($endpoint);
+                    <thead>
+                        <tr>
+                            <th class="go-left">Request Type</th>
+                            <th class="go-left">Endpoint Name</th>
+                            <th class="go-left">URL segments</th>
+                            <th class="go-right">Description</th>
+                        </tr>
+                    </thead>
+                <tbody>
+                <?php
+                foreach($endpoints as $endpoint_name => $endpoint) {
+                    $endpoint_json = json_encode($endpoint);
 
                         switch($endpoint['request_type']) {
-                          case 'GET':
-                            $btn_theme = 'green';
-                            break;
-                          case 'POST':
-                            $btn_theme = 'purple';
-                            break;
-                          case 'PUT':
-                            $btn_theme = 'deep-purple';
-                            break;
-                          case 'DELETE':
-                            $btn_theme = 'red';
-                            break;
-                          default:
-                            $btn_theme = 'green';
-                            break;
+                            case 'GET':
+                                $btn_theme = 'green';
+                                break;
+                            case 'POST':
+                                $btn_theme = 'purple';
+                                break;
+                            case 'PUT':
+                                $btn_theme = 'deep-purple';
+                                break;
+                            case 'DELETE':
+                                $btn_theme = 'red';
+                                break;
+                            default:
+                                $btn_theme = 'green';
+                                break;
                         }
 
                         $endpoint_data = json_encode($endpoint);
@@ -285,15 +119,15 @@ td {
                         $endpoint['url_segments'] = str_replace($ditch, $replace, $endpoint['url_segments']);
                     ?>
                     <tr>
-                      <td style="font-size: 0.8em;"><input onclick="openModal('<?= $endpoint_name ?>', '<?= $endpoint_data ?>')" type="submit" value="<?= $endpoint['request_type'] ?>" class="button-primary <?= $btn_theme ?>"></td>
-                      <td><?= $endpoint_name ?></td>
-                      <td><?= $endpoint['url_segments'] ?></td>
-                      <td class="go-right"><?= $endpoint['description'] ?></td>
+                        <td style="font-size: 0.8em;"><input onclick="openModal('<?= $endpoint_name ?>', '<?= $endpoint_data ?>')" type="submit" value="<?= $endpoint['request_type'] ?>" class="button-primary <?= $btn_theme ?>"></td>
+                        <td><?= $endpoint_name ?></td>
+                        <td><?= $endpoint['url_segments'] ?></td>
+                        <td class="go-right"><?= $endpoint['description'] ?></td>
                     </tr>
                     <?php 
-                    } 
+                    }
                     ?>
-                  </tbody>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -308,7 +142,6 @@ td {
         </header>
         <div id="modal-content" class="w3-container modal-content-get">
             <h4 style="margin-top: 0.4em;">Test Your API Endpoint</h4>
-
             <form>
                 <div class="row">
                     <div class="six columns">
@@ -316,18 +149,15 @@ td {
                             <div id="extra-required-fields"></div>
                             <label for="exampleMessage">Parameters</label>
                             <textarea onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'   '+v.substring(e);this.selectionStart=this.selectionEnd=s+3;return false;}" class="u-full-width" placeholder="Enter parameters in JSON format" id="params"></textarea>
-                             
-                                <div class="w3-row">
-                                  <div class="w3-col s6">
+                            <div class="w3-row">
+                                <div class="w3-col s6">
                                     Bypass authorization <input onclick="initBypassAuth()" type="checkbox" id="bypass" value="1">
-                                  </div>
-                                  <div class="w3-col s6 w3-center" id="clearParamsBox">
-                                    Clear Parameters <input onclick="clearContent()" type="checkbox" id="clearParams" value="1">
-                                  </div>
                                 </div>
-
+                                <div class="w3-col s6 w3-center" id="clearParamsBox">
+                                    Clear Parameters <input onclick="clearContent()" type="checkbox" id="clearParams" value="1">
+                                </div>
+                            </div>
                             <input onclick="submitRequest()" class="button-primary" type="button" value="Submit"> 
-                            
                         </div>
                     </div>
                     <div class="six columns">
@@ -343,10 +173,6 @@ td {
                             <input onclick="viewSettings()" class="button-default white-btn go-right" style="float-right; position: relative;" type="button" value="View Settings">
                             <input onclick="copyText()" class="button-default white-btn go-right" style="float-right; position: relative;" type="button" value="Copy Response BODY">
                         </p>
-
-                        
-
-                        
                     </div>
                 </div>
             </form>
@@ -359,7 +185,6 @@ td {
                 <?= $endpoint_settings_location ?><br>
                 <b>Your Current Token: </b><span id="token-value"></span>
             </p>
-
         </div>
         <footer id="modal-footer">
             <p style="text-align: center;">For full documentation and tutorials visit <a href="https://trongate.io/" target="_blank">Trongate.io</a></p>
@@ -373,8 +198,6 @@ var url_segments;
 var endpoint;
 var extraFieldsHtml = '';
 var extraRequiredFields = [];
-
-//setTimeout(expiredGoldenToken, 2000);
 
 function expiredGoldenToken() {
     document.getElementById("stage").innerHTML = '';
@@ -710,86 +533,7 @@ function copyText() {
   /* Alert the copied text */
   alert("Copied the text: " + copyText.value);
 }
-    </script>
 
-
-
-
-<style>
-
-#http-status-code {
-    color: green;
-}
-
-#header-info p {
-    margin: 0;
-}
-
-footer a:link { color: white; }
-footer a:active { color: white; }
-footer a:visited { color: white; }
-footer a:hover { color: white; }
-
-textarea {
-    min-height: 200px;
-    font-family: "Lucida Console", Monaco, monospace;
-}
-
-.server-response {
-    background: #fcfbe3;
-}
-
-.modal-content {
-    background: #f3f2ff;
-}
-
-.modal-content-get {
-    background: #eaf9fc;
-}
-
-.modal-content-put {
-    background: #f7eff9;
-}
-
-.modal-content-delete {
-    background: #fff;
-}
-
-.theme-a p, .theme-b p, .theme-c p, .theme-d p {
-    padding: 1em 0;
-    margin: 0;
-}
-
-.w3-modal h2 {
-    padding: 0.2em 0em;
-    margin: 0;
-    font-size: 2em;
-}
-
-.theme-a {
-    background-color: #50459b;
-}
-
-.theme-b {
-    background-color: #0285A1;
-}
-
-.theme-c {
-    background-color: #470B59;
-}
-
-.theme-d {
-    background-color: #a11e02;
-}
-
-.white-text {
-    color: #fff;
-}
-</style>
-
-
-
-<script>
 // Get the modal
 var modal = document.getElementById('id01');
 
@@ -799,18 +543,8 @@ window.onclick = function(event) {
     modal.style.display = "none";
   }
 }
-</script>
 
 
-
-
-
-
-
-
-
-
-<script>
 var headerInfo = '';
 
 
@@ -863,11 +597,6 @@ function displayHeaders() {
 }
 
 
-
-
-
-
-
     function myfunction(text){
 
        //function for validating json string
@@ -893,13 +622,12 @@ function displayHeaders() {
         }
     }
 
-
-
 showTokens();
 
 </script>
 
-<!-- End Document
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+<style>
+.default:hover{background:#22abd6!important;color:#fff!important}.trhs{top:.8em;position:relative}.logo{font-size:1.6em;margin:0!important;padding:0!important;font-weight:700}.top-row{background:#50459b;color:#eee;min-height:5em;line-height:5em}.top-row .w3-button{width:96%}.top-row>.container{display:flex;flex-direction:row;justify-content:space-between;align-items:center}.w3-quarter{min-height:6em;background:orange;display:flex;flex-direction:column;justify-content:center}.button.button-primary,button.button-primary,input[type=button].button-primary,input[type=reset].button-primary,input[type=submit].button-primary{padding:0 1em;min-width:94px;font-size:.9em;margin:0;padding:0}.purple{background-color:#bb9fe0!important;border:1px #bb9fe0 solid!important}.purple:hover{background-color:#a791c4!important;border:1px #a791c4 solid!important}.deep-purple{background-color:#470b59!important;border:1px #470b59 solid!important}.deep-purple:hover{background-color:#3b0a49!important;border:1px #3b0a49 solid!important}.green{background-color:#0285a1!important;border:1px #0285a1 solid!important}.green:hover{background-color:#02738c!important;border:1px #02738c solid!important}.red{background-color:#a11e02!important;border:1px #a11e02 solid!important}.red:hover{background-color:#6f1501!important;border:1px #6f1501 solid!important}td{padding:8px;vertical-align:center!important}.star{font-size:1.4em}.generate-btn{min-width:180px!important;margin-left:1em!important}.white-btn{background-color:#fff!important}.alt-font{font-family:"Lucida Console",Monaco,monospace}.w3-display-topright{font-size:2em;padding:0 .6em}#http-status-code{color:green}#header-info p{margin:0}footer a:link{color:#fff}footer a:active{color:#fff}footer a:visited{color:#fff}footer a:hover{color:#fff}textarea{min-height:200px;font-family:"Lucida Console",Monaco,monospace}.server-response{background:#fcfbe3}.modal-content{background:#f3f2ff}.modal-content-get{background:#eaf9fc}.modal-content-put{background:#f7eff9}.modal-content-delete{background:#fff}.theme-a p,.theme-b p,.theme-c p,.theme-d p{padding:1em 0;margin:0}.w3-modal h2{padding:.2em 0;margin:0;font-size:2em}.theme-a{background-color:#50459b}.theme-b{background-color:#0285a1}.theme-c{background-color:#470b59}.theme-d{background-color:#a11e02}.white-text{color:#fff}
+</style>
 </body>
 </html>
