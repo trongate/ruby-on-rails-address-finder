@@ -10,24 +10,10 @@ class Security extends Trongate {
         return $user_id;
     }
 
-    function _get_user_level($return_type=NULL) {
-        //possible return types are NULL (returns object), 'id' or 'level_title'
-        $data['user_id'] = $this->_get_user_id();
-        $sql = 'SELECT trongate_user_levels.*
-                    FROM
-                        trongate_users
-                    INNER JOIN trongate_user_levels ON trongate_users.user_level_id = trongate_user_levels.id 
-                    WHERE trongate_users.id = :user_id';
-
-        $rows = $this->model->query_bind($sql, $data, 'object');
-        $user_level = $rows[0];
-        
-        if ($return_type == 'id') {
-            $user_level = $user_level->id;
-        } elseif ($return_type == 'level_title') {
-            $user_level = $user_level->level_title;
-        }
-
+    function _get_user_level($user_id) {
+        //fetch the user_level for this user
+        $this->module('trongate_users-trongate_user_levels');
+        $user_level = $this->trongate_user_levels->_get_user_level($user_id);
         return $user_level;
     }
 
