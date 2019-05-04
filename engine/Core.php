@@ -185,6 +185,7 @@ class Core {
 
     private function draw_error_page() {
         load('error_404');
+        die();
     }
 
 }
