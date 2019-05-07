@@ -2,6 +2,8 @@
     <div class="w3-container">
 
         <h1><?= $headline ?></h1>
+        <?= flashdata() ?>
+        
         <p><a href="<?= BASE_URL ?>donors/create"><button class="w3-button w3-medium primary"><i class="fa fa-pencil"></i>  CREATE NEW DONOR RECORD</button></a></p>
         <p><?= Pagination::display($data) ?></p>
 

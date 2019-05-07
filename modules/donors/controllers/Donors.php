@@ -1,16 +1,7 @@
 <?php
 class Donors extends Trongate {
 
-
-    function test() {
-        $comments = false;
-        foreach ($comments as $key => $value) {
-            echo "Key of $key is $value<br>";
-        }
-
-        echo "finished"; die();
-        echo $update_id; die();
-    }
+    private $module = 'donors';
 
     function submit() {
         $this->module('security');
@@ -53,6 +44,38 @@ class Donors extends Trongate {
 
     }
 
+    function submit_delete() {
+        $this->module('security');
+        $this->security->_make_sure_allowed();
+
+        $submit = $this->input('submit', true);
+
+        if ($submit == 'Submit') {
+            $update_id = $this->url->segment(3);
+
+            if (!is_numeric($update_id)) {
+                die();
+            } else {
+                $data['update_id'] = $update_id;
+
+                //delete all of the comments associated with this record
+                $sql = 'delete from comments where target_table = :module and update_id = :update_id';
+                $data['module'] = $this->module;
+                $this->model->query_bind($sql, $data);
+
+                //delete the record
+                $this->model->delete($update_id, $this->module);
+
+                //set the flashdata
+                $flash_msg = 'The record was successfully created';
+                set_flashdata($flash_msg);
+
+                //redirect to the manage page
+                redirect('donors/manage');
+            }
+        }        
+    }
+
     function manage() {
         $this->module('security');
         $this->security->_make_sure_allowed();
@@ -75,22 +98,7 @@ class Donors extends Trongate {
 
         $this->template('admin', $data);
     }
-/*
 
-
-        $data['limit_pref'] = $_SESSION['limit_pref']; //the (max donors) 'per page' preference
-        $data['this_module_root'] = $this->get_this_module_root();
-        $data['flash'] = $this->flash_helper->_get_flashdata();
-
-        $data['headline'] = 'Manage Donors';
-        $data['view_file'] = 'manage';
-        $this->load->module('templates');
-        $this->templates->admin($data);
-
-
-
-    }
-*/
     function _fetch_data_from_db($update_id) {
         $donors = $this->model->get_where($update_id, 'donors');
 
@@ -108,9 +116,7 @@ class Donors extends Trongate {
 
             //format the unix timestamps
             $this->module('timedate');
- 
             $data['date_of_birth'] = $this->timedate->get_nice_date($data['date_of_birth'], 'datepicker');
-            //$data['next_appointment'] = $this->timedate->get_nice_date($data['next_appointment'], 'dateandtimepicker');
             $data['next_appointment'] = $this->timedate->get_nice_date($data['next_appointment'], 'datepicker');
 
             return $data;        
@@ -191,14 +197,6 @@ class Donors extends Trongate {
         if ($data == false) {
             redirect('donors/manage');
         } else {
-            // $this->module('comments');
-            // $this->module('trongate_tokens');
-            // $tables = array('comments' => '*'); //token lets user write to 'comments' tbl
-            // $token_information = array('tables' => $tables);
-            // $token_data['user_id'] = $this->security->_get_user_id();
-            // $token_data['information'] = json_encode($token_information);
-            // $token_data['expiry_date'] = $this->comments->_calc_expiry_date();
-            // $data['token'] = $this->trongate_tokens->_generate_token($token_data);
             $data['form_location'] = BASE_URL.'donors/submit/'.$update_id;
             $data['update_id'] = $update_id;
             $data['headline'] = 'Donor Information';
