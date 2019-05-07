@@ -37,9 +37,8 @@ class Donors extends Trongate {
                     $flash_msg = 'The record was successfully updated';
                 } else {
                     //insert the new record
-                    $this->model->insert($data, 'donors');
+                    $update_id = $this->model->insert($data, 'donors');
                     $flash_msg = 'The record was successfully created';
-                    $update_id = $this->model->get_max('donors');
                 }
     
                 set_flashdata($flash_msg);

@@ -49,7 +49,7 @@
               <div class="w3-border-bottom"><b>First Name:</b> <span class="w3-right w3-text-grey"><?= $first_name ?></span></div>
               <div class="w3-border-bottom"><b>Price:</b> <span class="w3-right w3-text-grey"><?= $price ?></span></div>
               <div class="w3-border-bottom"><b>Email:</b> <span class="w3-right w3-text-grey"><?= $email ?></span></div>
-              <div class="w3-border-bottom"><b>Introduction:</b> <br><span class="w3-text-grey"><?= $introduction ?></span> </div>
+              <div class="w3-border-bottom"><b>Introduction:</b> <br><span class="w3-text-grey"><?= nl2br($introduction) ?></span> </div>
 
             </div>
         </div>
