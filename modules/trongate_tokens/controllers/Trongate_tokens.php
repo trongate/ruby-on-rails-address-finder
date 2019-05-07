@@ -135,7 +135,6 @@ class Trongate_tokens extends Trongate {
 
     function _is_token_valid($token_validation_data) {
         extract($token_validation_data);
-        $authorization_rules = $this->_fetch_authorization_rules($endpoint, $module_endpoints);
 
         if ($authorization_rules == false) {
             //invalid token

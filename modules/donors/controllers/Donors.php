@@ -109,9 +109,11 @@ class Donors extends Trongate {
 
             //format the unix timestamps
             $this->module('timedate');
+ 
             $data['date_of_birth'] = $this->timedate->get_nice_date($data['date_of_birth'], 'datepicker');
             //$data['next_appointment'] = $this->timedate->get_nice_date($data['next_appointment'], 'dateandtimepicker');
             $data['next_appointment'] = $this->timedate->get_nice_date($data['next_appointment'], 'datepicker');
+
             return $data;        
         }
     }
@@ -174,27 +176,30 @@ class Donors extends Trongate {
 
     function edit() {
         $this->module('security');
+        $this->module('trongate_tokens');
         $this->security->_make_sure_allowed();
 
         $update_id = $this->url->segment(3);
-        
+    
         if ((!is_numeric($update_id)) && ($update_id != '')) {
             redirect('donors/manage');
         }
 
         $data = $this->_fetch_data_from_db($update_id);
+        $token_data['user_id'] = $this->security->_get_user_id();
+        $data['token'] = $this->trongate_tokens->_generate_token($token_data);
 
         if ($data == false) {
             redirect('donors/manage');
         } else {
-            $this->module('comments');
-            $this->module('trongate_tokens');
-            $tables = array('comments' => '*'); //token lets user write to 'comments' tbl
-            $token_information = array('tables' => $tables);
-            $token_data['user_id'] = $this->security->_get_user_id();
-            $token_data['information'] = json_encode($token_information);
-            $token_data['expiry_date'] = $this->comments->_calc_expiry_date();
-            $data['token'] = $this->trongate_tokens->_generate_token($token_data);
+            // $this->module('comments');
+            // $this->module('trongate_tokens');
+            // $tables = array('comments' => '*'); //token lets user write to 'comments' tbl
+            // $token_information = array('tables' => $tables);
+            // $token_data['user_id'] = $this->security->_get_user_id();
+            // $token_data['information'] = json_encode($token_information);
+            // $token_data['expiry_date'] = $this->comments->_calc_expiry_date();
+            // $data['token'] = $this->trongate_tokens->_generate_token($token_data);
             $data['form_location'] = BASE_URL.'donors/submit/'.$update_id;
             $data['update_id'] = $update_id;
             $data['headline'] = 'Donor Information';

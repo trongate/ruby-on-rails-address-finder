@@ -3,7 +3,8 @@
       "url_segments":"api/get/comments",
       "request_type":"GET",
       "description":"Fetch rows from the table",
-      "enableParams": true
+      "enableParams": true,
+      "authorization":"*"
    },
    "Find One":{  
       "url_segments":"api/get/comments/{id}",

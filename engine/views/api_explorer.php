@@ -34,7 +34,7 @@ function clearContent(){document.getElementById("params").value="",setTimeout(fu
     <div class="container" id="stage" style="margin-top: 5em;">
         <div class="row">
             <div>
-                <h4>donors</h4>
+                <h4><?= $target_module ?></h4>
                 <table class="u-full-width" style="font-size: 1.4em;">
                     <thead>
                         <tr>

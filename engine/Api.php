@@ -142,12 +142,24 @@ class Api extends Trongate {
 
     function _validate_token($token_validation_data) {
 
+        $this->module('trongate_tokens');
+
+        extract($token_validation_data);
+        $authorization_rules = $this->trongate_tokens->_fetch_authorization_rules($endpoint, $module_endpoints);
+
         if (!isset($_SERVER['HTTP_TRONGATETOKEN'])) {
-            $this->_not_allowed_msg();
+
+            if ($authorization_rules == '*') {
+                return true; //open endpoint
+            } else {
+                $this->_not_allowed_msg();
+            }
+
         } else {
             $token = $_SERVER['HTTP_TRONGATETOKEN'];
-            $this->module('trongate_tokens');
+
             $token_validation_data['token'] = $token;
+            $token_validation_data['authorization_rules'] = $authorization_rules;
             $valid = $this->trongate_tokens->_is_token_valid($token_validation_data);
 
             if ($valid == false) {
