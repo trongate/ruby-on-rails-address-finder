@@ -3,15 +3,7 @@
       "url_segments":"api/get/members",
       "request_type":"GET",
       "description":"Fetch rows from the table",
-      "enableParams": true,
-      "authorization":{  
-         "roles": [
-            "rock star", "Pope", "cool dude", "baker", "butcher"
-         ],
-         "userIds": [
-            3,1,6,9
-         ]
-      }
+      "enableParams": true
    },
    "Find One":{  
       "url_segments":"api/get/members/{id}",
@@ -22,13 +14,7 @@
            "name": "id",
            "label": "ID" 
         }
-      ],
-      "afterHook": "something",
-      "authorization":{  
-         "roles":[  
-            "admin"
-         ]
-      }
+      ]
    },
    "Exists":{  
       "url_segments":"api/exists/members/{id}",
@@ -39,12 +25,7 @@
            "name": "id",
            "label": "ID" 
         }
-      ],
-      "authorization":{  
-         "roles":[  
-            "admin"
-         ]
-      }
+      ]
    },
    "Count":{  
       "url_segments":"api/count/members",
@@ -61,23 +42,13 @@
       "url_segments":"api/create/members",
       "request_type":"POST",
       "description":"Insert database record",
-      "enableParams": true,
-      "authorization":{  
-         "roles":[  
-            "admin"
-         ]
-      }
+      "enableParams": true
    },
    "Insert Batch":{  
       "url_segments":"api/batch/members",
       "request_type":"POST",
       "description":"Insert multiple records",
-      "enableParams": true,
-      "authorization":{  
-         "roles":[  
-            "admin"
-         ]
-      }
+      "enableParams": true
    },
       "Update":{  
       "url_segments":"api/update/members/{id}",
@@ -89,23 +60,13 @@
            "name": "id",
            "label": "ID" 
         }
-      ],
-      "authorization":{  
-         "roles":[  
-            "admin"
-         ]
-      }
+      ]
    },
    "Destroy":{  
       "url_segments":"api/destroy/members",
       "request_type":"DELETE",
       "description":"Delete row or rows",
-      "enableParams": true,
-      "authorization":{  
-         "roles":[  
-            "admin"
-         ]
-      }
+      "enableParams": true
    },
    "Delete One":{  
       "url_segments":"api/delete/members/{id}",
@@ -116,11 +77,6 @@
            "name": "id",
            "label": "ID" 
         }
-      ],
-      "authorization":{  
-         "roles":[  
-            "admin"
-         ]
-      }
+      ]
    }
 }
