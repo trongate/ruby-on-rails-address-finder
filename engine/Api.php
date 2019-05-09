@@ -728,10 +728,14 @@ class Api extends Trongate {
 
     function batch() {
 
-        $input['token'] = $this->_validate_token();
-        $output['token'] = $input['token'];
         $module_name = $this->url->segment(3);
         $this->_make_sure_table_exists($module_name);
+        $module_endpoints = $this->_fetch_endpoints($module_name);
+
+        $token_validation_data['endpoint'] = 'Get';
+        $token_validation_data['module_name'] = $module_name;
+        $token_validation_data['module_endpoints'] = $module_endpoints;
+        $input['token'] = $this->_validate_token($token_validation_data);
 
         $post = file_get_contents('php://input');
         $decoded = json_decode($post, true);

@@ -81,11 +81,13 @@ class Donors extends Trongate {
         $this->security->_make_sure_allowed();
 
         //fetch the donors for this page
-        $limit = $this->_get_limit();
-        $offset = $this->_get_offset();
-        $data['donors'] = $this->model->get('first_name', 'donors', $limit, $offset);
-        $data['total_rows'] = count($data['donors']);
-        $data['total_rows'] = 888;
+        $data['limit'] = $this->_get_limit();
+        $data['offset'] = $this->_get_offset();
+
+        $records = $this->model->get('first_name', 'donors');
+        $data['donors'] = array_slice($records, $data['offset'], $data['limit'], true);
+        $data['total_rows'] = count($records);
+        $data['limit_pref'] = $_SESSION['limit_pref']; //'per page' preference
 
         //format the pagination
         $data['include_showing_statement'] = true;    
@@ -205,64 +207,37 @@ class Donors extends Trongate {
         }
     }
 
-/*
-    function search_results() {
-        $this->load->module('custom_pagination');
-        $this->load->module('flash_helper');
-        $this->load->module('site_security');
-        $this->site_security->_make_sure_is_admin();
+    function submit_search() {
 
-        $code = $this->uri->segment(3);
+        $this->module('search_memory');
+        $this->module('security');
+        $this->module('search_memory');
+        $this->security->_make_sure_allowed();
 
-        //count all records returned from the search query
-        $use_limit = FALSE;
-        $mysql_query = $this->_generate_search_query($code, $use_limit);
-        $query = $this->_custom_query($mysql_query);
-        $total_items = $query->num_rows();
+        $params['search_string'] = '%'.$this->input('search_string', true).'%';
+        $sql = 'SELECT * from donors WHERE first_name LIKE :search_string OR email LIKE :search_string';
+        $donors = $this->model->query_bind($sql, $params, 'object');
+        $num_rows = count($donors);
 
-        //fetch the records to be shown on this (search results) page
-        $use_limit = TRUE;
-        $mysql_query = $this->_generate_search_query($code, $use_limit);
-        $data['query'] = $this->_custom_query($mysql_query);
-        $data['num_rows'] = $data['query']->num_rows();
+        if ($num_rows > 0) {
+            //the search has yielded at least one result
+            $data['root_url'] = BASE_URL.'donors/search_results';
+            $data['code'] = $this->security->_generate_random_string(6);
+            $data['sql_query'] = $sql;
+            $data['search_string'] = $params['search_string']; 
+            $data['date_created'] = time();
 
-        //generate the pagination
-        $pagination_data['template'] = 'admin';
-        $pagination_data['target_base_url'] = $this->get_target_pagination_base_url().'/'.$code;
-        $pagination_data['total_rows'] = $total_items;
-        $pagination_data['offset_segment'] = 4;
-        $pagination_data['limit'] = $this->get_limit();
-        $data['pagination'] = $this->custom_pagination->_generate_pagination($pagination_data);
-        $pagination_data['offset'] = $this->get_offset();
-        $data['showing_statement'] = $this->custom_pagination->get_showing_statement($pagination_data);
+            $this->search_memory->_insert_and_go($data);
 
-        $data['limit_pref'] = $_SESSION['limit_pref']; //the (max search results) 'per page' preference
-        $data['this_module_root'] = $this->get_this_module_root();
-        $data['flash'] = $this->flash_helper->_get_flashdata();
-
-        $data['headline'] = 'Search Results';
-        $data['view_file'] = 'manage';
-        $this->load->module('templates');
-        $this->templates->admin($data);
-    }
-
-    function no_results() {
-        $this->load->module('custom_pagination');
-        $this->load->module('flash_helper');
-        $this->load->module('site_security');
-        $this->site_security->_make_sure_is_admin();
-
-        if (isset($_SERVER['HTTP_REFERER'])) {
-            $data['previous_url'] = $_SERVER['HTTP_REFERER'];
+        } else {
+            echo $params['search_string'].'<br>';
+            echo $sql; die();
+            redirect('donors/no_results');
         }
 
-        $data['headline'] = 'Search Results';
-        $data['view_file'] = 'no_results';
-        $this->load->module('templates');
-        $this->templates->admin($data);
-    }
 
-    function submit_search() {
+
+        /*
         $this->load->module('custom_pagination');
         $this->load->module('search_memory');
         $this->load->module('site_security');
@@ -289,7 +264,70 @@ class Donors extends Trongate {
         } else {
             redirect('donors/no_results');
         }
+        */
+
     }
+
+    function set_pref() {
+        $new_pref = $this->url->segment(3);
+
+        if((isset($_SERVER['HTTP_REFERER'])) && (is_numeric($new_pref))) {
+            $_SESSION['limit_pref'] = $new_pref;
+            redirect($_SERVER['HTTP_REFERER']);
+        }
+    }
+
+    function search_results() {
+
+        $this->module('security');
+        $this->security->_make_sure_allowed();
+        $code = $this->url->segment(3);
+
+        $data['limit'] = $this->_get_limit();
+        $data['offset'] = $this->url->segment(4);
+
+        $result = $this->model->get_one_where('code', $code, 'search_memory');
+        $sql = $result->sql_query;
+        $params['search_string'] = $result->search_string;
+        $records = $this->model->query_bind($sql, $params, 'object');
+        $data['donors'] = array_slice($records, $data['offset'], $data['limit'], true);
+        $data['total_rows'] = count($records);
+
+        //format the pagination
+        $data['include_showing_statement'] = true;    
+        $data['record_name_plural'] = 'donors';  
+        $data['page_num_segment'] = $this->url->segment(4);
+        $data['pagination_root'] = 'donors/search_results/'.$code;
+
+        $data['headline'] = 'Manage Donors';
+        $data['view_module'] = 'donors';
+        $data['view_file'] = 'manage';
+        $data['limit_pref'] = $_SESSION['limit_pref']; //the (max donors) 'per page' preference
+
+        $this->template('admin', $data);
+
+    }
+
+
+
+/*
+    function no_results() {
+        $this->load->module('custom_pagination');
+        $this->load->module('flash_helper');
+        $this->load->module('site_security');
+        $this->site_security->_make_sure_is_admin();
+
+        if (isset($_SERVER['HTTP_REFERER'])) {
+            $data['previous_url'] = $_SERVER['HTTP_REFERER'];
+        }
+
+        $data['headline'] = 'Search Results';
+        $data['view_file'] = 'no_results';
+        $this->load->module('templates');
+        $this->templates->admin($data);
+    }
+
+
 
     
 
