@@ -78,20 +78,19 @@ class Donors extends Trongate {
 
     function manage() {
         $this->module('security');
+        $this->module('trongate_tokens');
         $this->security->_make_sure_allowed();
 
-        //fetch the donors for this page
-        $data['limit'] = $this->_get_limit();
-        $data['offset'] = $this->_get_offset();
-
-        $records = $this->model->get('first_name', 'donors');
-        $data['donors'] = array_slice($records, $data['offset'], $data['limit'], true);
-        $data['total_rows'] = count($records);
-        $data['limit_pref'] = $_SESSION['limit_pref']; //'per page' preference
+        $token_data['user_id'] = $this->security->_get_user_id();
+        $data['token'] = $this->trongate_tokens->_generate_token($token_data);
+        $data['order_by'] = 'first_name';
 
         //format the pagination
+        $data['total_rows'] = 888;
         $data['include_showing_statement'] = true;    
-        $data['record_name_plural'] = 'donors';  
+        $data['record_name_plural'] = 'donors';
+        $data['limit'] = $this->_get_limit();  
+        $data['offset'] = $this->_get_offset();
 
         $data['headline'] = 'Manage Donors';
         $data['view_module'] = 'donors';
@@ -366,11 +365,7 @@ class Donors extends Trongate {
     }
 
     function _get_offset() {
-        $offset = $this->url->segment(3);
-        if (!is_numeric($offset)) {
-            $offset = 0;
-        }
-
+        $offset = 0;
         return $offset;
     }
 

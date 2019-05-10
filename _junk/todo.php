@@ -1,34 +1,19 @@
-WEDNESDAY
+1.  Figure out how to have the thing respecting limit and offset.
 
-1.  Get pagination and search working for donor module.
+2.  Add an edit button.
 
-2.  Test (and Fix?) all of the API endpoints.
+3.  Get results per page working.
 
-THURSDAY -> FRIDAY
+4.  Get pagination working.
 
-1.  Get desktop app automatically generating module.
+5.  Get search records working.
 
-SATURDAY
+----------------------------------
 
-1.  Download auto-generated module to target location.
+BONUS TO DO:
 
-SUNDAY
+*  Build a js function for converting unix timestamp.
 
-----
+*  Build a js function for limiting characters.
 
-MONDAY to WEDNESDAY
-
-1.  Get Module relations working.
-
-
-THURSDAY to FRIDAY
-
-1.  Get image uploaders working.
-
-MONDAY to FRIDAY
-
-1.  Test test test then LAUNCH!
-
-*********************************
-*********************************
-*********************************
+*  Consider building a function for currency.
