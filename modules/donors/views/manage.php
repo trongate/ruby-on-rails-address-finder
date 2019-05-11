@@ -7,7 +7,12 @@
                 <i class="fa fa-pencil"></i> CREATE NEW DONOR RECORD</button>
             </a>
         </p>
+
+
+
+
         <div id="loader" class="loadersmall"></div>
+        <div id="pagination"></div>
         <table class="w3-table results-tbl" id="results-tbl" style="margin-left: -2000em;">
             <thead>
                 <tr class="primary">
@@ -141,6 +146,65 @@ window.onclick = function(event) {
 }
 
 fetchRecords();
+
+function buildPagination() {
+
+    var pagination = `
+
+                    <div class="pagination">
+                    <a onclick="switchPage(1)" href="#" class="active">1</a>
+                    <a onclick="switchPage(2)" href="#">2</a>
+                    <a onclick="switchPage(3)" href="#">3</a>
+                    <a onclick="switchPage(4)" href="#">4</a>
+                    <a onclick="switchPage(5)" href="#">5</a>
+                    <a onclick="switchPage(6)" href="#">6</a>
+                    <a onclick="switchPage(7)" href="#">»</a>
+                    <a onclick="switchPage('last')" href="#">Last</a>
+                    </div>
+
+    `;
+
+
+    document.getElementById("pagination").innerHTML = pagination;
+}
+
+var currentPage = 1;
+
+function switchPage(pageNum) {
+
+    var totalRows = '<?= $total_rows ?>';
+    var recordNamePlural = '<?= $record_name_plural ?>';
+    var maxPages = 10;
+
+    //calculate number of pages
+    var totalPages = Math.ceil(totalRows / limit);
+
+
+    /*
+
+        FIGURING OUT THE LINKS TO DRAW BEFORE AND AFTER THE CURRENT PAGE
+        
+
+    */
+
+
+
+
+
+
+
+
+
+
+
+
+    console.log('we need ' + totalPages + ' pages');
+    console.log('this is page ' + currentPage);
+    // offset = pageNum;
+    // fetchRecords();
+}
+
+buildPagination();
 </script>
 
 

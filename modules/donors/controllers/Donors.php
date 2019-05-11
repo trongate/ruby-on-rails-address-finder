@@ -90,7 +90,7 @@ class Donors extends Trongate {
         $data['order_by'] = 'first_name';
 
         //format the pagination
-        $data['total_rows'] = 888;
+        $data['total_rows'] = $this->model->count('donors');
         $data['include_showing_statement'] = true;    
         $data['record_name_plural'] = 'donors';
         $data['limit'] = $this->_get_limit();  
