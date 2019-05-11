@@ -7,40 +7,34 @@
 <body>
     <script>
 
-        var searchPhrase = '';
-        
-        var params = [
-            { first_name : 'David' }, 
-            { orderBy : 'first_name desc' }
-        ]
-
-        var initParams = params;
-
-        console.log(JSON.stringify(params));
-
-        var searchColumns = [
-            { id :searchPhrase }, 
-            { email :searchPhrase }, 
-            { date_joined : searchPhrase }
-        ];
+        var searchPhrase = 'yes';
+        var params = {}
 
         function addSearchColumns() {
-            if (params.length<3) {
-                params = params.concat(searchColumns);
-                console.log(JSON.stringify(params));                
-            }
-        }
-
-        function removeSearchColumns() {
-            params = initParams;
+            params.id = searchPhrase;
+            params.email = searchPhrase;
+            params.date_of_birth = searchPhrase;
+            params.city = searchPhrase;
             console.log(JSON.stringify(params));
         }
+
+        function initParams() {
+
+            params = {
+                first_name : 'David',
+                orderBy : 'first_name desc'
+            }
+
+            console.log(JSON.stringify(params));
+        }
+
+        initParams();
 
     </script>
 
     <p>
         <button onclick="addSearchColumns()">Add Search Columns</button> 
-        <button onclick="removeSearchColumns()">Remove Search Columns</button>
+        <button onclick="initParams()">Remove Search Columns</button>
     </p>
 
 

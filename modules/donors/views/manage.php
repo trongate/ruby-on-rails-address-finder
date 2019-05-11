@@ -52,16 +52,51 @@ var orderBy = '<?= $order_by ?>';
 var limit = '<?= $limit ?>';
 var offset = '<?= $offset ?>';
 
+var searchPhrase = '';
+var params = {}
+
+function addSearchColumns() {
+    params.id = searchPhrase;
+    params.email = searchPhrase;
+    params.date_of_birth = searchPhrase;
+    params.city = searchPhrase;
+    console.log(JSON.stringify(params));
+}
+
+function initParams() {
+
+    params = {
+        first_name : 'David',
+        orderBy : 'first_name desc',
+        limit: 1
+    }
+
+    console.log(JSON.stringify(params));
+}
+
+initParams();
+
+
+
+
+
+
+
+
+
 function fetchRecords() {
 
-    var target_url = '<?= BASE_URL ?>api/get/donors/?orderBy=first*!underscore!*name&limit=' + limit + '&offset=' + offset;
+    var target_url = '<?= BASE_URL ?>api/get/donors';
 
     const http = new XMLHttpRequest()
-    http.open('GET', target_url)
+    http.open('POST', target_url)
     http.setRequestHeader('Content-type', 'application/json')
     http.setRequestHeader("trongateToken", token)
-    http.send()
+    http.send(JSON.stringify(params))
     http.onload = function() {
+
+        
+
 
         var records = JSON.parse(http.responseText);
         var newData = '<tbody>';

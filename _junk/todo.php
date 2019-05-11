@@ -1,8 +1,13 @@
+1.  Get page working by sending POST request.
+
+
+----------------------------------
+
 1.  Figure out how to have the thing respecting limit and offset.       DONE
 
 2.  Add an edit button.                                                 DONE
 
-3.  Get results per page working.                                       DONE
+3.   .                                       DONE
 
 4.  Get pagination working.
 
