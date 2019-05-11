@@ -483,11 +483,6 @@ class Api extends Trongate {
     }
 
     function get() {
-
-// $post = file_get_contents('php://input');
-// var_dump($post); die();
-
-
         $module_name = $this->url->segment(3);
         $this->_make_sure_table_exists($module_name);
         $module_endpoints = $this->_fetch_endpoints($module_name);

@@ -99,7 +99,6 @@ class Donors extends Trongate {
         $data['headline'] = 'Manage Donors';
         $data['view_module'] = 'donors';
         $data['view_file'] = 'manage';
-        $data['limit_pref'] = $_SESSION['limit_pref']; //the (max donors) 'per page' preference
 
         $this->template('admin', $data);
     }
