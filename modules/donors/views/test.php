@@ -11,6 +11,7 @@
         var params = {}
 
         function addSearchColumns() {
+            params['this has spaces'] = '%' + searchPhrase + '%';
             params.id = searchPhrase;
             params.email = searchPhrase;
             params.date_of_birth = searchPhrase;

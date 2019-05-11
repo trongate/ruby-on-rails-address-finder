@@ -13,11 +13,9 @@
                 <tr class="primary">
                     <th colspan="5">
                         <div class="table-top">
-                            <div>
-                                <form action="<?= BASE_URL ?>donors/submit_search" method="post" style="display: inline;">
-                                    <input type="text" name="search_string" placeholder="Search records..." >
-                                    <button type="submit"><i class="fa fa-search"> Search</i></button>
-                                </form>
+                            <div>   
+                                <input type="text" id="searchTest" placeholder="Search records..." >
+                                <button onclick="fetchRecords()"><i class="fa fa-search"> Search</i></button>
                             </div>
                             <div>Records Per Page:
                                 <div class="w3-dropdown-click">
@@ -46,47 +44,57 @@
     </div>
 </div>
 
+
+<input type="text" id="searchTesxt" placeholder="Search records..." >
+<button onclick="fetchRecords()">Try Again</button>
+
 <script>
 var token = '<?= $token ?>';
-var orderBy = '<?= $order_by ?>';
-var limit = '<?= $limit ?>';
-var offset = '<?= $offset ?>';
-
 var searchPhrase = '';
-var params = {}
-
-function addSearchColumns() {
-    params.id = searchPhrase;
-    params.email = searchPhrase;
-    params.date_of_birth = searchPhrase;
-    params.city = searchPhrase;
-    console.log(JSON.stringify(params));
-}
+var params = {};
 
 function initParams() {
-
     params = {
-        first_name : 'David',
-        orderBy : 'first_name desc',
-        limit: 1
+        orderBy: '<?= $order_by ?>',
+        limit: <?= $limit ?>,
+        offset: <?= $offset ?>
     }
-
-    console.log(JSON.stringify(params));
 }
 
 initParams();
 
 
 
-
-
-
-
-
-
 function fetchRecords() {
 
+    var searchValue = document.getElementById('searchTest').value;
+
+    if (searchValue !== '') {
+
+        document.getElementById("results-tbl").tBodies[0].innerHTML = '';
+
+        var params = {
+            'first_name LIKE':'%' + searchValue + '%',
+            'OR email LIKE':'%' + searchValue + '%',
+            orderBy: '<?= $order_by ?>',
+            limit: <?= $limit ?>,
+            offset: <?= $offset ?>
+        }         
+    } else {
+
+        var params = {
+            orderBy: '<?= $order_by ?>',
+            limit: <?= $limit ?>,
+            offset: <?= $offset ?>
+        } 
+
+    }
+
+    console.log('search value is ' + searchValue);
+    console.log(JSON.stringify(params));
+
     var target_url = '<?= BASE_URL ?>api/get/donors';
+    console.log('submitting to ', target_url);
 
     const http = new XMLHttpRequest()
     http.open('POST', target_url)
@@ -95,8 +103,7 @@ function fetchRecords() {
     http.send(JSON.stringify(params))
     http.onload = function() {
 
-        
-
+        console.log(http.responseText)
 
         var records = JSON.parse(http.responseText);
         var newData = '<tbody>';
@@ -118,11 +125,94 @@ function fetchRecords() {
 
         newData = newData.concat('</tbody>');
 
+
+        console.log(document.getElementById("results-tbl").innerHTML);
+
+        var resultsTable = document.getElementById("results-tbl").innerHTML;
+        document.getElementById("results-tbl").innerHTML = resultsTable.replace('<tbody></tbody>', newData);
+        document.getElementById("loader").style.display = 'none';
+        document.getElementById("results-tbl").style.marginLeft = '0em';
+
+
+    }
+
+}
+
+
+
+function fetchRecordsX() {
+
+    console.log('<?= time() ?> -> running fetch records.  Here we go....');
+
+    if (document.getElementById("search-string").value !== '') {
+        // params['first_name LIKE'] = '%' + searchPhrase + '%';
+        // params['OR email LIKE'] = '%' + searchPhrase + '%';
+
+        var paramsAlt = {
+            orderBy: '<?= $order_by ?>',
+            limit: <?= $limit ?>,
+            offset: <?= $offset ?>
+        }
+
+        console.log('hello');
+    } else {
+        console.log('no search vibes here');
+
+
+        var paramsAlt = {
+            orderBy: '<?= $order_by ?>',
+            limit: <?= $limit ?>,
+            offset: <?= $offset ?>
+        }
+
+    }
+
+    var target_url = '<?= BASE_URL ?>api/get/donors';
+
+    console.log('sending ' + JSON.stringify(paramsAlt));
+
+    const http = new XMLHttpRequest()
+    http.open('POST', target_url)
+    http.setRequestHeader('Content-type', 'application/json')
+    http.setRequestHeader("trongateToken", token)
+    http.send(JSON.stringify(paramsAlt))
+    http.onload = function() {
+
+
+
+
+        // var records = JSON.parse(http.responseText);
+        // var newData = '<tbody>';
+
+        // for (var i = 0; i < records.length; i++) {
+        //     records[i];
+        //     var recordUrl = '<?= BASE_URL ?>donors/edit/' + records[i]['id'];
+        //     var editBtn = '<a href="' + recordUrl + '"><button type="button" class="btn btn-xs">View</button></a>';
+        //     var newRow = `  <tr>
+        //                         <td>${records[i]['first_name']}</td>
+        //                         <td>${records[i]['email']}</td>
+        //                         <td>${records[i]['introduction']}</td>
+        //                         <td>${records[i]['price']}</td>
+        //                         <td>${editBtn}</td>
+        //                     </tr>`;
+
+        //     newData = newData.concat(newRow);
+        // }
+
+        // newData = newData.concat('</tbody>');
+
+
+        var newData = '<tbody><tr><td colspan=5>' + http.responseText + '</td></tbody>';
+
         var resultsTable = document.getElementById("results-tbl").innerHTML;
         document.getElementById("results-tbl").innerHTML = resultsTable.replace('<tbody></tbody>', newData);
         document.getElementById("loader").style.display = 'none';
         document.getElementById("results-tbl").style.marginLeft = '0em';
     }
+}
+
+function submitSearch() {
+    fetchRecords();
 }
 
 function togglePerPage() {
@@ -136,7 +226,7 @@ function togglePerPage() {
 
 function setPerPage(perPage) {
     document.getElementById("results-tbl").tBodies[0].innerHTML = '';
-    limit = perPage;
+    params.limit = perPage;
     fetchRecords();
 }
 
