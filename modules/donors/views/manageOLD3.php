@@ -4,9 +4,13 @@
         <?= flashdata() ?>
         <p>
             <a href="<?= BASE_URL ?>donors/create"><button class="w3-button w3-medium primary">
-                <i class="fa fa-pencil"></i> CREATE NEW RECORD</button>
+                <i class="fa fa-pencil"></i> CREATE NEW DONOR RECORD</button>
             </a>
         </p>
+
+
+
+
         <div id="loader" class="loadersmall"></div>
         <div class="pagination" id="pagination"></div>
         <table class="w3-table results-tbl" id="results-tbl" style="margin-left: -2000em;">
@@ -49,14 +53,9 @@
 var token = '<?= $token ?>';
 var limit = '<?= $limit ?>';
 var offset = '<?= $offset ?>';
-var pageNum = 1;
 
-function fetchRecords(pageNum) {
-    buildPagination(pageNum);
-    getRecords();
-}
+function fetchRecords() {
 
-function getRecords() {
     var searchValue = document.getElementById('searchTest').value;
     document.getElementById("results-tbl").tBodies[0].innerHTML = '';
 
@@ -101,7 +100,7 @@ function getRecords() {
                                 <td>${records[i]['first_name']}</td>
                                 <td>${records[i]['email']}</td>
                                 <td>${records[i]['introduction']}</td>
-                                <td>${records[i]['price']}</td>
+                                <td>&pound;${records[i]['price']}</td>
                                 <td>${editBtn}</td>
                             </tr>`;
 
@@ -116,11 +115,118 @@ function getRecords() {
         document.getElementById("results-tbl").style.marginLeft = '0em';
         document.getElementById("perPage").innerHTML = limit;
     }
+
 }
 
-function buildPagination(pageNum) {
+function submitSearch() {
+    fetchRecords();
+}
+
+function togglePerPage() {
+    var x = document.getElementById("per-page-options");
+    if (x.className.indexOf("w3-show") == -1) {  
+        x.className += " w3-show";
+    } else { 
+        x.className = x.className.replace(" w3-show", "");
+    }
+}
+
+function setPerPage(perPage) {
+    limit = perPage;
+    fetchRecords();
+}
+
+//When the user clicks anywhere outside of the dropdown btn, close it
+window.onclick = function(event) {
+    if (event.target !== perPage) {
+        var x = document.getElementById("per-page-options");
+        x.className = x.className.replace(" w3-show", "");
+    }
+}
+
+fetchRecords();
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+
+function drawPagination(pagination, pageNum) {
+
+
+    var paginationHtml = '';
+
+    for (var i = 0; i < pagination.length; i++) {
+
+
+
+        if (pagination[i] == pageNum) {
+            paginationHtml = paginationHtml.concat('<a href="#" onclick="buildPagination(\'' + pagination[i] + '\')" class="active">' + pagination[i] + '</a>');
+            console.log(`WE HAVE A MATCH since pagination i is ${pagination[i]} and pageNum is ${pageNum}`)            
+        } else {
+            paginationHtml = paginationHtml.concat('<a href="#" onclick="buildPagination(\'' + pagination[i] + '\')">' + pagination[i] + '</a>');
+
+           // console.log(`no match since pagination i is ${pagination[i]} and pageNum is ${pageNum}`)
+        }
+    }
+
+    document.getElementById("pagination").innerHTML = paginationHtml;
+}
+
+function buildPagination(num) {
+
+    console.log('pagenum is ', pageNum);
+
+    if(isNaN(pageNum)) {
+        console.log('pageNum of ' + pageNum + ' is not a number!');
+    }
+
+    switch(pageNum) {
+      case "First":
+        pageNum = 1; //needs work!
+        break;
+      case "Last":
+        pageNum = pageNum+1; //needs work!
+        break;
+      case "Prev":
+        pageNum = pageNum-1; //needs work!
+        break;
+      case "Next":
+        pageNum = 30; //needs work!
+        break;
+      default:
+        pageNum = pageNum;
+    }
+
+console.log('assuming', pageNum);
+
 
     offset = pageNum;
+
+    fetchRecords();
 
     var totalRows = '<?= $total_rows ?>';
     var recordNamePlural = '<?= $record_name_plural ?>';
@@ -204,9 +310,13 @@ function buildPagination(pageNum) {
     var halfMax = Math.ceil(maxLinks);
     var endPointLimit = startPoint+halfMax;
 
+    console.log('endPointLimit is ' + endPointLimit);
+
     if (endPoint>endPointLimit) {
         endPoint = endPointLimit;
     }
+
+    console.log("ENDPOINT IS " + endPoint);
 
     for (var i = startPoint; i < endPoint; i++) {
         pagination.push(i);
@@ -220,74 +330,13 @@ function buildPagination(pageNum) {
         pagination.push("Last");
     }
 
-    drawPagination(pagination, pageNum, totalPages);
+    drawPagination(pagination, pageNum);
 
 }
 
-function drawPagination(pagination, pageNum, totalPages) {
-
-
-    var paginationHtml = '';
-
-    for (var i = 0; i < pagination.length; i++) {
-
-        switch(pagination[i]) {
-          case "First":
-            linkLabel = 'First';
-            linkValue = 1;
-            break;
-          case "Last":
-            linkLabel = 'Last';
-            linkValue = totalPages;
-            break;
-          case "Prev":
-            linkLabel = '&laquo;';
-            linkValue = pageNum-1;
-            break;
-          case "Next":
-            linkLabel = '&raquo;';
-            linkValue = pageNum+1;
-            break;
-          default:
-            linkLabel = pagination[i];
-            linkValue = pagination[i];
-            break;
-        }
-
-        if (linkValue == pageNum) {
-            paginationHtml = paginationHtml.concat('<a href="#" class="active" onclick="fetchRecords(' + linkValue + ')">' + linkLabel + '</a>');
-        } else {
-            paginationHtml = paginationHtml.concat('<a href="#" onclick="fetchRecords(' + linkValue + ')">' + linkLabel + '</a>');
-        }
-
-    }
-
-    document.getElementById("pagination").innerHTML = paginationHtml;
-}
-
-fetchRecords(pageNum);
-
-
-
-
-</script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+var pageNum = 1;
+buildPagination(1);
+    </script>
 
 
 
