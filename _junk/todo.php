@@ -2,7 +2,7 @@
 
 2.  Add an edit button.                                                 DONE
 
-3.  Get results per page working.
+3.  Get results per page working.                                       DONE
 
 4.  Get pagination working.
 
@@ -23,13 +23,3 @@ BONUS TO DO:
 
 
 
-
-                                                <div class="w3-dropdown-click">
-                                          <button id="per-page"><?= $limit_pref ?></button>
-                                          <div id="per-page-options" class="w3-dropdown-content w3-bar-block w3-border" style="right:0">
-                                            <a href="#" class="w3-bar-item w3-button" onClick="sayPerPageLimit(10)">10</a>
-                                            <a href="#" class="w3-bar-item w3-button" onClick="sayPerPageLimit(20)">20</a>
-                                            <a href="#" class="w3-bar-item w3-button" onClick="sayPerPageLimit(50)">50</a>
-                                            <a href="#" class="w3-bar-item w3-button" onClick="sayPerPageLimit(100)">100</a>
-                                          </div>
-                                        </div>

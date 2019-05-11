@@ -3,6 +3,10 @@ class Donors extends Trongate {
 
     private $module = 'donors';
 
+    function test() {
+        $this->view('test');
+    }
+
     function submit() {
         $this->module('security');
         $this->security->_make_sure_allowed();
