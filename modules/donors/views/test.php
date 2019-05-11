@@ -8,8 +8,7 @@
 
     <div id="pagination"></div>
 
-    <script>
-
+<script>
 var offset = 0;
 
 function switchPage(pageNum) {
@@ -25,8 +24,6 @@ function switchPage(pageNum) {
 
     //calculate number of pages
     var totalPages = Math.ceil(totalRows / limit);
-    
-    console.log('total pages required is ' + totalPages);
 
     if (document.getElementById("pageNum").value == '') {
         currentPage = 1;
@@ -35,95 +32,54 @@ function switchPage(pageNum) {
         currentPage = parseInt(currentPage);
     }
 
-console.log('it is ', currentPage);
-
     //figure out startPoint
-    var startPoint = currentPage-(maxLinks-1);
+    var startPoint = currentPage - (maxLinks - 1);
 
-    if (startPoint<1) {
+    if (startPoint < 1) {
         startPoint = 1;
     }
 
-    console.log('start point is ' + startPoint);
-    var numBeforeLinks = currentPage-startPoint;
-    console.log('num before links required: ' + numBeforeLinks);
+    var numBeforeLinks = currentPage - startPoint;
 
     //figure out endPoint
-    var endPoint = currentPage+maxLinks;
-    var numAfterLinks = endPoint-currentPage;
-    console.log('num after links required: ' + numAfterLinks);
+    var endPoint = currentPage + maxLinks;
+    var numAfterLinks = endPoint - currentPage;
 
-    if (endPoint>totalPages) {
-        endPoint = totalPages+1;
+    if (endPoint > totalPages) {
+        endPoint = totalPages + 1;
     }
-
-    console.log('end point is ' + endPoint);
-
 
     //modify number of before links
     var totalLinksRequired = numBeforeLinks + numAfterLinks;
-    console.log('this page requires links: ', totalLinksRequired);
-
 
     if (totalLinksRequired > maxLinks) {
         //too many links!
 
         //modify the startPoint
         startPoint = currentPage - Math.ceil(maxLinks / 2);
-        console.log('corrected startPoint is ' + startPoint);
 
-        if (startPoint<1) {
+        if (startPoint < 1) {
             startPoint = 1;
         }
 
         //modify the endPoint
         endPoint = currentPage + Math.ceil(maxLinks / 2);
 
-        if (endPoint>totalPages) {
-            endPoint = totalPages+1;
+        if (endPoint > totalPages) {
+            endPoint = totalPages + 1;
         }
 
-        console.log('corrected endPoint is ' + endPoint);
-    } 
-
-    if(endPoint-startPoint < maxLinks) {
-        //do nothing yet
-        console.log("NOT ENOUGH LINKS!");
-        var numAfterLinks = endPoint-currentPage;
-        console.log('num after links is  ', numAfterLinks);
-
-        endPoint = endPoint + Math.ceil(maxLinks / 2);
-        if (endPoint>totalPages) {
-            endPoint = totalPages+1;
-        }        
     }
 
-    console.log('total required is ', totalLinksRequired);
+    if (endPoint - startPoint < maxLinks) {
+        var numAfterLinks = endPoint - currentPage;
+        endPoint = endPoint + Math.ceil(maxLinks / 2);
+        if (endPoint > totalPages) {
+            endPoint = totalPages + 1;
+        }
+    }
 
-
-
-
-
-
-
-
-
-    /*
-
-        FIGURING OUT THE LINKS TO DRAW BEFORE AND AFTER THE CURRENT PAGE
-    
-
-    X L L L L L  <--- DUFFF!
-
-    X L L L L L L L L L L <--- good!
-
-    L L L L L L L L L L X <--- good!
-
-    L L L L L X L L L L L <--- good!
-
-    */
-
-    if (currentPage<2) {
+    if (currentPage < 2) {
         addPrev = false;
         addFirst = false;
     }
@@ -133,60 +89,34 @@ console.log('it is ', currentPage);
         addLast = false;
     }
 
-
-
-
-
-
-
-
-    var pagination = '';
+    var pagination = [];
 
     if (addFirst == true) {
-        var linkText = '<b>First</b>';
-        pagination = pagination.concat(linkText)
+        pagination.push("First");
     }
 
     if (addPrev == true) {
-        var linkText = '<b>Prev</b>';
-        pagination = pagination.concat(linkText)
+        pagination.push("Prev");
     }
 
-
     for (var i = startPoint; i < endPoint; i++) {
-
-
-
-
-
-        if (i == currentPage) {
-            var linkText = '<b>' + currentPage + '</b>';
-        } else {
-            var linkText = ' ' + i + ' ';
-        }
-
-
-        pagination = pagination.concat(linkText)
+        pagination.push(i);
     }
 
     if (addNext == true) {
-        var linkText = '<b>Next</b>';
-        pagination = pagination.concat(linkText)
+        pagination.push("Next");
     }
 
     if (addLast == true) {
-        var linkText = '<b>Last</b>';
-        pagination = pagination.concat(linkText)
+        pagination.push("Last");
     }
 
+    console.log(pagination);
 
     document.getElementById("pagination").innerHTML = pagination;
 
-
-
-
-    //console.log(currentPage);
 }
+
 
     </script>
 

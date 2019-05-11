@@ -12,7 +12,7 @@
 
 
         <div id="loader" class="loadersmall"></div>
-        <div id="pagination"></div>
+        <div class="pagination" id="pagination"></div>
         <table class="w3-table results-tbl" id="results-tbl" style="margin-left: -2000em;">
             <thead>
                 <tr class="primary">
@@ -80,7 +80,6 @@ function fetchRecords() {
 
     }
 
-    console.log(JSON.stringify(params));
     var target_url = '<?= BASE_URL ?>api/get/donors';
 
     const http = new XMLHttpRequest()
@@ -146,66 +145,210 @@ window.onclick = function(event) {
 }
 
 fetchRecords();
-
-function buildPagination() {
-
-    var pagination = `
-
-                    <div class="pagination">
-                    <a onclick="switchPage(1)" href="#" class="active">1</a>
-                    <a onclick="switchPage(2)" href="#">2</a>
-                    <a onclick="switchPage(3)" href="#">3</a>
-                    <a onclick="switchPage(4)" href="#">4</a>
-                    <a onclick="switchPage(5)" href="#">5</a>
-                    <a onclick="switchPage(6)" href="#">6</a>
-                    <a onclick="switchPage(7)" href="#">»</a>
-                    <a onclick="switchPage('last')" href="#">Last</a>
-                    </div>
-
-    `;
+</script>
 
 
-    document.getElementById("pagination").innerHTML = pagination;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+
+function drawPagination(pagination, pageNum) {
+
+
+    var paginationHtml = '';
+
+    for (var i = 0; i < pagination.length; i++) {
+
+
+
+        if (pagination[i] == pageNum) {
+            paginationHtml = paginationHtml.concat('<a href="#" onclick="buildPagination(\'' + pagination[i] + '\')" class="active">' + pagination[i] + '</a>');
+            console.log(`WE HAVE A MATCH since pagination i is ${pagination[i]} and pageNum is ${pageNum}`)            
+        } else {
+            paginationHtml = paginationHtml.concat('<a href="#" onclick="buildPagination(\'' + pagination[i] + '\')">' + pagination[i] + '</a>');
+
+           // console.log(`no match since pagination i is ${pagination[i]} and pageNum is ${pageNum}`)
+        }
+    }
+
+    document.getElementById("pagination").innerHTML = paginationHtml;
 }
 
-var currentPage = 1;
+function buildPagination(num) {
 
-function switchPage(pageNum) {
+    console.log('pagenum is ', pageNum);
+
+    if(isNaN(pageNum)) {
+        console.log('pageNum of ' + pageNum + ' is not a number!');
+    }
+
+    switch(pageNum) {
+      case "First":
+        pageNum = 1; //needs work!
+        break;
+      case "Last":
+        pageNum = pageNum+1; //needs work!
+        break;
+      case "Prev":
+        pageNum = pageNum-1; //needs work!
+        break;
+      case "Next":
+        pageNum = 30; //needs work!
+        break;
+      default:
+        pageNum = pageNum;
+    }
+
+console.log('assuming', pageNum);
+
+
+    offset = pageNum;
+
+    fetchRecords();
 
     var totalRows = '<?= $total_rows ?>';
     var recordNamePlural = '<?= $record_name_plural ?>';
-    var maxPages = 10;
+    var maxLinks = 10;
+    var addFirst = true;
+    var addLast = true;
+    var addPrev = true;
+    var addNext = true;
 
     //calculate number of pages
     var totalPages = Math.ceil(totalRows / limit);
+    var currentPage = pageNum;
 
+    //figure out startPoint
+    var startPoint = currentPage - (maxLinks - 1);
 
-    /*
+    if (startPoint < 1) {
+        startPoint = 1;
+    }
 
-        FIGURING OUT THE LINKS TO DRAW BEFORE AND AFTER THE CURRENT PAGE
-        
+    var numBeforeLinks = currentPage - startPoint;
 
-    */
+    //figure out endPoint
+    var endPoint = currentPage + maxLinks;
+    var numAfterLinks = endPoint - currentPage;
 
+    if (endPoint > totalPages) {
+        endPoint = totalPages + 1;
+    }
 
+    //modify number of before links
+    var totalLinksRequired = numBeforeLinks + numAfterLinks;
 
+    if (totalLinksRequired > maxLinks) {
+        //too many links!
 
+        //modify the startPoint
+        startPoint = currentPage - Math.ceil(maxLinks / 2);
 
+        if (startPoint < 1) {
+            startPoint = 1;
+        }
 
+        //modify the endPoint
+        endPoint = currentPage + Math.ceil(maxLinks / 2);
 
+        if (endPoint > totalPages) {
+            endPoint = totalPages + 1;
+        }
 
+    }
 
+    if (endPoint - startPoint < maxLinks) {
+        var numAfterLinks = endPoint - currentPage;
+        endPoint = endPoint + Math.ceil(maxLinks / 2);
+        if (endPoint > totalPages) {
+            endPoint = totalPages + 1;
+        }
+    }
 
+    if (currentPage < 2) {
+        addPrev = false;
+        addFirst = false;
+    }
 
+    if (currentPage >= totalPages) {
+        addNext = false;
+        addLast = false;
+    }
 
-    console.log('we need ' + totalPages + ' pages');
-    console.log('this is page ' + currentPage);
-    // offset = pageNum;
-    // fetchRecords();
+    var pagination = [];
+
+    if (addFirst == true) {
+        pagination.push("First");
+    }
+
+    if (addPrev == true) {
+        pagination.push("Prev");
+    }
+
+    var halfMax = Math.ceil(maxLinks);
+    var endPointLimit = startPoint+halfMax;
+
+    console.log('endPointLimit is ' + endPointLimit);
+
+    if (endPoint>endPointLimit) {
+        endPoint = endPointLimit;
+    }
+
+    console.log("ENDPOINT IS " + endPoint);
+
+    for (var i = startPoint; i < endPoint; i++) {
+        pagination.push(i);
+    }
+
+    if (addNext == true) {
+        pagination.push("Next");
+    }
+
+    if (addLast == true) {
+        pagination.push("Last");
+    }
+
+    drawPagination(pagination, pageNum);
+
 }
 
-buildPagination();
-</script>
+var pageNum = 1;
+buildPagination(1);
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
