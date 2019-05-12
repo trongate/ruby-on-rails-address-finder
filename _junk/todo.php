@@ -24,7 +24,7 @@ FIXES
 
 BONUS FIXES
 
-* Check ALL endpoints on API Explorer (one by one) and make sure they are cool.
+* Check ALL endpoints on API Explorer (one by one) and make sure they are cool.     DONE.
 
 * Have redirect respecting custom routing.
 

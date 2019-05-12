@@ -1241,7 +1241,102 @@ class Api extends Trongate {
 
     }
 
+    function destroy() {
 
+        $module_name = $this->url->segment(3);
+        $this->_make_sure_table_exists($module_name);
+        $module_endpoints = $this->_fetch_endpoints($module_name);
+
+        $endpoint_name = 'Destroy';
+        $token_validation_data['endpoint'] = $endpoint_name;
+        $token_validation_data['module_name'] = $module_name;
+        $token_validation_data['module_endpoints'] = $module_endpoints;
+        $input['token'] = $this->_validate_token($token_validation_data);
+
+        $output['token'] = $input['token'];
+
+        $token_validation_data['endpoint'] = $endpoint_name;
+        $token_validation_data['module_name'] = $module_name;
+        $token_validation_data['module_endpoints'] = $module_endpoints;
+        $input['token'] = $this->_validate_token($token_validation_data);
+        $output['token'] = $input['token'];
+
+        $fourth_bit = $this->url->segment(4);
+
+        //get posted params (PHP doesn't differentiate btn GET and DELETE)
+        $post = file_get_contents('php://input');
+        $decoded = json_decode($post, true);
+
+        if (count($decoded)>0) {
+            $params = $this->_get_params_from_post($decoded);
+        } else {
+            $params = [];
+        }
+
+        $sql = 'select * from '.$module_name;
+
+        //attempt invoke 'before' hook
+        $input['params'] = $params;
+        $input['module_name'] = $module_name;
+        $input['endpoint'] = 'Destroy';
+
+        $module_endpoints = $this->_fetch_endpoints($input['module_name']);
+        $target_endpoint = $module_endpoints[$input['endpoint']];
+        $input = $this->_attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint);
+        extract($input);
+
+        $num_params = count($params);
+
+        if ($num_params < 1) { 
+            $rows = $this->model->get('id', $module_name);
+            $num_rows_affected = count($rows);
+
+        } else {
+            //params were posted
+            $sql = 'select * from '.$module_name;
+            $params = json_encode($params);
+            $params = ltrim($params);
+            $params = json_decode($params);
+            $params = get_object_vars($params);
+            $query_info = $this->_add_params_to_query($module_name, $sql, $params);
+
+            $sql = $query_info['sql'];
+            $data = $query_info['data'];
+
+            if (count($data)<1) {
+                $rows = $this->model->query($sql, 'object');
+            } else {
+                $rows = $this->model->query_bind($sql, $data, 'object');
+            }
+
+            $num_rows_affected = count($rows);
+
+        }   
+
+        $msg = $num_rows_affected;
+
+        if ($num_rows_affected>0) {
+
+            $sql = substr($sql, 13, strlen($sql));
+            $sql = 'delete from'.$sql;
+
+            if (!isset($data)) {
+                $this->model->query($sql);
+            } else {
+                $this->model->query_bind($sql, $data);
+            }            
+        }
+
+        $output['body'] = $msg;
+        $output['code'] = 200;
+        $output['module_name'] = $module_name;
+
+        $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+        
+        $code = $output['code'];
+        http_response_code($code);
+        echo $output['body'];
+    }
 
 
 
