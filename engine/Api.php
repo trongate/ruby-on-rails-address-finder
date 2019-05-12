@@ -1009,10 +1009,13 @@ class Api extends Trongate {
         $this->_make_sure_table_exists($module_name);
         $module_endpoints = $this->_fetch_endpoints($module_name);
 
-        $token_validation_data['endpoint'] = 'Create';
+        $endpoint_name = 'Create';
+        $token_validation_data['endpoint'] = $endpoint_name;
         $token_validation_data['module_name'] = $module_name;
         $token_validation_data['module_endpoints'] = $module_endpoints;
         $input['token'] = $this->_validate_token($token_validation_data);
+
+        $output['token'] = $input['token'];
 
         $post = file_get_contents('php://input');
         $decoded = json_decode($post, true);
@@ -1061,11 +1064,13 @@ class Api extends Trongate {
         $this->_make_sure_table_exists($module_name);
         $module_endpoints = $this->_fetch_endpoints($module_name);
 
-        $token_validation_data['endpoint'] = 'Insert Batch';
+        $endpoint_name = 'Insert Batch';
+        $token_validation_data['endpoint'] = $endpoint_name;
         $token_validation_data['module_name'] = $module_name;
         $token_validation_data['module_endpoints'] = $module_endpoints;
-
         $input['token'] = $this->_validate_token($token_validation_data);
+
+        $output['token'] = $input['token'];
 
         $post = file_get_contents('php://input');
         $decoded = json_decode($post, true);
@@ -1108,10 +1113,133 @@ class Api extends Trongate {
         echo $output['body'];
     }
 
+    function update() {
+
+        $module_name = $this->url->segment(3);
+        $this->_make_sure_table_exists($module_name);
+        $module_endpoints = $this->_fetch_endpoints($module_name);
+
+        $endpoint_name = 'Update';
+        $token_validation_data['endpoint'] = $endpoint_name;
+        $token_validation_data['module_name'] = $module_name;
+        $token_validation_data['module_endpoints'] = $module_endpoints;
+        $input['token'] = $this->_validate_token($token_validation_data);
+
+        $output['token'] = $input['token'];
+
+        $update_id = $this->url->segment(4);
+
+        if (!is_numeric($update_id)) {
+            http_response_code(400);
+            echo 'Non numeric update id.';
+            die();
+        } else {
+            $post = file_get_contents('php://input');
+            $decoded = json_decode($post, true);
+        }
+
+        if (count($decoded)>0) {
+            $params = $this->_get_params_from_post($decoded);
+        } else {
+            $params = [];
+        }
+        
+        //attempt invoke 'before' hook
+        $input['params'] = $params;
+        $input['module_name'] = $module_name;
+        $input['endpoint'] = $endpoint_name;
+
+        $module_endpoints = $this->_fetch_endpoints($input['module_name']);
+        $target_endpoint = $module_endpoints[$input['endpoint']];
+        $input = $this->_attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint);
+        extract($input);
+
+        if (isset($params['id'])) {
+            unset($params['id']); //id cannot be changed
+        }
+
+        if (count($params)>0) {
+            //make sure params are valid
+            $this->_make_sure_columns_exist($module_name, $params);
+            $this->model->update($update_id, $params, $module_name);
+            $result = $this->model->get_where($update_id, $module_name);
+
+            if ($result == false) {
+                $output['code'] = 422;
+            }  else {
+                $output['code'] = 200;
+            }
+
+            $output['body'] = json_encode($result);
+        } else {
+            $output['code'] = 422;
+            $output['body'] = '';
+        }
+
+        $output['module_name'] = $module_name;
+        $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+
+        $code = $output['code'];
+        http_response_code($code);
+        echo $output['body'];
+    }
 
 
+    function delete() {
 
+        $module_name = $this->url->segment(3);
+        $this->_make_sure_table_exists($module_name);
+        $module_endpoints = $this->_fetch_endpoints($module_name);
 
+        $endpoint_name = 'Delete One';
+        $token_validation_data['endpoint'] = $endpoint_name;
+        $token_validation_data['module_name'] = $module_name;
+        $token_validation_data['module_endpoints'] = $module_endpoints;
+        $input['token'] = $this->_validate_token($token_validation_data);
+
+        $output['token'] = $input['token'];
+
+        $id = $this->url->segment(4);
+
+        //attempt invoke 'before' hook
+        $data['id'] = $id;
+        $input['params'] = $data;
+        $input['module_name'] = $module_name;
+        $input['endpoint'] = $endpoint_name;
+
+        $module_endpoints = $this->_fetch_endpoints($input['module_name']);
+        $target_endpoint = $module_endpoints[$input['endpoint']];
+        $input = $this->_attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint);
+        extract($input);
+        $update_id = $input['params']['id'];
+
+        if (!is_numeric($update_id)) {
+            http_response_code(400);
+            echo 'Non numeric id.';
+            die();
+        }
+
+        $result = $this->model->get_where($update_id, $module_name);
+
+        if ($result == false) {
+            http_response_code(422);
+            echo 'false';
+            die();
+        } else {
+
+            $this->model->delete($update_id, $module_name);
+            $output['body'] = 'true';
+            $output['code'] = 200;
+            $output['module_name'] = $module_name;
+            $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+
+            $code = $output['code'];
+            http_response_code($code);
+            echo $output['body'];
+
+        }
+
+    }
 
 
 

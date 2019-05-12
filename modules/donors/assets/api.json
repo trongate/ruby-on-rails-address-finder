@@ -98,7 +98,9 @@
          "roles": [
             "admin"
          ]
-      }
+      },
+      "beforeHook": "get_hello",
+      "afterHook": "post_hello"
    },
       "Update":{  
       "url_segments":"api/update/donors/{id}",
@@ -110,7 +112,12 @@
            "name": "id",
            "label": "ID" 
         }
-      ]
+      ],
+      "authorization":{  
+         "roles": [
+            "admin"
+         ]
+      }
    },
    "Destroy":{  
       "url_segments":"api/destroy/donors",
@@ -137,7 +144,9 @@
          "roles": [
             "admin"
          ]
-      }
+      },
+      "beforeHook": "get_hello",
+      "afterHook": "post_hello"
    }
 
 
