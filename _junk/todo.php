@@ -14,15 +14,17 @@ FIXES
 
 * Add 'no comments yet' message when no comments.                               DONE.
 
-* Retain memory of search phrase and make sure works with 'per page' feature.
+* Retain memory of search phrase and make sure works with 'per page' feature.   DONE.
 
-* Have it gracefully saying 'no results' message when search is not successful.
+* Have it gracefully saying 'no results' message when search is not successful. DONE.
 
 * clean up code.
 
 --------------------------------------------------------------------------------
 
 BONUS FIXES
+
+// 
 
 * Check ALL endpoints on API Explorer (one by one) and make sure they are cool.     DONE.
 

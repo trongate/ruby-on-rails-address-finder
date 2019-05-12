@@ -50,7 +50,7 @@
 
 <script>
 var token = '<?= $token ?>';
-var limit = 10; //FIXTHIS
+var limit = 20;
 var offset = 0;
 var pageNum = 1;
 var totalRows = <?= $total_rows ?>;
@@ -58,7 +58,14 @@ var recordNamePlural = '<?= $record_name_plural ?>';
 
 function fetchRecords(pageNum) {
     buildPagination(pageNum);
-    getRecords();
+
+    if (totalRows<1) {
+        noResults();
+    } else {
+        getRecords();
+    }
+
+    
 }
 
 function refreshResults(searchPhrase) {
@@ -82,7 +89,7 @@ function refreshResults(searchPhrase) {
         var numRows = http.responseText;
 
         if(isNaN(numRows)) {
-            alert('results of ' + numRows + ' is not a number!'); //FIXTHIS
+            noResults();
         } else {
             //update totalRows
             totalRows = numRows;
@@ -94,6 +101,37 @@ function refreshResults(searchPhrase) {
 
 }
 
+function tryAgain() {
+    document.getElementById('searchPhrase').value = '';
+    totalRows = '<?= $total_rows ?>';
+    pageNum = 1;
+    fetchRecords(pageNum);
+}
+
+function noResults() {
+
+    var searchPhrase = document.getElementById('searchPhrase').value;
+
+    if (searchPhrase !== '') {
+        var msg = '<p>Your search produced no results.</p>';
+
+        var tryAgainBtn = `<button onclick="tryAgain()" class="w3-button w3-medium w3-white w3-border">
+                            <i class="fa fa-refresh"></i> TRY AGAIN</button>`;
+
+        msg = msg.concat(tryAgainBtn);
+
+
+    } else {
+        var msg = 'There are currently no donor records';
+    }
+
+    document.getElementById("showing-statement").innerHTML = msg;
+    document.getElementById("loader").style.display = 'none';
+    document.getElementById("pagination").innerHTML = '';
+    document.getElementById("pagination-btm").innerHTML = '';
+    document.getElementById("results-tbl").style.marginLeft = '-2000em';
+}
+
 function submitSearch() {
 
 
@@ -103,7 +141,7 @@ function submitSearch() {
 
         pageNum = 1;
         document.getElementById("loader").style.display = 'block';
-        document.getElementById("results-tbl").style.marginLeft = '-2em';
+        document.getElementById("results-tbl").style.marginLeft = '-2000em';
         document.getElementById("showing-statement").innerHTML = '';
         document.getElementById("pagination").innerHTML = '';
         document.getElementById("pagination-btm").innerHTML = '';
