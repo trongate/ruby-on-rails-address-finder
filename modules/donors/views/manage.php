@@ -17,8 +17,8 @@
                     <th colspan="5">
                         <div class="table-top">
                             <div>   
-                                <input type="text" id="searchTest" placeholder="Search records..." >
-                                <button onclick="fetchRecords()"><i class="fa fa-search"> Search</i></button>
+                                <input type="text" id="searchPhrase" placeholder="Search records..." >
+                                <button onclick="submitSearch()"><i class="fa fa-search"> Search</i></button>
                             </div>
                             <div>Records Per Page:
                                 <div class="w3-dropdown-click">
@@ -50,7 +50,7 @@
 
 <script>
 var token = '<?= $token ?>';
-var limit = 20;
+var limit = 10; //FIXTHIS
 var offset = 0;
 var pageNum = 1;
 var totalRows = <?= $total_rows ?>;
@@ -61,9 +61,24 @@ function fetchRecords(pageNum) {
     getRecords();
 }
 
+function submitSearch() {
+
+    pageNum = 1;
+    document.getElementById("loader").style.display = 'block';
+    document.getElementById("results-tbl").style.marginLeft = '-2000em';
+    document.getElementById("showing-statement").innerHTML = '';
+    document.getElementById("pagination").innerHTML = '';
+    document.getElementById("pagination-btm").innerHTML = '';
+
+    //count the number of rows returned THEN get the results for this page
+    totalRows = 88;
+
+    fetchRecords(1);
+}
+
 function getRecords() {
 
-    var searchValue = document.getElementById('searchTest').value;
+    var searchValue = document.getElementById('searchPhrase').value;
     document.getElementById("results-tbl").tBodies[0].innerHTML = '';
 
     if (searchValue !== '') {
@@ -75,7 +90,6 @@ function getRecords() {
             limit,
             offset
         }  
-
 
     } else {
 
