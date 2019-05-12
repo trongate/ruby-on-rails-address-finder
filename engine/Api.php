@@ -555,7 +555,79 @@ class Api extends Trongate {
 
     }
 
+    function _find_one($module_name, $module_endpoints, $update_id) {
+
+        $endpoint_name = 'Find One';
+        $token_validation_data['endpoint'] = $endpoint_name;
+        $token_validation_data['module_name'] = $module_name;
+        $token_validation_data['module_endpoints'] = $module_endpoints;
+        $input['token'] = $this->_validate_token($token_validation_data);
+
+        $output['token'] = $input['token'];
+
+        //attempt invoke 'before' hook
+        $input['params'] = [];
+        $input['module_name'] = $module_name;   
+        $input['endpoint'] = 'Find One'; 
+
+        $module_endpoints = $this->_fetch_endpoints($input['module_name']);
+        $target_endpoint = $module_endpoints[$input['endpoint']];
+        $input = $this->_attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint);
+        extract($input);
+
+
+        $result = $this->model->get_where($update_id, $module_name);
+
+        $output['body'] = json_encode($result);
+        $output['code'] = 200;
+        $output['module_name'] = $module_name;
+
+        $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+        
+        $code = $output['code'];
+        http_response_code($code);
+        echo $output['body'];
+        die();
+    }
+
+
+    // function _find_one($module_name, $update_id, $token) {
+
+    //     //attempt invoke 'before' hook
+    //     $input['token'] = $token;
+    //     $input['params'] = [];
+    //     $input['module_name'] = $module_name;   
+    //     $input['endpoint'] = 'Find One'; 
+
+    //     $module_endpoints = $this->_fetch_endpoints($input['module_name']);
+    //     $target_endpoint = $module_endpoints[$input['endpoint']];
+    //     $input = $this->_attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint);
+    //     extract($input);
+
+
+    //     $result = $this->model->get_where($update_id, $module_name);
+
+    //     $output['body'] = json_encode($result);
+    //     $output['code'] = 200;
+    //     $output['module_name'] = $module_name;
+
+    //     $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+        
+    //     $code = $output['code'];
+    //     http_response_code($code);
+    //     echo $output['body'];
+    //     die();
+    // }
+
+
+
     function _process_get_with_get($module_name, $module_endpoints) {
+
+        $update_id = $this->url->segment(4);
+        if (is_numeric($update_id)) {
+            $this->_find_one($module_name, $module_endpoints, $update_id);
+            return;
+        }
 
         $endpoint_name = 'Get';
         $token_validation_data['endpoint'] = $endpoint_name;
@@ -564,7 +636,7 @@ class Api extends Trongate {
         $input['token'] = $this->_validate_token($token_validation_data);
 
         $output['token'] = $input['token'];
-        $fourth_bit = $this->url->segment(4);
+        
 
         $params = $this->_get_params_from_url(4);
 
@@ -634,7 +706,7 @@ class Api extends Trongate {
         $input['token'] = $this->_validate_token($token_validation_data);
 
         $output['token'] = $input['token'];
-        $fourth_bit = $this->url->segment(4);
+        
 
         //get posted params
         $post = file_get_contents('php://input');
@@ -659,7 +731,8 @@ class Api extends Trongate {
 
         $num_params = count($params);
 
-        if ($num_params < 1) { 
+        if ($num_params < 1) {
+
             $rows = $this->model->get('id', $module_name);
             $output['body'] = json_encode($rows);
             $output['code'] = 200;
@@ -738,10 +811,10 @@ class Api extends Trongate {
         $input['token'] = $this->_validate_token($token_validation_data);
 
         $output['token'] = $input['token'];
-        $fourth_bit = $this->url->segment(4);
+        $update_id = $this->url->segment(4);
 
-        if (is_numeric($fourth_bit)) {
-            $this->_find_one($module_name, $fourth_bit, $input['token']);
+        if (is_numeric($update_id)) {
+            $this->_find_one($module_name, $update_id, $input['token']);
         } else {
 
             if ($_SERVER['REQUEST_METHOD'] == 'GET') {

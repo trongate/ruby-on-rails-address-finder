@@ -20,5 +20,24 @@
             "admin"
          ]
       }
+   },
+   "Find One":{  
+      "url_segments":"api/get/donors/{id}",
+      "request_type":"GET",
+      "description":"Fetch one row",
+      "required_fields": [
+        {
+           "name": "id",
+           "label": "ID" 
+        }
+      ],
+     "authorization":{  
+         "roles": [
+            "admin"
+         ]
+      }
    }
+
+
+
 }
