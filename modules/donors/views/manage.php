@@ -47,9 +47,10 @@
 
 <script>
 var token = '<?= $token ?>';
-var limit = '<?= $limit ?>';
-var offset = '<?= $offset ?>';
+var limit = 20;
+var offset = 0;
 var pageNum = 1;
+var totalRows = <?= $total_rows ?>;
 
 function fetchRecords(pageNum) {
     buildPagination(pageNum);
@@ -57,6 +58,7 @@ function fetchRecords(pageNum) {
 }
 
 function getRecords() {
+
     var searchValue = document.getElementById('searchTest').value;
     document.getElementById("results-tbl").tBodies[0].innerHTML = '';
 
@@ -80,6 +82,8 @@ function getRecords() {
         } 
 
     }
+
+    console.log(`limit is ${limit} and offset is ${offset}`);
 
     var target_url = '<?= BASE_URL ?>api/get/donors';
 
@@ -120,9 +124,16 @@ function getRecords() {
 
 function buildPagination(pageNum) {
 
-    offset = pageNum;
+    if (pageNum == 1) {
+        offset = 0;
+    } else {
+        offset = limit*(pageNum-1);
+    }
 
-    var totalRows = '<?= $total_rows ?>';
+    if (totalRows <= limit) {
+        return;
+    }
+
     var recordNamePlural = '<?= $record_name_plural ?>';
     var maxLinks = 10;
     var addFirst = true;

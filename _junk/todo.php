@@ -1,12 +1,12 @@
 FIXES
 
-* Get records on /manage starting from 0 index.
+* Get records on /manage starting from 0 index.                         DONE.
 
-* Test the pagination thoroughly REALLY MAKE SURE IT WORKS!!!!!!!
+* Test the pagination thoroughly REALLY MAKE SURE IT WORKS!!!!!!!       DONE.
 
-* Do not show pagination unless required.
+* Do not show pagination unless required.                               DONE.
 
-* Get showing statement working.
+* Get showing statement working. 
 
 * Add pagination to page btm (but without showing statement).
 

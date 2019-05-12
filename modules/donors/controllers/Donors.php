@@ -90,11 +90,8 @@ class Donors extends Trongate {
         $data['order_by'] = 'id';
 
         //format the pagination
-        $data['total_rows'] = $this->model->count('donors');
-        $data['include_showing_statement'] = true;    
+        $data['total_rows'] = $this->model->count('donors'); 
         $data['record_name_plural'] = 'donors';
-        $data['limit'] = $this->_get_limit();  
-        $data['offset'] = $this->_get_offset();
 
         $data['headline'] = 'Manage Donors';
         $data['view_module'] = 'donors';
@@ -356,20 +353,6 @@ class Donors extends Trongate {
         return $mysql_query;
     }
 */
-    function _get_limit() {
-        if (isset($_SESSION['limit_pref'])) {
-            $limit = $_SESSION['limit_pref'];
-        } else {
-            $limit = 20;
-            $_SESSION['limit_pref'] = $limit;
-        }
 
-        return $limit;
-    }
-
-    function _get_offset() {
-        $offset = 0;
-        return $offset;
-    }
 
 }
