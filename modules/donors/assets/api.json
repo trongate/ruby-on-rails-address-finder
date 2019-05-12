@@ -76,6 +76,18 @@
          ]
       },
       "beforeHook": "get_hello"
+   },
+   "Create":{  
+      "url_segments":"api/create/donors",
+      "request_type":"POST",
+      "description":"Insert database record",
+      "enableParams": true,
+      "authorization":{  
+         "roles": [
+            "admin"
+         ]
+      },
+      "beforeHook": "get_hello"
    }
 
 

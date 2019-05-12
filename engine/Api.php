@@ -13,6 +13,44 @@ class Api extends Trongate {
         }
     }
 
+    function _make_sure_columns_exist($module_name, $params) {
+        //make sure columns exists on the table
+        $invalid_columns = [];
+        $columns = $this->_get_all_columns($module_name);
+
+        foreach ($params as $key => $value) {
+            if (!in_array($key,$columns)) {
+                $invalid_columns[] = $key;
+            }
+        }
+
+        if (count($invalid_columns)) {
+            $error_count = 0;
+            http_response_code(422);
+
+            $msg = "The following fields are not valid; ";
+
+            if (count($invalid_columns)==1) {
+                $msg = str_replace('fields are', 'field is', $msg);
+            }
+
+            echo $msg;
+
+            foreach ($invalid_columns as $invalid_field) {
+                $error_count++;
+                echo $invalid_field;
+
+                if ($error_count<count($invalid_columns)) {
+                    echo ", ";
+                }
+
+                echo '.';
+            }
+            die();
+        }
+
+    }
+
     function _get_all_tables() {
         $tables = [];
         $sql = 'show tables';
@@ -542,6 +580,8 @@ class Api extends Trongate {
 
 
 
+
+
     function get() {
         $module_name = $this->url->segment(3);
         $this->_make_sure_table_exists($module_name);
@@ -963,120 +1003,78 @@ class Api extends Trongate {
         }
     }
 
+    function create() {
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    function getOLD() {
         $module_name = $this->url->segment(3);
         $this->_make_sure_table_exists($module_name);
         $module_endpoints = $this->_fetch_endpoints($module_name);
 
-        $token_validation_data['endpoint'] = 'Get';
+        $token_validation_data['endpoint'] = 'Create';
         $token_validation_data['module_name'] = $module_name;
         $token_validation_data['module_endpoints'] = $module_endpoints;
         $input['token'] = $this->_validate_token($token_validation_data);
 
-        $output['token'] = $input['token'];
-        $update_id = $this->url->segment(4);
+        $post = file_get_contents('php://input');
+        $decoded = json_decode($post, true);
 
-        if (is_numeric($update_id)) {
-            $this->_find_one($module_name, $update_id, $input['token']);
+        if (count($decoded)>0) {
+            $params = $this->_get_params_from_post($decoded);
         } else {
-
-            if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-                $params = $this->_get_params_from_url(4);
-            } else {
-
-                //let's allow posted params too!
-                $post = file_get_contents('php://input');
-                $decoded = json_decode($post, true);
-
-                if (count($decoded)>0) {
-                    $params = $this->_get_params_from_post($decoded);
-                } else {
-                    $params = [];
-                }
-
-            }
-  
+            $params = [];
         }
-
-        $sql = 'select * from '.$module_name;
-
+        
         //attempt invoke 'before' hook
         $input['params'] = $params;
         $input['module_name'] = $module_name;
-        $input['endpoint'] = 'Get';
+        $input['endpoint'] = 'Create';
 
+        $module_endpoints = $this->_fetch_endpoints($input['module_name']);
         $target_endpoint = $module_endpoints[$input['endpoint']];
         $input = $this->_attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint);
         extract($input);
 
-        $num_params = count($params);
-
-        if ($num_params < 1) { 
-            $rows = $this->model->get('id', $module_name);
-            $output['body'] = json_encode($rows);
+        if (count($params)>0) {
+            //make sure params are valid
+            $this->_make_sure_columns_exist($module_name, $params);
+            $new_id = $this->model->insert($params, $module_name);
+            $result = $this->model->get_where($new_id, $module_name);
             $output['code'] = 200;
-            $output['module_name'] = $module_name;
-
-            $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
-            
-            $code = $output['code'];
-            http_response_code($code);
-            echo $output['body'];
-
+            $output['body'] = json_encode($result);
         } else {
-            //params were posted
-            $sql = 'select * from '.$module_name;
-            $params = json_encode($params);
-            $params = ltrim($params);
-            $params = json_decode($params);
-            $params = get_object_vars($params);
-            $query_info = $this->_add_params_to_query($module_name, $sql, $params);
-
-            $sql = $query_info['sql'];
-            $data = $query_info['data'];
-
-            if (count($data)<1) {
-                $rows = $this->model->query($sql, 'object');
-            } else {
-                $rows = $this->model->query_bind($sql, $data, 'object');
-            }
-
-            $output['body'] = json_encode($rows);
-            $output['code'] = 200;
-            $output['module_name'] = $module_name;
-
-            $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
-            
-            $code = $output['code'];
-            http_response_code($code);
-            echo $output['body'];
+            $output['code'] = 422;
+            $output['body'] = '';
         }
-        
+
+        $output['module_name'] = $module_name;
+        $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+
+        $code = $output['code'];
+        http_response_code($code);
+        echo $output['body'];
+
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
