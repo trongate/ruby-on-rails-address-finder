@@ -732,9 +732,10 @@ class Api extends Trongate {
         $this->_make_sure_table_exists($module_name);
         $module_endpoints = $this->_fetch_endpoints($module_name);
 
-        $token_validation_data['endpoint'] = 'Get';
+        $token_validation_data['endpoint'] = 'Insert Batch';
         $token_validation_data['module_name'] = $module_name;
         $token_validation_data['module_endpoints'] = $module_endpoints;
+
         $input['token'] = $this->_validate_token($token_validation_data);
 
         $post = file_get_contents('php://input');
@@ -897,10 +898,15 @@ class Api extends Trongate {
 
     function destroy() {
 
-        $input['token'] = $this->_validate_token();
-        $output['token'] = $input['token'];
         $module_name = $this->url->segment(3);
         $this->_make_sure_table_exists($module_name);
+        $module_endpoints = $this->_fetch_endpoints($module_name);
+
+        $token_validation_data['endpoint'] = 'Destroy';
+        $token_validation_data['module_name'] = $module_name;
+        $token_validation_data['module_endpoints'] = $module_endpoints;
+        $input['token'] = $this->_validate_token($token_validation_data);
+        $output['token'] = $input['token'];
 
         $fourth_bit = $this->url->segment(4);
 

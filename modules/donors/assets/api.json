@@ -58,7 +58,12 @@
       "url_segments":"api/batch/donors",
       "request_type":"POST",
       "description":"Insert multiple records",
-      "enableParams": true
+      "enableParams": true,
+      "authorization":{  
+         "roles": [
+            "admin"
+         ]
+      }
    },
       "Update":{  
       "url_segments":"api/update/donors/{id}",
@@ -76,7 +81,12 @@
       "url_segments":"api/destroy/donors",
       "request_type":"DELETE",
       "description":"Delete row or rows",
-      "enableParams": true
+      "enableParams": true,
+      "authorization":{  
+         "roles": [
+            "admin"
+         ]
+      }
    },
    "Delete One":{  
       "url_segments":"api/delete/donors/{id}",

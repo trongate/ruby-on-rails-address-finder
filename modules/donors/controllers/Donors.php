@@ -87,7 +87,7 @@ class Donors extends Trongate {
 
         $token_data['user_id'] = $this->security->_get_user_id();
         $data['token'] = $this->trongate_tokens->_generate_token($token_data);
-        $data['order_by'] = 'first_name';
+        $data['order_by'] = 'id';
 
         //format the pagination
         $data['total_rows'] = $this->model->count('donors');
