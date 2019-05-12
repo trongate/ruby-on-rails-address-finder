@@ -407,327 +407,82 @@ class Api extends Trongate {
         return $output;
     }
 
-    function explorer() {
-        $this->module('security');
-        $target_module = $this->url->segment(3);
-        $this->_make_sure_table_exists($target_module);
-        $this->module('trongate_tokens');
-
-        $token_data['user_id'] = $this->security->_get_user_id();
-        $token_data['code'] = 'aaa';
-        $token_data['expiry_date'] = time() + 7200; //two hours
-        $data['golden_token'] = $this->trongate_tokens->_generate_token($token_data);
-        
-        $data['endpoints'] = $this->_fetch_endpoints($target_module);
-        $data['endpoint_settings_location'] = '/modules/'.$target_module.'/assets/api.json';
-
-        $view_file = $file_path = APPPATH.'engine/views/api_explorer.php';
-        extract($data);
-        require_once $view_file;
-    }
-
-    function _fetch_endpoints($target_module) {
-
-        if ($target_module == '') {
-            http_response_code(422);
-            echo "No target module set"; die();
-        }
-
-        $file_path = APPPATH.'modules/'.$target_module.'/assets/api.json';
-        $settings = file_get_contents($file_path);
-        $endpoints = json_decode($settings, true);   
-        return $endpoints;    
-    }
-
-    function _get_param_type($module_name, $key) {
-
-        switch ($key) {
-            case 'limit':
-                $type = 'limit';
-                break;
-            case 'offset':
-                $type = 'offset';
-                break;
-            case 'orderBy':
-                $type = 'order by';
-                break;
-            default:
-                $type = 'where';
-                break;
-        }
-
-
-        return $type;
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    function get() {
+    function exists() {
+        $input['token'] = $this->_validate_token();
+        $output['token'] = $input['token'];
         $module_name = $this->url->segment(3);
         $this->_make_sure_table_exists($module_name);
-        $module_endpoints = $this->_fetch_endpoints($module_name);
 
-        if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-            $this->_process_get_with_get($module_name, $module_endpoints);
+        $update_id = $this->url->segment(4);
+
+        if (!is_numeric($update_id)) {
+            http_response_code(422);
+            echo "Non numeric ID"; die();
         } else {
-            $this->_process_get_with_post($module_name, $module_endpoints);
+
+            //attempt invoke 'before' hook
+            $input['token'] = $input['token'];
+            $input['params'] = [];
+            $input['module_name'] = $module_name;   
+            $input['endpoint'] = 'Exists'; 
+
+            $module_endpoints = $this->_fetch_endpoints($input['module_name']);
+            $target_endpoint = $module_endpoints[$input['endpoint']];
+            $input = $this->_attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint);
+            extract($input);
+
+            $result = $this->model->get_where($update_id, $module_name);
+
+            if ($result == false) {
+                $result = 'false';
+            } else {
+                $result = 'true';
+            }
+
+            $output['body'] = $result;
+            $output['code'] = 200;
+            $output['module_name'] = $module_name;
+
+            $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+            
+            $code = $output['code'];
+            http_response_code($code);
+            echo $output['body'];            
+
+
         }
 
     }
 
-    function _process_get_with_get($module_name, $module_endpoints) {
-
-        $endpoint_name = 'Get';
-        $token_validation_data['endpoint'] = $endpoint_name;
-        $token_validation_data['module_name'] = $module_name;
-        $token_validation_data['module_endpoints'] = $module_endpoints;
-        $input['token'] = $this->_validate_token($token_validation_data);
-
-        $output['token'] = $input['token'];
-        $fourth_bit = $this->url->segment(4);
-
-        $params = $this->_get_params_from_url(4);
-
-        $sql = 'select * from '.$module_name;
+    function _find_one($module_name, $update_id, $token) {
 
         //attempt invoke 'before' hook
-        $input['params'] = $params;
-        $input['module_name'] = $module_name;
-        $input['endpoint'] = $endpoint_name;
+        $input['token'] = $token;
+        $input['params'] = [];
+        $input['module_name'] = $module_name;   
+        $input['endpoint'] = 'Find One'; 
 
-        $target_endpoint = $module_endpoints[$input['endpoint']];
-
-        $input = $this->_attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint);
-        extract($input);
-
-        $num_params = count($params);
-
-        if ($num_params < 1) { 
-            $rows = $this->model->get('id', $module_name);
-            $output['body'] = json_encode($rows);
-            $output['code'] = 200;
-            $output['module_name'] = $module_name;
-
-            $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
-            
-            $code = $output['code'];
-            http_response_code($code);
-            echo $output['body'];
-
-        } else {
-            //params were submitted via URL
-            $sql = 'select * from '.$module_name;
-            $params = json_encode($params);
-            $params = ltrim($params);
-            $params = json_decode($params);
-            $params = get_object_vars($params);
-            $query_info = $this->_add_params_to_query($module_name, $sql, $params);
-
-            $sql = $query_info['sql'];
-            $data = $query_info['data'];
-
-            if (count($data)<1) {
-                $rows = $this->model->query($sql, 'object');
-            } else {
-                $rows = $this->model->query_bind($sql, $data, 'object');
-            }
-
-            $output['body'] = json_encode($rows);
-            $output['code'] = 200;
-            $output['module_name'] = $module_name;
-
-            $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
-            
-            $code = $output['code'];
-            http_response_code($code);
-            echo $output['body'];
-        }
-
-    }
-
-    function _process_get_with_post($module_name, $module_endpoints) {
-
-        $endpoint_name = 'Get By Post';
-        $token_validation_data['endpoint'] = $endpoint_name;
-        $token_validation_data['module_name'] = $module_name;
-        $token_validation_data['module_endpoints'] = $module_endpoints;
-        $input['token'] = $this->_validate_token($token_validation_data);
-
-        $output['token'] = $input['token'];
-        $fourth_bit = $this->url->segment(4);
-
-        //get posted params
-        $post = file_get_contents('php://input');
-        $decoded = json_decode($post, true);
-
-        if (count($decoded)>0) {
-            $params = $this->_get_params_from_post($decoded);
-        } else {
-            $params = [];
-        }
-
-        $sql = 'select * from '.$module_name;
-
-        //attempt invoke 'before' hook
-        $input['params'] = $params;
-        $input['module_name'] = $module_name;
-        $input['endpoint'] = $endpoint_name;
-
+        $module_endpoints = $this->_fetch_endpoints($input['module_name']);
         $target_endpoint = $module_endpoints[$input['endpoint']];
         $input = $this->_attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint);
         extract($input);
 
-        $num_params = count($params);
 
-        if ($num_params < 1) { 
-            $rows = $this->model->get('id', $module_name);
-            $output['body'] = json_encode($rows);
-            $output['code'] = 200;
-            $output['module_name'] = $module_name;
+        $result = $this->model->get_where($update_id, $module_name);
 
-            $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
-            
-            $code = $output['code'];
-            http_response_code($code);
-            echo $output['body'];
+        $output['body'] = json_encode($result);
+        $output['code'] = 200;
+        $output['module_name'] = $module_name;
 
-        } else {
-            //params were posted
-            $sql = 'select * from '.$module_name;
-            $params = json_encode($params);
-            $params = ltrim($params);
-            $params = json_decode($params);
-            $params = get_object_vars($params);
-            $query_info = $this->_add_params_to_query($module_name, $sql, $params);
-
-            $sql = $query_info['sql'];
-            $data = $query_info['data'];
-
-            if (count($data)<1) {
-                $rows = $this->model->query($sql, 'object');
-            } else {
-                $rows = $this->model->query_bind($sql, $data, 'object');
-            }
-
-            $output['body'] = json_encode($rows);
-            $output['code'] = 200;
-            $output['module_name'] = $module_name;
-
-            $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+        $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
         
-            $code = $output['code'];
-            http_response_code($code);
-            echo $output['body'];
-        }
+        $code = $output['code'];
+        http_response_code($code);
+        echo $output['body'];
+        die();
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    function getOLD() {
+    function get() {
         $module_name = $this->url->segment(3);
         $this->_make_sure_table_exists($module_name);
         $module_endpoints = $this->_fetch_endpoints($module_name);
@@ -818,18 +573,544 @@ class Api extends Trongate {
         
     }
 
+    function count() {
+        $input['token'] = $this->_validate_token();
+        $output['token'] = $input['token'];
+        $module_name = $this->url->segment(3);
+        $this->_make_sure_table_exists($module_name);
+        $params = $this->_get_params_from_url(4);
+        
+        $sql = 'select * from '.$module_name;
+
+        //attempt invoke 'before' hook
+        $input['params'] = $params;
+        $input['module_name'] = $module_name;
+        $input['endpoint'] = 'Get';
+
+        $module_endpoints = $this->_fetch_endpoints($input['module_name']);
+        $target_endpoint = $module_endpoints[$input['endpoint']];
+        $input = $this->_attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint);
+        extract($input);
+
+        $num_params = count($params);
+
+        if ($num_params < 1) { 
+            $rows = $this->model->get('id', $module_name);
+            $output['body'] = count($rows);
+            $output['code'] = 200;
+            $output['module_name'] = $module_name;
+
+            $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+            
+            $code = $output['code'];
+            http_response_code($code);
+            echo $output['body'];
+
+        } else {
+            //params were posted
+            $sql = 'select * from '.$module_name;
+            $params = json_encode($params);
+            $params = ltrim($params);
+            $params = json_decode($params);
+            $params = get_object_vars($params);
+            $query_info = $this->_add_params_to_query($module_name, $sql, $params);
+
+            $sql = $query_info['sql'];
+            $data = $query_info['data'];
+
+            if (count($data)<1) {
+                $rows = $this->model->query($sql, 'object');
+            } else {
+                $rows = $this->model->query_bind($sql, $data, 'object');
+            }
+
+            $output['body'] = count($rows);
+            $output['code'] = 200;
+            $output['module_name'] = $module_name;
+
+            $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+            
+            $code = $output['code'];
+            http_response_code($code);
+            echo $output['body'];
+        }
+        
+    }
+
+    function _make_sure_columns_exist($module_name, $params) {
+        //make sure columns exists on the table
+        $invalid_columns = [];
+        $columns = $this->_get_all_columns($module_name);
+
+        foreach ($params as $key => $value) {
+            if (!in_array($key,$columns)) {
+                $invalid_columns[] = $key;
+            }
+        }
+
+        if (count($invalid_columns)) {
+            $error_count = 0;
+            http_response_code(422);
+
+            $msg = "The following fields are not valid; ";
+
+            if (count($invalid_columns)==1) {
+                $msg = str_replace('fields are', 'field is', $msg);
+            }
+
+            echo $msg;
+
+            foreach ($invalid_columns as $invalid_field) {
+                $error_count++;
+                echo $invalid_field;
+
+                if ($error_count<count($invalid_columns)) {
+                    echo ", ";
+                }
+
+                echo '.';
+            }
+            die();
+        }
+
+    }
+
+    function create() {
+
+        $module_name = $this->url->segment(3);
+        $this->_make_sure_table_exists($module_name);
+        $module_endpoints = $this->_fetch_endpoints($module_name);
+
+        $token_validation_data['endpoint'] = 'Create';
+        $token_validation_data['module_name'] = $module_name;
+        $token_validation_data['module_endpoints'] = $module_endpoints;
+        $input['token'] = $this->_validate_token($token_validation_data);
+
+        $post = file_get_contents('php://input');
+        $decoded = json_decode($post, true);
+
+        if (count($decoded)>0) {
+            $params = $this->_get_params_from_post($decoded);
+        } else {
+            $params = [];
+        }
+        
+        //attempt invoke 'before' hook
+        $input['params'] = $params;
+        $input['module_name'] = $module_name;
+        $input['endpoint'] = 'Create';
+
+        $module_endpoints = $this->_fetch_endpoints($input['module_name']);
+        $target_endpoint = $module_endpoints[$input['endpoint']];
+        $input = $this->_attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint);
+        extract($input);
+
+        if (count($params)>0) {
+            //make sure params are valid
+            $this->_make_sure_columns_exist($module_name, $params);
+            $new_id = $this->model->insert($params, $module_name);
+            $result = $this->model->get_where($new_id, $module_name);
+            $output['code'] = 200;
+            $output['body'] = json_encode($result);
+        } else {
+            $output['code'] = 422;
+            $output['body'] = '';
+        }
+
+        $output['module_name'] = $module_name;
+        $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+
+        $code = $output['code'];
+        http_response_code($code);
+        echo $output['body'];
+
+    }
+
+    function batch() {
+
+        $module_name = $this->url->segment(3);
+        $this->_make_sure_table_exists($module_name);
+        $module_endpoints = $this->_fetch_endpoints($module_name);
+
+        $token_validation_data['endpoint'] = 'Insert Batch';
+        $token_validation_data['module_name'] = $module_name;
+        $token_validation_data['module_endpoints'] = $module_endpoints;
+
+        $input['token'] = $this->_validate_token($token_validation_data);
+
+        $post = file_get_contents('php://input');
+        $decoded = json_decode($post, true);
+        $data = [];
+
+        if (count($decoded)>0) {
+
+            foreach ($decoded as $key => $value) {
+                $row_data = $this->_get_params_from_post($value);
+                $data[] = $row_data;
+            }
+
+        }
+        
+        $input['params'] = $data;
+        $input['module_name'] = $module_name;
+        $input['endpoint'] = 'Insert Batch';
+
+        $module_endpoints = $this->_fetch_endpoints($input['module_name']);
+        $target_endpoint = $module_endpoints[$input['endpoint']];
+        $input = $this->_attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint);
+        extract($input);
+
+        if (count($data)>0) {
+            //execute batch insert and return num rows inserted
+            $row_count = $this->model->insert_batch($module_name, $data);
+            $output['body'] = $row_count;
+            $output['code'] = 200;
+        } else {
+            $output['code'] = 422;
+            $output['body'] = 'No rows were inserted.';
+        }
+
+        //attempt invoke 'after' hook
+        $output['module_name'] = $module_name;
+        $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+
+        $code = $output['code'];
+        http_response_code($code);
+        echo $output['body'];
+    }
+
+    function update() {
+
+        $input['token'] = $this->_validate_token();
+        $output['token'] = $input['token'];
+        $module_name = $this->url->segment(3);
+        $this->_make_sure_table_exists($module_name);
+
+        $update_id = $this->url->segment(4);
+
+        if (!is_numeric($update_id)) {
+            http_response_code(400);
+            echo 'Non numeric update id.';
+            die();
+        } else {
+            $post = file_get_contents('php://input');
+            $decoded = json_decode($post, true);
+        }
+
+        if (count($decoded)>0) {
+            $params = $this->_get_params_from_post($decoded);
+        } else {
+            $params = [];
+        }
+        
+        //attempt invoke 'before' hook
+        $input['params'] = $params;
+        $input['module_name'] = $module_name;
+        $input['endpoint'] = 'Update';
+
+        $module_endpoints = $this->_fetch_endpoints($input['module_name']);
+        $target_endpoint = $module_endpoints[$input['endpoint']];
+        $input = $this->_attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint);
+        extract($input);
+
+        if (isset($params['id'])) {
+            unset($params['id']); //id cannot be changed
+        }
+
+        if (count($params)>0) {
+            //make sure params are valid
+            $this->_make_sure_columns_exist($module_name, $params);
+            $this->model->update($update_id, $params, $module_name);
+            $result = $this->model->get_where($update_id, $module_name);
+
+            if ($result == false) {
+                $output['code'] = 422;
+            }  else {
+                $output['code'] = 200;
+            }
+
+            $output['body'] = json_encode($result);
+        } else {
+            $output['code'] = 422;
+            $output['body'] = '';
+        }
+
+        $output['module_name'] = $module_name;
+        $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+
+        $code = $output['code'];
+        http_response_code($code);
+        echo $output['body'];
+    }
+
+    function delete() {
+
+        $module_name = $this->url->segment(3);
+        $this->_make_sure_table_exists($module_name);
+        $module_endpoints = $this->_fetch_endpoints($module_name);
+
+        $token_validation_data['endpoint'] = 'Create';
+        $token_validation_data['module_name'] = $module_name;
+        $token_validation_data['module_endpoints'] = $module_endpoints;
+        $input['token'] = $this->_validate_token($token_validation_data);
+
+        $id = $this->url->segment(4);
+
+        //attempt invoke 'before' hook
+        $data['id'] = $id;
+        $input['params'] = $data;
+        $input['module_name'] = $module_name;
+        $input['endpoint'] = 'Delete One';
+
+        $module_endpoints = $this->_fetch_endpoints($input['module_name']);
+        $target_endpoint = $module_endpoints[$input['endpoint']];
+        $input = $this->_attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint);
+        extract($input);
+        $update_id = $input['params']['id'];
+
+        if (!is_numeric($update_id)) {
+            http_response_code(400);
+            echo 'Non numeric id.';
+            die();
+        }
+
+        $result = $this->model->get_where($update_id, $module_name);
+
+        if ($result == false) {
+            http_response_code(422);
+            echo 'false';
+            die();
+        } else {
+
+            $this->model->delete($update_id, $module_name);
+            $output['body'] = 'true';
+            $output['code'] = 200;
+            $output['module_name'] = $module_name;
+            $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+
+            $code = $output['code'];
+            http_response_code($code);
+            echo $output['body'];
+
+        }
+
+    }
+
+    function destroy() {
+
+        $module_name = $this->url->segment(3);
+        $this->_make_sure_table_exists($module_name);
+        $module_endpoints = $this->_fetch_endpoints($module_name);
+
+        $token_validation_data['endpoint'] = 'Destroy';
+        $token_validation_data['module_name'] = $module_name;
+        $token_validation_data['module_endpoints'] = $module_endpoints;
+        $input['token'] = $this->_validate_token($token_validation_data);
+        $output['token'] = $input['token'];
+
+        $fourth_bit = $this->url->segment(4);
+
+        if (is_numeric($fourth_bit)) {
+            $this->_find_one($module_name, $fourth_bit, $input['token']);
+        } else {
+
+            if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+                $params = $this->_get_params_from_url(4);
+            } else {
+
+                //let's allow posted params too!
+                $post = file_get_contents('php://input');
+                $decoded = json_decode($post, true);
+
+                if (count($decoded)>0) {
+                    $params = $this->_get_params_from_post($decoded);
+                } else {
+                    $params = [];
+                }
+
+            }
+  
+        }
+
+        $sql = 'select * from '.$module_name;
+
+        //attempt invoke 'before' hook
+        $input['params'] = $params;
+        $input['module_name'] = $module_name;
+        $input['endpoint'] = 'Destroy';
+
+        $module_endpoints = $this->_fetch_endpoints($input['module_name']);
+        $target_endpoint = $module_endpoints[$input['endpoint']];
+        $input = $this->_attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint);
+        extract($input);
+
+        $num_params = count($params);
+
+        if ($num_params < 1) { 
+            $rows = $this->model->get('id', $module_name);
+            $num_rows_affected = count($rows);
+
+        } else {
+            //params were posted
+            $sql = 'select * from '.$module_name;
+            $params = json_encode($params);
+            $params = ltrim($params);
+            $params = json_decode($params);
+            $params = get_object_vars($params);
+            $query_info = $this->_add_params_to_query($module_name, $sql, $params);
+
+            $sql = $query_info['sql'];
+            $data = $query_info['data'];
+
+            if (count($data)<1) {
+                $rows = $this->model->query($sql, 'object');
+            } else {
+                $rows = $this->model->query_bind($sql, $data, 'object');
+            }
+
+            $num_rows_affected = count($rows);
+
+        }   
+
+        $msg = $num_rows_affected;
+
+        if ($num_rows_affected>0) {
+
+            $sql = substr($sql, 13, strlen($sql));
+            $sql = 'delete from'.$sql;
+
+            if (!isset($data)) {
+                $this->model->query($sql);
+            } else {
+                $this->model->query_bind($sql, $data);
+            }            
+        }
+
+        $output['body'] = $msg;
+        $output['code'] = 200;
+        $output['module_name'] = $module_name;
+
+        $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+        
+        $code = $output['code'];
+        http_response_code($code);
+        echo $output['body'];
+    }
+
+    function _figure_out_connective($key, $bits) {
+
+        $num_bits = count($bits);
+
+        if ($num_bits > 2) {
+
+            /*
+                must be one of the following formats:
+
+                    * OR        { "OR age >" : 21}
+                    * NOT LIKE  { "name NOT LIKE" : "e"}
+            */ 
+
+            $key_len = strlen($key);
+
+            if ($key_len >= 10) {
+                $start = $key_len - 9;
+                $last_nine = substr($key, $start, $key_len);
+                
+                if ($last_nine == ' NOT LIKE') {
+                    $connective = 'NOT LIKE';
+                    return $connective;
+                }
+            }
+
+            //check for 'LIKE'
+            $start = $key_len - 5;
+            $last_five = substr($key, $start, $key_len);
+            
+            if ($last_five == ' LIKE') {
+                $connective = 'LIKE';
+                return $connective;
+            }            
 
 
+            //connective must be last two characters of key (left trimmed)
+            $start = $key_len - 2;
+            $last_two = substr($key, $start, $key_len);
+            $connective = ltrim($last_two);
+
+            return $connective;
+
+        } else {
+
+            /*
+                must be one of the following formats:
+                * !=        { "name !=": "John"}
+                * >         { "age >" : 21}
+                * <         { "age <" : 21}
+                * LIKE      { "name LIKE" : "e"}
+            */
+
+            if ($bits[0] == 'OR') {
+                $connective = '=';
+            } else {
+                $connective = $bits[1];
+            }
+
+            return $connective;
+        }
+
+    }
+
+    function _get_param_type($module_name, $key) {
+
+        switch ($key) {
+            case 'limit':
+                $type = 'limit';
+                break;
+            case 'offset':
+                $type = 'offset';
+                break;
+            case 'orderBy':
+                $type = 'order by';
+                break;
+            default:
+                $type = 'where';
+                break;
+        }
 
 
+        return $type;
+    }
 
+    function explorer() {
+        $this->module('security');
+        $target_module = $this->url->segment(3);
+        $this->_make_sure_table_exists($target_module);
+        $this->module('trongate_tokens');
 
+        $token_data['user_id'] = $this->security->_get_user_id();
+        $token_data['code'] = 'aaa';
+        $token_data['expiry_date'] = time() + 7200; //two hours
+        $data['golden_token'] = $this->trongate_tokens->_generate_token($token_data);
+        
+        $data['endpoints'] = $this->_fetch_endpoints($target_module);
+        $data['endpoint_settings_location'] = '/modules/'.$target_module.'/assets/api.json';
 
+        $view_file = $file_path = APPPATH.'engine/views/api_explorer.php';
+        extract($data);
+        require_once $view_file;
+    }
 
+    function _fetch_endpoints($target_module) {
 
+        if ($target_module == '') {
+            http_response_code(422);
+            echo "No target module set"; die();
+        }
 
-
-
-
+        $file_path = APPPATH.'modules/'.$target_module.'/assets/api.json';
+        $settings = file_get_contents($file_path);
+        $endpoints = json_decode($settings, true);   
+        return $endpoints;    
+    }
 
 }

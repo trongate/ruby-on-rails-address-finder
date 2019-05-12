@@ -7,6 +7,27 @@ class Donors extends Trongate {
         $this->view('test');
     }
 
+    function get_hello($input) {
+        echo 'Get hello running';
+        return $input;
+    }
+
+    function get_goodbye($output) {
+        echo 'Get goobye running';
+        return $output;
+    }
+
+    function post_hello($input) {
+        echo 'Post hello running';
+        return $input;
+    }
+
+
+    function post_goodbye($output) {
+        echo 'Post goobye running';
+        return $output;
+    }
+
     function submit() {
         $this->module('security');
         $this->security->_make_sure_allowed();
