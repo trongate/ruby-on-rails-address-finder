@@ -1055,7 +1055,58 @@ class Api extends Trongate {
     }
 
 
+    function batch() {
 
+        $module_name = $this->url->segment(3);
+        $this->_make_sure_table_exists($module_name);
+        $module_endpoints = $this->_fetch_endpoints($module_name);
+
+        $token_validation_data['endpoint'] = 'Insert Batch';
+        $token_validation_data['module_name'] = $module_name;
+        $token_validation_data['module_endpoints'] = $module_endpoints;
+
+        $input['token'] = $this->_validate_token($token_validation_data);
+
+        $post = file_get_contents('php://input');
+        $decoded = json_decode($post, true);
+        $data = [];
+
+        if (count($decoded)>0) {
+
+            foreach ($decoded as $key => $value) {
+                $row_data = $this->_get_params_from_post($value);
+                $data[] = $row_data;
+            }
+
+        }
+        
+        $input['params'] = $data;
+        $input['module_name'] = $module_name;
+        $input['endpoint'] = 'Insert Batch';
+
+        $module_endpoints = $this->_fetch_endpoints($input['module_name']);
+        $target_endpoint = $module_endpoints[$input['endpoint']];
+        $input = $this->_attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint);
+        extract($input);
+
+        if (count($data)>0) {
+            //execute batch insert and return num rows inserted
+            $row_count = $this->model->insert_batch($module_name, $data);
+            $output['body'] = $row_count;
+            $output['code'] = 200;
+        } else {
+            $output['code'] = 422;
+            $output['body'] = 'No rows were inserted.';
+        }
+
+        //attempt invoke 'after' hook
+        $output['module_name'] = $module_name;
+        $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+
+        $code = $output['code'];
+        http_response_code($code);
+        echo $output['body'];
+    }
 
 
 
