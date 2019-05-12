@@ -3,6 +3,97 @@ class Donors extends Trongate {
 
     private $module = 'donors';
 
+    function manage() {
+        $this->module('security');
+        $this->module('trongate_tokens');
+        $this->security->_make_sure_allowed();
+
+        $token_data['user_id'] = $this->security->_get_user_id();
+        $data['token'] = $this->trongate_tokens->_generate_token($token_data);
+        $data['order_by'] = 'id';
+
+        //format the pagination
+        $data['total_rows'] = $this->model->count('donors'); 
+        $data['record_name_plural'] = 'donors';
+
+        $data['headline'] = 'Manage Donors';
+        $data['view_module'] = 'donors';
+        $data['view_file'] = 'manage';
+
+        $this->template('admin', $data);
+    }
+
+    function edit() {
+        $this->module('security');
+        $this->module('trongate_tokens');
+        $this->security->_make_sure_allowed();
+
+        $update_id = $this->url->segment(3);
+    
+        if ((!is_numeric($update_id)) && ($update_id != '')) {
+            redirect('donors/manage');
+        }
+
+        $data = $this->_fetch_data_from_db($update_id);
+        $token_data['user_id'] = $this->security->_get_user_id();
+        $data['token'] = $this->trongate_tokens->_generate_token($token_data);
+
+        if ($data == false) {
+            redirect('donors/manage');
+        } else {
+            $data['form_location'] = BASE_URL.'donors/submit/'.$update_id;
+            $data['update_id'] = $update_id;
+            $data['headline'] = 'Donor Information';
+            $data['view_file'] = 'edit';
+            $this->template('admin', $data);
+        }
+    }
+
+    function create() {
+        $this->module('security');
+        $this->security->_make_sure_allowed();
+
+        $update_id = $this->url->segment(3);
+        $submit = $this->input('submit', true);
+
+        if ((!is_numeric($update_id)) && ($update_id != '')) {
+            redirect('donors/manage');
+        }
+
+        //fetch the form data
+        if (($submit == '') && ($update_id>0)) {
+            $data = $this->_fetch_data_from_db($update_id);
+        } else {
+            $data = $this->_fetch_data_from_post();
+        }
+
+        $data['headline'] = $this->_get_page_headline($update_id, 'donor');
+
+        if ($update_id>0) {
+            $data['cancel_url'] = BASE_URL.'donors/edit/'.$update_id;
+            $data['btn_text'] = 'UPDATE DONOR DETAILS';
+        } else {
+            $data['cancel_url'] = BASE_URL.'donors/manage';
+            $data['btn_text'] = 'CREATE DONOR RECORD';
+        }
+
+        $data['form_location'] = BASE_URL.'donors/submit/'.$update_id;
+        $data['update_id'] = $update_id;
+        $data['view_file'] = 'create';
+        $this->template('admin', $data);
+    }
+
+    function _get_page_headline($update_id) {
+        //figure out what the page headline should be (on the donors/create page)
+        if (!is_numeric($update_id)) {
+            $headline = 'Create New Donor Record';
+        } else {
+            $headline = 'Update Donor Details';
+        }
+
+        return $headline;
+    }
+
     function submit() {
         $this->module('security');
         $this->security->_make_sure_allowed();
@@ -76,26 +167,6 @@ class Donors extends Trongate {
         }        
     }
 
-    function manage() {
-        $this->module('security');
-        $this->module('trongate_tokens');
-        $this->security->_make_sure_allowed();
-
-        $token_data['user_id'] = $this->security->_get_user_id();
-        $data['token'] = $this->trongate_tokens->_generate_token($token_data);
-        $data['order_by'] = 'id';
-
-        //format the pagination
-        $data['total_rows'] = $this->model->count('donors'); 
-        $data['record_name_plural'] = 'donors';
-
-        $data['headline'] = 'Manage Donors';
-        $data['view_module'] = 'donors';
-        $data['view_file'] = 'manage';
-
-        $this->template('admin', $data);
-    }
-
     function _fetch_data_from_db($update_id) {
         $donors = $this->model->get_where($update_id, 'donors');
 
@@ -129,77 +200,6 @@ class Donors extends Trongate {
         $data['next_appointment'] = $this->input('next_appointment', true);
         $data['active'] = $this->input('active', true);
         return $data;
-    }
-
-    function create() {
-        $this->module('security');
-        $this->security->_make_sure_allowed();
-
-        $update_id = $this->url->segment(3);
-        $submit = $this->input('submit', true);
-
-        if ((!is_numeric($update_id)) && ($update_id != '')) {
-            redirect('donors/manage');
-        }
-
-        //fetch the form data
-        if (($submit == '') && ($update_id>0)) {
-            $data = $this->_fetch_data_from_db($update_id);
-        } else {
-            $data = $this->_fetch_data_from_post();
-        }
-
-        $data['headline'] = $this->_get_page_headline($update_id, 'donor');
-
-        if ($update_id>0) {
-            $data['cancel_url'] = BASE_URL.'donors/edit/'.$update_id;
-            $data['btn_text'] = 'UPDATE DONOR DETAILS';
-        } else {
-            $data['cancel_url'] = BASE_URL.'donors/manage';
-            $data['btn_text'] = 'CREATE DONOR RECORD';
-        }
-
-        $data['form_location'] = BASE_URL.'donors/submit/'.$update_id;
-        $data['update_id'] = $update_id;
-        $data['view_file'] = 'create';
-        $this->template('admin', $data);
-    }
-
-    function _get_page_headline($update_id) {
-        //figure out what the page headline should be (on the donors/create page)
-        if (!is_numeric($update_id)) {
-            $headline = 'Create New Donor Record';
-        } else {
-            $headline = 'Update Donor Details';
-        }
-
-        return $headline;
-    }
-
-    function edit() {
-        $this->module('security');
-        $this->module('trongate_tokens');
-        $this->security->_make_sure_allowed();
-
-        $update_id = $this->url->segment(3);
-    
-        if ((!is_numeric($update_id)) && ($update_id != '')) {
-            redirect('donors/manage');
-        }
-
-        $data = $this->_fetch_data_from_db($update_id);
-        $token_data['user_id'] = $this->security->_get_user_id();
-        $data['token'] = $this->trongate_tokens->_generate_token($token_data);
-
-        if ($data == false) {
-            redirect('donors/manage');
-        } else {
-            $data['form_location'] = BASE_URL.'donors/submit/'.$update_id;
-            $data['update_id'] = $update_id;
-            $data['headline'] = 'Donor Information';
-            $data['view_file'] = 'edit';
-            $this->template('admin', $data);
-        }
     }
 
 }
