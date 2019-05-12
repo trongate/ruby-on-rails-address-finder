@@ -18,17 +18,16 @@ FIXES
 
 * Have it gracefully saying 'no results' message when search is not successful. DONE.
 
-* clean up code.
+* Check ALL endpoints on API Explorer (one by one) and make sure they are cool. DONE.
 
 --------------------------------------------------------------------------------
 
 BONUS FIXES
-
-// 
-
-* Check ALL endpoints on API Explorer (one by one) and make sure they are cool.     DONE.
+ 
 
 * Have redirect respecting custom routing.
+
+* clean up code.
 
 * REALLY CLEAN UP CODE (minify JS etc)
 
