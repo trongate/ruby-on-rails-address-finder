@@ -10,15 +10,13 @@ FIXES
 
 * Add pagination to page btm (but without showing statement).                   DONE.
 
-* get 'per page' working.                                                       <---
+* get 'per page' working.                                                       DONE.
+
+* Add 'no comments yet' message when no comments.                               DONE.
 
 * Retain memory of search phrase and make sure works with 'per page' feature.
 
-* Add 'no comments yet' message when no comments.
-
 * Have it gracefully saying 'no results' message when search is not successful.
-
-* Do not show 'First' and 'Last' unless we have lots of pages  !?
 
 * clean up code.
 

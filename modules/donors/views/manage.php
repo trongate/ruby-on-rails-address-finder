@@ -295,6 +295,29 @@ function addShowingStatement(limit, pageNum, totalRows, recordNamePlural) {
     document.getElementById("showing-statement").innerHTML = showingStatement;
 }
 
+function togglePerPage() {
+    var x = document.getElementById("per-page-options");
+    if (x.className.indexOf("w3-show") == -1) {  
+        x.className += " w3-show";
+    } else { 
+        x.className = x.className.replace(" w3-show", "");
+    }
+}
+
+function setPerPage(perPage) {
+    pageNum = 1;
+    limit = perPage;
+    fetchRecords(1);
+}
+
+//When the user clicks anywhere outside of the dropdown btn, close it
+window.onclick = function(event) {
+    if (event.target !== perPage) {
+        var x = document.getElementById("per-page-options");
+        x.className = x.className.replace(" w3-show", "");
+    }
+}
+
 </script>
 
 

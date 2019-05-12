@@ -10,8 +10,8 @@
                 <textarea name="comment" id="new-comment" class="w3-input w3-border w3-sand" placeholder="Enter comment here..." ></textarea>
             </p>
             <p class="w3-right modal-btns">
-                <button onclick="submitNewComment()" type="button" name="submit" value="Submit" class="w3-button w3-small primary">ADD COMMENT</button> 
-                <button onclick="document.getElementById('create-comment-modal').style.display='none'" type="button" name="submit" value="Submit" class="w3-button w3-small 3-white w3-border">CANCEL</button>
+                <button onclick="document.getElementById('create-comment-modal').style.display='none'" type="button" name="submit" value="Submit" class="w3-button w3-small 3-white w3-border">CANCEL</button> 
+                <button onclick="submitNewComment()" type="button" name="submit" value="Submit" class="w3-button w3-small primary">ADD COMMENT</button>
             </p>
         </div>
     </div>
@@ -51,6 +51,13 @@ function fetch_comments() {
 
         commentsTbl = commentsTbl.concat('</table>');
 
+        if (comments.length>0) {
+            var commentInfo = '';
+        } else {
+            var commentInfo = 'No comments have been posted so far.';
+        }
+
+        document.getElementById("comments-info").innerHTML = commentInfo;
         document.getElementById("comments-so-far").innerHTML = commentsTbl;
     }
 

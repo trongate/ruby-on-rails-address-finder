@@ -27,10 +27,8 @@
                             <p>You are about to delete a donor record.  This cannot be undone. <br>
                                         Do you really want to do this?</p>
                             <p class="w3-rigxht modal-btns">
-                                <button type="submit" name="submit" value="Submit" class="w3-button w3-small w3-red w3-hover-black">YES - DELETE IT NOW!</button> 
-                                 
                                 <button onclick="document.getElementById('delete-record-modal').style.display='none'" type="button" name="submit" value="Submit" class="w3-button w3-small 3-white w3-border">CANCEL</button> 
-
+                                <button type="submit" name="submit" value="Submit" class="w3-button w3-small w3-red w3-hover-black">YES - DELETE IT NOW!</button> 
                             </p>
                             <?= form_close() ?>
                         </div>
