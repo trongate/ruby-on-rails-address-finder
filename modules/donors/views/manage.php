@@ -61,31 +61,74 @@ function fetchRecords(pageNum) {
     getRecords();
 }
 
+function refreshResults(searchPhrase) {
+
+    //update totalRows
+
+    var params = {
+        'first_name LIKE':'%' + searchPhrase + '%',
+        'OR email LIKE':'%' + searchPhrase + '%'
+    }
+
+    var target_url = '<?= BASE_URL ?>api/count/donors';
+
+    const http = new XMLHttpRequest()
+    http.open('POST', target_url)
+    http.setRequestHeader('Content-type', 'application/json')
+    http.setRequestHeader("trongateToken", token)
+    http.send(JSON.stringify(params))
+    http.onload = function() {
+
+        var numRows = http.responseText;
+
+        if(isNaN(numRows)) {
+            alert('results of ' + numRows + ' is not a number!'); //FIXTHIS
+        } else {
+            //update totalRows
+            totalRows = numRows;
+            pageNum = 1;
+            fetchRecords(pageNum);
+        }
+
+    }
+
+}
+
 function submitSearch() {
 
-    pageNum = 1;
-    document.getElementById("loader").style.display = 'block';
-    document.getElementById("results-tbl").style.marginLeft = '-2000em';
-    document.getElementById("showing-statement").innerHTML = '';
-    document.getElementById("pagination").innerHTML = '';
-    document.getElementById("pagination-btm").innerHTML = '';
 
-    //count the number of rows returned THEN get the results for this page
-    totalRows = 88;
+    var searchPhrase = document.getElementById('searchPhrase').value;
 
-    fetchRecords(1);
+    if (searchPhrase !== '') {
+
+        pageNum = 1;
+        document.getElementById("loader").style.display = 'block';
+        document.getElementById("results-tbl").style.marginLeft = '-2em';
+        document.getElementById("showing-statement").innerHTML = '';
+        document.getElementById("pagination").innerHTML = '';
+        document.getElementById("pagination-btm").innerHTML = '';
+
+        //update the totalRows
+        refreshResults(searchPhrase);
+
+    } else {
+        pageNum = 1;
+        totalRows = '<?= $total_rows ?>';
+        fetchRecords(pageNum);
+    }
+
 }
 
 function getRecords() {
 
-    var searchValue = document.getElementById('searchPhrase').value;
+    var searchPhrase = document.getElementById('searchPhrase').value;
     document.getElementById("results-tbl").tBodies[0].innerHTML = '';
 
-    if (searchValue !== '') {
+    if (searchPhrase !== '') {
 
         var params = {
-            'first_name LIKE':'%' + searchValue + '%',
-            'OR email LIKE':'%' + searchValue + '%',
+            'first_name LIKE':'%' + searchPhrase + '%',
+            'OR email LIKE':'%' + searchPhrase + '%',
             orderBy: '<?= $order_by ?>',
             limit,
             offset
@@ -130,11 +173,18 @@ function getRecords() {
 
         newData = newData.concat('</tbody>');
 
+        var searchPhrase = document.getElementById('searchPhrase').value;
         var resultsTable = document.getElementById("results-tbl").innerHTML;
         document.getElementById("results-tbl").innerHTML = resultsTable.replace('<tbody></tbody>', newData);
         document.getElementById("loader").style.display = 'none';
         document.getElementById("results-tbl").style.marginLeft = '0em';
         document.getElementById("perPage").innerHTML = limit;
+
+        if (searchPhrase !== '') { 
+            document.getElementById('searchPhrase').value = searchPhrase;
+        } 
+
+
     }
 }
 

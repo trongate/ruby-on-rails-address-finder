@@ -9,7 +9,12 @@
     "url_segments": "api/get/donors",
     "request_type": "POST",
     "description": "Fetch rows from table using POST request.",
-    "enableParams": true
+    "enableParams": true,
+    "authorization":{  
+        "roles": [
+            "admin"
+        ]
+    }
   },
   "Find One": {
     "url_segments": "api/get/donors/{id}",
@@ -43,7 +48,12 @@
     "url_segments": "api/count/donors",
     "request_type": "POST",
     "description": "Count number of records using POST request",
-    "enableParams": true
+    "enableParams": true,
+    "authorization":{  
+        "roles": [
+            "admin"
+        ]
+    }
   },
   "Create": {
     "url_segments": "api/create/donors",
