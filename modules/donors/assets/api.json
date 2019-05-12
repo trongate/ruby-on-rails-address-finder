@@ -36,6 +36,46 @@
             "admin"
          ]
       }
+   },
+   "Exists":{  
+      "url_segments":"api/exists/donors/{id}",
+      "request_type":"GET",
+      "description":"Check if instance exists",
+      "required_fields": [
+        {
+           "name": "id",
+           "label": "ID" 
+        }
+      ],
+     "authorization":{  
+         "roles": [
+            "admin"
+         ]
+      }
+   },
+   "Count":{  
+      "url_segments":"api/count/donors",
+      "request_type":"GET",
+      "description":"Count number of records",
+      "enableParams": true,
+      "authorization":{  
+         "roles":[  
+            "admin"
+         ]
+      },
+      "afterHook": "get_goodbye"
+   },
+   "Count By Post":{  
+      "url_segments":"api/count/donors",
+      "request_type":"POST",
+      "description":"Count number of records using POST request",
+      "enableParams": true,
+      "authorization":{  
+         "roles":[  
+            "admin"
+         ]
+      },
+      "beforeHook": "get_hello"
    }
 
 

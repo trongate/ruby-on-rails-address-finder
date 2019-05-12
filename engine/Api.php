@@ -575,7 +575,6 @@ class Api extends Trongate {
         $input = $this->_attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint);
         extract($input);
 
-
         $result = $this->model->get_where($update_id, $module_name);
 
         $output['body'] = json_encode($result);
@@ -589,37 +588,6 @@ class Api extends Trongate {
         echo $output['body'];
         die();
     }
-
-
-    // function _find_one($module_name, $update_id, $token) {
-
-    //     //attempt invoke 'before' hook
-    //     $input['token'] = $token;
-    //     $input['params'] = [];
-    //     $input['module_name'] = $module_name;   
-    //     $input['endpoint'] = 'Find One'; 
-
-    //     $module_endpoints = $this->_fetch_endpoints($input['module_name']);
-    //     $target_endpoint = $module_endpoints[$input['endpoint']];
-    //     $input = $this->_attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint);
-    //     extract($input);
-
-
-    //     $result = $this->model->get_where($update_id, $module_name);
-
-    //     $output['body'] = json_encode($result);
-    //     $output['code'] = 200;
-    //     $output['module_name'] = $module_name;
-
-    //     $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
-        
-    //     $code = $output['code'];
-    //     http_response_code($code);
-    //     echo $output['body'];
-    //     die();
-    // }
-
-
 
     function _process_get_with_get($module_name, $module_endpoints) {
 
@@ -774,7 +742,226 @@ class Api extends Trongate {
         }
     }
 
+    function exists() {
 
+        $module_name = $this->url->segment(3);
+        $this->_make_sure_table_exists($module_name);
+        $module_endpoints = $this->_fetch_endpoints($module_name);
+
+        $endpoint_name = 'Exists';
+        $token_validation_data['endpoint'] = $endpoint_name;
+        $token_validation_data['module_name'] = $module_name;
+        $token_validation_data['module_endpoints'] = $module_endpoints;
+        $input['token'] = $this->_validate_token($token_validation_data);
+
+        $output['token'] = $input['token'];
+
+        $update_id = $this->url->segment(4);
+
+        if (!is_numeric($update_id)) {
+            http_response_code(422);
+            echo "Non numeric ID"; die();
+        } else {
+
+            //attempt invoke 'before' hook
+            $input['token'] = $input['token'];
+            $input['params'] = [];
+            $input['module_name'] = $module_name;   
+            $input['endpoint'] = $endpoint_name;
+
+            $module_endpoints = $this->_fetch_endpoints($input['module_name']);
+            $target_endpoint = $module_endpoints[$input['endpoint']];
+            $input = $this->_attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint);
+            extract($input);
+
+            $result = $this->model->get_where($update_id, $module_name);
+
+            if ($result == false) {
+                $result = 'false';
+            } else {
+                $result = 'true';
+            }
+
+            $output['body'] = $result;
+            $output['code'] = 200;
+            $output['module_name'] = $module_name;
+
+            $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+            
+            $code = $output['code'];
+            http_response_code($code);
+            echo $output['body'];            
+
+
+        }
+
+    }
+
+    function count() {
+        $module_name = $this->url->segment(3);
+        $this->_make_sure_table_exists($module_name);
+        $module_endpoints = $this->_fetch_endpoints($module_name);
+
+        if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+            $this->_process_count_with_get($module_name, $module_endpoints);
+        } else {
+            $this->_process_count_with_post($module_name, $module_endpoints);
+        }
+
+    }
+
+    function _process_count_with_get($module_name, $module_endpoints) {
+
+        $update_id = $this->url->segment(4);
+        if (is_numeric($update_id)) {
+            $this->_find_one($module_name, $module_endpoints, $update_id);
+            return;
+        }
+
+        $endpoint_name = 'Count';
+        $token_validation_data['endpoint'] = $endpoint_name;
+        $token_validation_data['module_name'] = $module_name;
+        $token_validation_data['module_endpoints'] = $module_endpoints;
+        $input['token'] = $this->_validate_token($token_validation_data);
+
+        $output['token'] = $input['token'];
+        
+
+        $params = $this->_get_params_from_url(4);
+
+        $sql = 'select * from '.$module_name;
+
+        //attempt invoke 'before' hook
+        $input['params'] = $params;
+        $input['module_name'] = $module_name;
+        $input['endpoint'] = $endpoint_name;
+
+        $target_endpoint = $module_endpoints[$input['endpoint']];
+
+        $input = $this->_attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint);
+        extract($input);
+
+        $num_params = count($params);
+
+        if ($num_params < 1) { 
+            $rows = $this->model->get('id', $module_name);
+            $output['body'] = count($rows);
+            $output['code'] = 200;
+            $output['module_name'] = $module_name;
+
+            $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+            
+            $code = $output['code'];
+            http_response_code($code);
+            echo $output['body'];
+
+        } else {
+            //params were submitted via URL
+            $sql = 'select * from '.$module_name;
+            $params = json_encode($params);
+            $params = ltrim($params);
+            $params = json_decode($params);
+            $params = get_object_vars($params);
+            $query_info = $this->_add_params_to_query($module_name, $sql, $params);
+
+            $sql = $query_info['sql'];
+            $data = $query_info['data'];
+
+            if (count($data)<1) {
+                $rows = $this->model->query($sql, 'object');
+            } else {
+                $rows = $this->model->query_bind($sql, $data, 'object');
+            }
+
+            $output['body'] = count($rows);
+            $output['code'] = 200;
+            $output['module_name'] = $module_name;
+
+            $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+            
+            $code = $output['code'];
+            http_response_code($code);
+            echo $output['body'];
+        }
+
+    }
+
+    function _process_count_with_post($module_name, $module_endpoints) {
+
+        $endpoint_name = 'Count By Post';
+        $token_validation_data['endpoint'] = $endpoint_name;
+        $token_validation_data['module_name'] = $module_name;
+        $token_validation_data['module_endpoints'] = $module_endpoints;
+        $input['token'] = $this->_validate_token($token_validation_data);
+
+        $output['token'] = $input['token'];
+        
+
+        //get posted params
+        $post = file_get_contents('php://input');
+        $decoded = json_decode($post, true);
+
+        if (count($decoded)>0) {
+            $params = $this->_get_params_from_post($decoded);
+        } else {
+            $params = [];
+        }
+
+        $sql = 'select * from '.$module_name;
+
+        //attempt invoke 'before' hook
+        $input['params'] = $params;
+        $input['module_name'] = $module_name;
+        $input['endpoint'] = $endpoint_name;
+
+        $target_endpoint = $module_endpoints[$input['endpoint']];
+        $input = $this->_attempt_invoke_before_hook($input, $module_endpoints, $target_endpoint);
+        extract($input);
+
+        $num_params = count($params);
+
+        if ($num_params < 1) {
+
+            $rows = $this->model->get('id', $module_name);
+            $output['body'] = count($rows);
+            $output['code'] = 200;
+            $output['module_name'] = $module_name;
+
+            $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+            
+            $code = $output['code'];
+            http_response_code($code);
+            echo $output['body'];
+
+        } else {
+            //params were posted
+            $sql = 'select * from '.$module_name;
+            $params = json_encode($params);
+            $params = ltrim($params);
+            $params = json_decode($params);
+            $params = get_object_vars($params);
+            $query_info = $this->_add_params_to_query($module_name, $sql, $params);
+
+            $sql = $query_info['sql'];
+            $data = $query_info['data'];
+
+            if (count($data)<1) {
+                $rows = $this->model->query($sql, 'object');
+            } else {
+                $rows = $this->model->query_bind($sql, $data, 'object');
+            }
+
+            $output['body'] = count($rows);
+            $output['code'] = 200;
+            $output['module_name'] = $module_name;
+
+            $output = $this->_attempt_invoke_after_hook($output, $module_endpoints, $target_endpoint);
+        
+            $code = $output['code'];
+            http_response_code($code);
+            echo $output['body'];
+        }
+    }
 
 
 
