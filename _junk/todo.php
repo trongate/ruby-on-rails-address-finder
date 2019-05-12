@@ -1,16 +1,16 @@
 FIXES
 
-* Get records on /manage starting from 0 index.                         DONE.
+* Get records on /manage starting from 0 index.                                 DONE.
 
-* Test the pagination thoroughly REALLY MAKE SURE IT WORKS!!!!!!!       DONE.
+* Test the pagination thoroughly REALLY MAKE SURE IT WORKS!!!!!!!               DONE.
 
-* Do not show pagination unless required.                               DONE.
+* Do not show pagination unless required.                                       DONE.
 
-* Get showing statement working. 
+* Get showing statement working.                                                DONE.
 
-* Add pagination to page btm (but without showing statement).
+* Add pagination to page btm (but without showing statement).                   DONE.
 
-* get 'per page' working.
+* get 'per page' working.                                                       <---
 
 * Retain memory of search phrase and make sure works with 'per page' feature.
 

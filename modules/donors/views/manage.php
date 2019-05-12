@@ -2,12 +2,14 @@
     <div class="w3-container">
         <h1><?= $headline ?></h1>
         <?= flashdata() ?>
+
         <p>
             <a href="<?= BASE_URL ?>donors/create"><button class="w3-button w3-medium primary">
                 <i class="fa fa-pencil"></i> CREATE NEW RECORD</button>
             </a>
         </p>
         <div id="loader" class="loadersmall"></div>
+        <p id="showing-statement"></p>
         <div class="pagination" id="pagination"></div>
         <table class="w3-table results-tbl" id="results-tbl" style="margin-left: -2000em;">
             <thead>
@@ -42,6 +44,7 @@
             </thead>
             <tbody></tbody>
         </table>
+        <div class="pagination" id="pagination-btm"></div>
     </div>
 </div>
 
@@ -51,6 +54,7 @@ var limit = 20;
 var offset = 0;
 var pageNum = 1;
 var totalRows = <?= $total_rows ?>;
+var recordNamePlural = '<?= $record_name_plural ?>';
 
 function fetchRecords(pageNum) {
     buildPagination(pageNum);
@@ -82,8 +86,6 @@ function getRecords() {
         } 
 
     }
-
-    console.log(`limit is ${limit} and offset is ${offset}`);
 
     var target_url = '<?= BASE_URL ?>api/get/donors';
 
@@ -134,7 +136,6 @@ function buildPagination(pageNum) {
         return;
     }
 
-    var recordNamePlural = '<?= $record_name_plural ?>';
     var maxLinks = 10;
     var addFirst = true;
     var addLast = true;
@@ -274,12 +275,25 @@ function drawPagination(pagination, pageNum, totalPages) {
     }
 
     document.getElementById("pagination").innerHTML = paginationHtml;
+    document.getElementById("pagination-btm").innerHTML = paginationHtml;
+    addShowingStatement(limit, pageNum, totalRows, recordNamePlural);
 }
 
 fetchRecords(pageNum);
 
+function addShowingStatement(limit, pageNum, totalRows, recordNamePlural) {
+    
+    var value1 = offset+1;
+    var value2 = offset+limit;
+    var value3 = totalRows;
 
+    if (value2>value3) {
+        value2 = value3;
+    }
 
+    showingStatement = `Showing ${value1} to ${value2} of ${value3} ${recordNamePlural}.`;
+    document.getElementById("showing-statement").innerHTML = showingStatement;
+}
 
 </script>
 
@@ -337,5 +351,9 @@ fetchRecords(pageNum);
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+#pagination-btm, #showing-statement {
+    margin-top: 2em;
 }
 </style>
