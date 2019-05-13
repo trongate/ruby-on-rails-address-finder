@@ -140,6 +140,10 @@ class Core {
 
         $controller_path = '../modules/'.$this->current_module.'/controllers/'.$this->current_controller.'.php';
 
+        if ($controller_path == '../modules/api/controllers/Api.php') {
+            $controller_path = '../engine/Api.php';
+        }
+
         if (!file_exists($controller_path)) {
             $controller_path = $this->attempt_init_child_controller($controller_path);
         }
@@ -177,6 +181,7 @@ class Core {
         }
 
         $this->draw_error_page();
+        die(); //end of the line (all possible scenarios tried)
     }
 
     private function draw_error_page() {

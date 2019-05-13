@@ -5,6 +5,7 @@ class Trongate {
     protected $module_name;
     protected $parent_module = '';
     protected $child_module = '';
+    public $vibe = 'cool';
 
     public function __construct($module_name=NULL) {
     
@@ -49,40 +50,6 @@ class Trongate {
         } else {
             $template_controller_path = str_replace('../', APPPATH, $template_controller_path);
             die('ERROR: Unable to find '.$template_name.' method in '.$template_controller_path.'.');
-        }
-    }
-
-    public function templateOLD($template_name, $data=NULL) {
-
-        $template_file_path = '../templates/'.$template_name.'.php';
-
-        if (!isset($data['view_file'])) {
-            $data['view_file'] = DEFAULT_METHOD;
-        }
-
-        if (!isset($data['view_module'])) {
-
-            $segments = SEGMENTS;
-
-            if (isset($segments[1])) {
-                $data['view_module'] = $segments[1];
-            } else {
-                $data['view_module'] = DEFAULT_MODULE;
-            }
-        }
-
-        if (($data['view_module'] == 'homepage') && ($data['view_file'] == 'index')) {
-            $data['is_home'] = true;
-        } else {
-            $data['is_home'] = false;
-        }
-
-        extract($data);
-
-        if (file_exists($template_file_path)) {
-            require_once($template_file_path);
-        } else {
-            die('ERROR: Unable to find template file in '.$template_file_path.'.');
         }
     }
 

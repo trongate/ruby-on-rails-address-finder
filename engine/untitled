@@ -1,5 +1,0 @@
-
-
-    $mysql_query = "select WHATEVER";
-
-    $this->model->query($mysql_query);

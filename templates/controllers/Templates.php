@@ -1,8 +1,8 @@
 <?php
 class Templates extends Trongate {
 
-    function public($data) {
-        load('public', $data);
+    function admin($data) {
+        load('admin', $data);
     }
 
     function error_404($data) {

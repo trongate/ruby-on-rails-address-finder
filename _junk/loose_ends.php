@@ -1,12 +1,3 @@
-* custom_routing.php  
+* have added a before and after hook to donors module.
 
-* config.php (change BASE_URL)
-
-* delete store_items module
-
-* remove public.php file from templates/views
-
-* remove public() from templates controller
-
-* clear the database settings
-
+* disabled _not_allowed_msg().
