@@ -83,7 +83,7 @@ class Trongate {
         return $child_module;
     }
 
-    public function view($view, $data = [], $return_as_str) {
+    public function view($view, $data = [], $return_as_str=NULL) {
 
         if ((isset($return_as_str)) || (gettype($data) == 'boolean')) {
             $return_as_str = true;
