@@ -376,7 +376,8 @@ margin: 1em 0;
         }
 
         $this->prepare_and_execute($sql, $data);
-
+        $id = $this->dbh->lastInsertId();
+        return $id;
     }
 
     public function update($update_id, $data, $target_tbl=NULL) {
@@ -480,6 +481,8 @@ margin: 1em 0;
         $stmt = $this->dbh->prepare($sql);
         $stmt->execute($values);
 
+        $count = $stmt->rowCount();
+        return $count;
     }
 
     public function exec($sql) {

@@ -1,29 +1,59 @@
 <?php
 class Comments extends Trongate {
 
+    function pre_insert($input) {
+        //establish user_id, date_created and code before doing an insert
+        $this->module('security');
+        $this->module('trongate_tokens');
+
+        $token = $input['token'];
+        $user = $this->trongate_tokens->_fetch_token_obj($token);
+
+        $input['params']['user_id'] = $user->user_id;
+        $input['params']['date_created'] = time();
+        $input['params']['code'] = $this->security->_generate_random_string(6);
+
+        return $input;
+    }
+
+    function prep_comments($output) {
+        //return comments with nicely formatted date
+        $body = $output['body'];
+
+        $comments = json_decode($body);
+        $data = [];
+        foreach ($comments as $key=>$value) {
+
+            $row_data['comment'] = nl2br($value->comment);
+            $row_data['date_created'] = date('l jS \of F Y \a\t h:i:s A', $value->date_created);
+            $row_data['user_id'] = $value->user_id;
+            $row_data['target_table'] = $value->target_table;
+            $row_data['update_id'] = $value->update_id;
+            $row_data['code'] = $value->code;
+            $data[] = $row_data;
+
+        }
+
+        $output['body'] = json_encode($data);
+        return $output;
+    }
+
     function _display_comments_block($token) {
         $this->module('security');
         $target_table = $this->url->segment(1);
         $update_id = $this->url->segment(3);
 
         //fetch all of the comments for this page
-        $sql = 'select * from comments where target_table = :target_table and update_id = :update_id order by date_created';
+        // $sql = 'select * from comments where target_table = :target_table and update_id = :update_id order by date_created';
+        // $data['target_table'] = $target_table;
+        // $data['update_id'] = $update_id;
+        // $data['comments'] = $this->model->query_bind($sql, $data, 'object');
+
         $data['target_table'] = $target_table;
         $data['update_id'] = $update_id;
-        $data['comments'] = $this->model->query_bind($sql, $data, 'object');
         $data['token'] = $token;
         $this->view('comments_block', $data);
     }
-
-
-
-    // function _display_comments($token) {
-    //     $data['target_table'] = $this->url->segment(1);
-    //     $data['update_id'] = $this->url->segment(3);
-    //     $data['comments'] = $this->model->get('date_created', 'comments');
-    //     $data['token'] = $token;
-    //     $this->view('comments', $data);
-    // }
 
     function submit() {
 

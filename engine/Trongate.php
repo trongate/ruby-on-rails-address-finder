@@ -53,40 +53,6 @@ class Trongate {
         }
     }
 
-    public function templateOLD($template_name, $data=NULL) {
-
-        $template_file_path = '../templates/'.$template_name.'.php';
-
-        if (!isset($data['view_file'])) {
-            $data['view_file'] = DEFAULT_METHOD;
-        }
-
-        if (!isset($data['view_module'])) {
-
-            $segments = SEGMENTS;
-
-            if (isset($segments[1])) {
-                $data['view_module'] = $segments[1];
-            } else {
-                $data['view_module'] = DEFAULT_MODULE;
-            }
-        }
-
-        if (($data['view_module'] == 'homepage') && ($data['view_file'] == 'index')) {
-            $data['is_home'] = true;
-        } else {
-            $data['is_home'] = false;
-        }
-
-        extract($data);
-
-        if (file_exists($template_file_path)) {
-            require_once($template_file_path);
-        } else {
-            die('ERROR: Unable to find template file in '.$template_file_path.'.');
-        }
-    }
-
     public function module($target_module) {
         $target_controller = ucfirst($target_module);
         $target_controller_path = '../modules/'.$target_module.'/controllers/'.$target_controller.'.php';
@@ -117,11 +83,27 @@ class Trongate {
         return $child_module;
     }
 
-    public function view($view, $data = []) {
+    public function view($view, $data = [], $return_as_str=NULL) {
+
+        if ((isset($return_as_str)) || (gettype($data) == 'boolean')) {
+            $return_as_str = true;
+        } else {
+            $return_as_str = false;
+        }
 
         if (($this->parent_module !== '') && ($this->child_module !== '')) {
             //load view from child module
-            $this->load_child_view($view, $data);
+            if ($return_as_str == true) {
+                // Return output as string
+                ob_start();
+                $this->load_child_view($view, $data);
+                $output = ob_get_clean();
+                return $output;
+            } else {
+                // Require child file
+                $this->load_child_view($view, $data);
+            }
+
         } else {
             //normal view loading process
             if (isset($data['view_module'])) {
@@ -136,16 +118,36 @@ class Trongate {
 
             // Check for view file
             if(file_exists($view_path)){
-                // Require view file
-                require_once $view_path;
+                
+                if ($return_as_str == true) {
+                    // Return output as string
+                    ob_start();
+                    require_once $view_path;
+                    $output = ob_get_clean();
+                    return $output;
+                } else {
+                    // Require view file
+                    require_once $view_path;
+                }
+                
             } else {
                 // No view exists
                 $view = str_replace('/', '/views/', $view);
                 $view_path = APPPATH.'modules/'.$view.'.php';
             
                 if(file_exists($view_path)){
-                    // Require view file
-                    require_once $view_path;
+
+                    if ($return_as_str == true) {
+                        // Return output as string
+                        ob_start();
+                        require_once $view_path;
+                        $output = ob_get_clean();
+                        return $output;
+                    } else {
+                        // Require view file
+                        require_once $view_path;
+                    }
+
                 } else {
                     throw new exception('view '.$view_path.' does not exist');
                 }

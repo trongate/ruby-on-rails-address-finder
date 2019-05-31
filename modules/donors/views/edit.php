@@ -20,15 +20,17 @@
                             <h4><i class="fa fa-trash-o"></i> DELETE RECORD</h4>
                         </header>
                         <div class="w3-container">
-                    
+                            <?php 
+                            echo form_open('donors/submit_delete/'.$update_id);
+                            ?>
                             <h5>Are you sure?</h5>
                             <p>You are about to delete a donor record.  This cannot be undone. <br>
                                         Do you really want to do this?</p>
                             <p class="w3-rigxht modal-btns">
                                 <button onclick="document.getElementById('delete-record-modal').style.display='none'" type="button" name="submit" value="Submit" class="w3-button w3-small 3-white w3-border">CANCEL</button> 
-
                                 <button type="submit" name="submit" value="Submit" class="w3-button w3-small w3-red w3-hover-black">YES - DELETE IT NOW!</button> 
                             </p>
+                            <?= form_close() ?>
                         </div>
                     </div>
                 </div>
@@ -49,12 +51,11 @@
               <div class="w3-border-bottom"><b>First Name:</b> <span class="w3-right w3-text-grey"><?= $first_name ?></span></div>
               <div class="w3-border-bottom"><b>Price:</b> <span class="w3-right w3-text-grey"><?= $price ?></span></div>
               <div class="w3-border-bottom"><b>Email:</b> <span class="w3-right w3-text-grey"><?= $email ?></span></div>
-              <div class="w3-border-bottom"><b>Introduction:</b> <br><span class="w3-text-grey"><?= $introduction ?></span> </div>
+              <div class="w3-border-bottom"><b>Introduction:</b> <br><span class="w3-text-grey"><?= nl2br($introduction) ?></span> </div>
 
             </div>
         </div>
     </div>
-
     <div class="w3-half w3-container">    
         <div class="w3-card-4 edit-block" style="margin-top: 1em;">
             <div class="w3-container primary">
