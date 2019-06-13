@@ -8,12 +8,9 @@
     <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
     <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-    <link rel="stylesheet" href="<?= BASE_URL ?>css/jquery.ui.datepicker.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>css/admin.css">
+    <?= $additional_includes_top ?>
 </head>
 <body>
 
@@ -37,138 +34,23 @@
             <i class="fa fa-remove"></i>
         </a>
         <h4 class="w3-bar-item"><b>Menu</b></h4>
-        <a class="w3-bar-item w3-button w3-hover-black" href="#"><i class="fa fa-home"></i> Link</a>
-        <a class="w3-bar-item w3-button w3-hover-black" href="<?= BASE_URL ?>donors/manage"><i class="fa fa-search"></i> Manage Donors</a>
-        <a class="w3-bar-item w3-button w3-hover-black" href="#"><i class="fa fa-cloud"></i> Link</a>
-        <a class="w3-bar-item w3-button w3-hover-black" href="#"><i class="fa fa-trash"></i> Link</a>
+        <?= Template::partial('admin_files/dynamic_nav') ?>
     </nav>
 
     <!-- Overlay effect when opening sidebar on small screens -->
     <div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
 
-    <!-- Main content: shift it to the right by 250 pixels when the sidebar is visible -->
+    <!-- Main content -->
     <div class="w3-main" style="margin-left:250px">
         <div class="center-stage">
-
             <div class="w3-row w3-padding-64">
                 <div class="w3-container">
                 <?= Template::display($data) ?>
                 </div>
             </div>
-
         </div>
-        <?php Template::partial('admin_files/footer') ?>
-
-        <!-- END MAIN -->
+        <?= Template::partial('admin_files/footer') ?>
     </div>
-
-    <style>
-    html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif;}
-    .w3-sidebar {
-      z-index: 3;
-      width: 250px;
-      top: 43px;
-      bottom: 0;
-      height: inherit;
-    }
-
-    .center-stage {
-      min-height: 89vh;
-    }
-    </style>
-
-
-
-<style>
-    .w3-button, .w3-btn, .w3-hover-black {
-        transition: 0.4s;
-    }
-
-    .w3-button.w3-small.primary:hover, .w3-button.w3-medium.primary:hover {
-        background-color: #4ba787 !important;
-        color: #fff !important;
-    }
-
-    .primary, .primary th {
-        color: #fff;
-        background-color: #51bf99;
-        border: 1px #488a74 solid !important;
-    }
-
-    .secondary th {
-      color: #fff;
-      background-color: #4ba787;
-      border: 1px #488a74 solid !important;
-    }
-
-    .w3-table {
-        border-color: #488a74 !important;
-        border: 1px #488a74 solid !important;
-    }
-
-    .w3-table td {
-        border: 1px #ddd solid !important;
-    }
-
-    .edit-block-content {
-        height: 50vh; 
-        overflow: auto;
-    }
-
-    .edit-block-content > div {
-        padding: 0.6em;
-    }
-
-    .w3-modal textarea {
-        min-height: 12vh;
-        resize: none;
-    }
-
-    .modal-btns {
-        margin-top: 0;
-    }
-
-    .w3-modal header h4 {
-        top: 2px;
-        position: relative;
-    }
-
-.pagination {
-  display: inline-block;
-}
-
-.pagination a {
-  color: black;
-  float: left;
-  padding: 8px 16px;
-  text-decoration: none;
-  border: 1px solid #ddd;
-}
-
-.pagination a.active {
-  background-color: #aaa;
-  color: white;
-  border: 1px solid #aaa;
-}
-
-.pagination a:hover:not(.active) {background-color: #ddd;}
-
-.pagination a:first-child {
-  border-top-left-radius: 5px;
-  border-bottom-left-radius: 5px;
-}
-
-.pagination a:last-child {
-  border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
-}
-
-.w3-button {
-    text-transform: uppercase;
-}
-
-
-</style>
 
     <script>
         // Get the Sidebar
@@ -194,7 +76,6 @@
             overlayBg.style.display = "none";
         }
     </script>
-
+    <?= $additional_includes_btm ?>
 </body>
-
 </html>
