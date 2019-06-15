@@ -84,7 +84,7 @@ class validation_helper {
 
     private function check_for_numeric($label, $posted_value) {
         
-        if (!is_numeric($posted_value)) {
+        if ((!is_numeric($posted_value)) && ($posted_value !== '')) {
             $this->form_submission_errors[] = 'The '.$label.' field must be numeric.';
         }
 
@@ -92,96 +92,112 @@ class validation_helper {
 
     private function check_for_integer($label, $posted_value) {
 
-        $result = ctype_digit(strval($posted_value));
+        if ($posted_value !== '') {
 
-        if ($result == false) {
-            $this->form_submission_errors[] = 'The '.$label.' field must be an integer.';
+            $result = ctype_digit(strval($posted_value));
+
+            if ($result == false) {
+                $this->form_submission_errors[] = 'The '.$label.' field must be an integer.';
+            }
+
         }
 
     }
 
     private function check_for_decimal($label, $posted_value) {
 
-        if ((float) $posted_value == floor($posted_value)) {
-            $this->form_submission_errors[] = 'The '.$label.' field must contain a number with a decimal.';
+        if ($posted_value !== '') {
+
+            if ((float) $posted_value == floor($posted_value)) {
+                $this->form_submission_errors[] = 'The '.$label.' field must contain a number with a decimal.';
+            }
+
         }
     }
 
     private function valid_datepicker_us($label, $posted_value) {
 
-        $got_error = false;
-        $posted_value = str_replace('/', '-', $posted_value);
-        $bits = explode('-', $posted_value);
+        if ($posted_value !== '') {
 
-        if (count($bits) !== 3) {
-            $got_error = true;
-        }
+            $got_error = false;
+            $posted_value = str_replace('/', '-', $posted_value);
+            $bits = explode('-', $posted_value);
 
-        $count = 0;
-        foreach ($bits as $bit) {
-            $count++;
-            if ((($count<3) && (strlen($bit)) !== 2) || (!is_numeric($bit))) {
-                $got_error = true;
-            } elseif ((($count==3) && (strlen($bit)) !== 4) || (!is_numeric($bit))) {
+            if (count($bits) !== 3) {
                 $got_error = true;
             }
 
-        }
+            $count = 0;
+            foreach ($bits as $bit) {
+                $count++;
+                if ((($count<3) && (strlen($bit)) !== 2) || (!is_numeric($bit))) {
+                    $got_error = true;
+                } elseif ((($count==3) && (strlen($bit)) !== 4) || (!is_numeric($bit))) {
+                    $got_error = true;
+                }
 
-        if ($got_error == false) {
-
-            $month = $bits[0];
-            $day = $bits[1];
-
-            if ($month>12) {
-                $got_error = true;
-            } elseif ($day>31) {
-                $got_error = true;
             }
 
-        }
-      
-        if ($got_error == true) {
-            $this->form_submission_errors[] = 'The '.$label.' field must contain a valid datepicker value of the format mm-dd-yyyy.';
+            if ($got_error == false) {
+
+                $month = $bits[0];
+                $day = $bits[1];
+
+                if ($month>12) {
+                    $got_error = true;
+                } elseif ($day>31) {
+                    $got_error = true;
+                }
+
+            }
+          
+            if ($got_error == true) {
+                $this->form_submission_errors[] = 'The '.$label.' field must contain a valid datepicker value of the format mm-dd-yyyy.';
+            }
+
         }
     }
 
     private function valid_datepicker_eu($label, $posted_value) {
 
-        $got_error = false;
-        $posted_value = str_replace('/', '-', $posted_value);
-        $bits = explode('-', $posted_value);
+        if ($posted_value !== '') {
 
-        if (count($bits) !== 3) {
-            $got_error = true;
-        }
+            $got_error = false;
+            $posted_value = str_replace('/', '-', $posted_value);
+            $bits = explode('-', $posted_value);
 
-        $count = 0;
-        foreach ($bits as $bit) {
-            $count++;
-            if ((($count<3) && (strlen($bit)) !== 2) || (!is_numeric($bit))) {
-                $got_error = true;
-            } elseif ((($count==3) && (strlen($bit)) !== 4) || (!is_numeric($bit))) {
+            if (count($bits) !== 3) {
                 $got_error = true;
             }
 
-        }
+            $count = 0;
+            foreach ($bits as $bit) {
+                $count++;
+                if ((($count<3) && (strlen($bit)) !== 2) || (!is_numeric($bit))) {
+                    $got_error = true;
+                } elseif ((($count==3) && (strlen($bit)) !== 4) || (!is_numeric($bit))) {
+                    $got_error = true;
+                }
 
-        if ($got_error == false) {
-
-            $month = $bits[1];
-            $day = $bits[0];
-
-            if ($month>12) {
-                $got_error = true;
-            } elseif ($day>31) {
-                $got_error = true;
             }
 
-        }
-      
-        if ($got_error == true) {
-            $this->form_submission_errors[] = 'The '.$label.' field must contain a valid datepicker value of the format dd-mm-yyyy.';
+            if ($got_error == false) {
+
+                $month = $bits[1];
+                $day = $bits[0];
+
+                if ($month>12) {
+                    $got_error = true;
+                } elseif ($day>31) {
+                    $got_error = true;
+                }
+
+            }
+          
+            if ($got_error == true) {
+                $this->form_submission_errors[] = 'The '.$label.' field must contain a valid datepicker value of the format dd-mm-yyyy.';
+            }
+
         }
     }
 
@@ -224,7 +240,7 @@ class validation_helper {
 
     private function min_length($key, $label, $posted_value, $inner_value) {
 
-        if(strlen($_POST[$key])<$inner_value) {
+        if((strlen($_POST[$key])<$inner_value) && ($posted_value !== '')) {
             $this->form_submission_errors[] = 'The '.$label.' field must greater than '.$inner_value.' characters in length.';
         }
 
@@ -232,7 +248,7 @@ class validation_helper {
 
     private function max_length($key, $label, $posted_value, $inner_value) {
 
-        if(strlen($_POST[$key])>$inner_value) {
+        if((strlen($_POST[$key])>$inner_value) && ($posted_value !== '')) {
             $this->form_submission_errors[] = 'The '.$label.' field must be less than '.$inner_value.' characters in length.';
         }
 
@@ -240,7 +256,7 @@ class validation_helper {
 
     private function greater_than($key, $label, $posted_value, $inner_value) {
 
-        if ((is_numeric($_POST[$key])) && ($_POST[$key]<=$inner_value)) {
+        if (((is_numeric($_POST[$key])) && ($_POST[$key]<=$inner_value)) && ($posted_value !== '')) {
             $this->form_submission_errors[] = 'The '.$label.' field must greater than '.$inner_value;
         }
 
@@ -248,7 +264,7 @@ class validation_helper {
 
     private function less_than($key, $label, $posted_value, $inner_value) {
 
-        if ((is_numeric($_POST[$key])) && ($_POST[$key]>=$inner_value)) {
+        if (((is_numeric($_POST[$key])) && ($_POST[$key]>=$inner_value)) && ($posted_value !== '')) {
             $this->form_submission_errors[] = 'The '.$label.' field must less than '.$inner_value;
         }
         
@@ -256,7 +272,7 @@ class validation_helper {
 
     private function valid_email($label, $posted_value) {
 
-        if (!filter_var($posted_value, FILTER_VALIDATE_EMAIL)) {
+        if ((!filter_var($posted_value, FILTER_VALIDATE_EMAIL)) && ($posted_value !== '')) {
             $this->form_submission_errors[] = 'The '.$label.' field must contain a valid email address.';
         }
 
@@ -264,7 +280,7 @@ class validation_helper {
 
     private function exact_length($key, $label, $posted_value, $inner_value) {
 
-        if(strlen($_POST[$key])!=$inner_value) {
+        if((strlen($_POST[$key])!=$inner_value) && ($posted_value !== '')) {
 
             $error_msg = 'The '.$label.' field must be '.$inner_value.' characters in length.';
 
@@ -279,6 +295,9 @@ class validation_helper {
 
     private function run_special_test($key, $label, $posted_value, $test_to_run) {
 
+        if ($posted_value == '') {
+            return true; //no need to do tests since no value submitted
+        }
 
         $pos = strpos($test_to_run, '[');
 
