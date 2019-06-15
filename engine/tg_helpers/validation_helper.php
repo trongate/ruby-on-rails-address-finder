@@ -35,7 +35,12 @@ class validation_helper {
                 case 'validate_file':
                     $this->validate_file($key, $label, $rules);
                     break;
-                
+                case 'valid_datepicker_us':
+                    $this->valid_datepicker_us($label, $posted_value);
+                    break;
+                case 'valid_datepicker_eu':
+                    $this->valid_datepicker_eu($label, $posted_value);
+                    break;
                 default:
                     $this->run_special_test($key, $label, $posted_value, $test_to_run);
                     break;
@@ -99,6 +104,84 @@ class validation_helper {
 
         if ((float) $posted_value == floor($posted_value)) {
             $this->form_submission_errors[] = 'The '.$label.' field must contain a number with a decimal.';
+        }
+    }
+
+    private function valid_datepicker_us($label, $posted_value) {
+
+        $got_error = false;
+        $posted_value = str_replace('/', '-', $posted_value);
+        $bits = explode('-', $posted_value);
+
+        if (count($bits) !== 3) {
+            $got_error = true;
+        }
+
+        $count = 0;
+        foreach ($bits as $bit) {
+            $count++;
+            if ((($count<3) && (strlen($bit)) !== 2) || (!is_numeric($bit))) {
+                $got_error = true;
+            } elseif ((($count==3) && (strlen($bit)) !== 4) || (!is_numeric($bit))) {
+                $got_error = true;
+            }
+
+        }
+
+        if ($got_error == false) {
+
+            $month = $bits[0];
+            $day = $bits[1];
+
+            if ($month>12) {
+                $got_error = true;
+            } elseif ($day>31) {
+                $got_error = true;
+            }
+
+        }
+      
+        if ($got_error == true) {
+            $this->form_submission_errors[] = 'The '.$label.' field must contain a valid datepicker value of the format mm-dd-yyyy.';
+        }
+    }
+
+    private function valid_datepicker_eu($label, $posted_value) {
+
+        $got_error = false;
+        $posted_value = str_replace('/', '-', $posted_value);
+        $bits = explode('-', $posted_value);
+
+        if (count($bits) !== 3) {
+            $got_error = true;
+        }
+
+        $count = 0;
+        foreach ($bits as $bit) {
+            $count++;
+            if ((($count<3) && (strlen($bit)) !== 2) || (!is_numeric($bit))) {
+                $got_error = true;
+            } elseif ((($count==3) && (strlen($bit)) !== 4) || (!is_numeric($bit))) {
+                $got_error = true;
+            }
+
+        }
+
+        if ($got_error == false) {
+
+            $month = $bits[1];
+            $day = $bits[0];
+
+            if ($month>12) {
+                $got_error = true;
+            } elseif ($day>31) {
+                $got_error = true;
+            }
+
+        }
+      
+        if ($got_error == true) {
+            $this->form_submission_errors[] = 'The '.$label.' field must contain a valid datepicker value of the format dd-mm-yyyy.';
         }
     }
 
