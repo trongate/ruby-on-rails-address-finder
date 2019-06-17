@@ -287,35 +287,6 @@ class validation_helper {
 
     private function valid_datetimepicker_eu($label, $posted_value) {
 
-        $got_error = true;
-
-        $bits = explode(':', $posted_value);
-
-        $num_bits = count($bits);
-        $score = 0;
-        if ($num_bits == 2) {
-            if ((is_numeric($bits[0])) && ($bits[0]<24)) {
-                $score++;
-            }
-
-            if ((is_numeric($bits[1])) && ($bits[1]<60)) {
-                $score++;
-            }
-
-            if ($score == 2) {
-                $got_error = false;
-            }
-
-        }
-
-        if ($got_error == true) {
-            $this->form_submission_errors[] = 'The '.$label.' field must contain a valid time value.';
-        }
-
-    }
-
-    private function valid_time($label, $posted_value) {
-
         $got_error = false;
 
         if ($posted_value !== '') {
@@ -385,7 +356,37 @@ class validation_helper {
 
         if ($got_error == true) {
             $this->form_submission_errors[] = 'The '.$label.' field must contain a valid datetime value.';
-        }        
+        }
+
+    }
+
+    private function valid_time($label, $posted_value) {
+
+        $got_error = true;
+
+        $bits = explode(':', $posted_value);
+
+        $num_bits = count($bits);
+        $score = 0;
+        if ($num_bits == 2) {
+            if ((is_numeric($bits[0])) && ($bits[0]<24)) {
+                $score++;
+            }
+
+            if ((is_numeric($bits[1])) && ($bits[1]<60)) {
+                $score++;
+            }
+
+            if ($score == 2) {
+                $got_error = false;
+            }
+
+        }
+
+        if ($got_error == true) {
+            $this->form_submission_errors[] = 'The '.$label.' field must contain a valid time value.';
+        }
+
     }
 
     private function matches($label, $posted_value, $target_field) {
