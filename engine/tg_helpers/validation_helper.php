@@ -128,164 +128,86 @@ class validation_helper {
 
         if ($posted_value !== '') {
 
-            $got_error = false;
-            $posted_value = str_replace('/', '-', $posted_value);
-            $bits = explode('-', $posted_value);
+            try {
 
-            if (count($bits) !== 3) {
-                $got_error = true;
-            }
+                $posted_date = new DateTime($posted_value);
+                return true;
 
-            $count = 0;
-            foreach ($bits as $bit) {
-                $count++;
-                if ((($count<3) && (strlen($bit)) !== 2) || (!is_numeric($bit))) {
-                    $got_error = true;
-                } elseif ((($count==3) && (strlen($bit)) !== 4) || (!is_numeric($bit))) {
-                    $got_error = true;
-                }
+            } catch (Exception $e) {
 
-            }
-
-            if ($got_error == false) {
-
-                $month = $bits[0];
-                $day = $bits[1];
-
-                if ($month>12) {
-                    $got_error = true;
-                } elseif ($day>31) {
-                    $got_error = true;
-                }
-
-            }
-          
-            if ($got_error == true) {
                 $this->form_submission_errors[] = 'The '.$label.' field must contain a valid datepicker value of the format mm-dd-yyyy.';
             }
 
         }
+        
     }
 
     private function valid_datepicker_eu($label, $posted_value) {
 
         if ($posted_value !== '') {
 
-            $got_error = false;
-            $posted_value = str_replace('/', '-', $posted_value);
-            $bits = explode('-', $posted_value);
+            $day = substr($posted_value, 0, 2);
+            $month = substr($posted_value, 3, 2);
+            $year = substr($posted_value, 6, 4);
 
-            if (count($bits) !== 3) {
-                $got_error = true;
-            }
+            $posted_value = $month.'/'.$day.'/'.$year;
 
-            $count = 0;
-            foreach ($bits as $bit) {
-                $count++;
-                if ((($count<3) && (strlen($bit)) !== 2) || (!is_numeric($bit))) {
-                    $got_error = true;
-                } elseif ((($count==3) && (strlen($bit)) !== 4) || (!is_numeric($bit))) {
-                    $got_error = true;
-                }
+            try {
 
-            }
+                $posted_date = new DateTime($posted_value);
+                return true;
 
-            if ($got_error == false) {
-
-                $month = $bits[1];
-                $day = $bits[0];
-
-                if ($month>12) {
-                    $got_error = true;
-                } elseif ($day>31) {
-                    $got_error = true;
-                }
-
-            }
-          
-            if ($got_error == true) {
+            } catch (Exception $e) {
                 $this->form_submission_errors[] = 'The '.$label.' field must contain a valid datepicker value of the format dd-mm-yyyy.';
             }
 
         }
+        
     }
 
     private function valid_datetimepicker_us($label, $posted_value) {
 
-        $got_error = false;
-
         if ($posted_value !== '') {
 
-            $bits = explode(' ', $posted_value);
+            try {
+                $posted_date = str_replace(' at ', ' ', $value);
+                $posted_date = new DateTime($posted_value);
+                return true;
 
-            if (count($bits) !== 3) {
-                $got_error = true;
-            } else {
-                if ($bits[1] !== 'at') {
-                    $got_error = true;
-                } else {
-                    $time = $bits[2];
-                    $time_bits = explode(':', $time);
+            } catch (Exception $e) {
 
-                    if (count($time_bits) !==2) {
-                        $got_error = true;
-                    } else {
-                        $i = 0;
-                        foreach ($time_bits as $x) {
-                            $i++;
-                            if (((strlen($x) !== 2) || (!is_numeric($x))) || ((($i==1) && ($x>23)) || (($i==2) && ($x>59))))  {
-                                $got_error = true;
-                            }
-                        }
-                    }
-                }
+                $this->form_submission_errors[] = 'The '.$label.' field must contain a valid datetime picker value.';
             }
 
-            if ($got_error == false) {
-
-                $date_value = str_replace('/', '-', $bits[0]);
-                unset($bits);
-                $bits = explode('-', $date_value);
-
-                if (count($bits) !== 3) {
-                    $got_error = true;
-                }
-
-                $count = 0;
-                foreach ($bits as $bit) {
-                    $count++;
-                    if ((($count<3) && (strlen($bit)) !== 2) || (!is_numeric($bit))) {
-                        $got_error = true;
-                    } elseif ((($count==3) && (strlen($bit)) !== 4) || (!is_numeric($bit))) {
-                        $got_error = true;
-                    }
-
-                }
-
-                if ($got_error == false) {
-
-                    $month = $bits[0];
-                    $day = $bits[1];
-
-                    if ($month>12) {
-                        $got_error = true;
-                    } elseif ($day>31) {
-                        $got_error = true;
-                    }
-
-                }
-
-            }
-
-        }
-
-        if ($got_error == true) {
-            $this->form_submission_errors[] = 'The '.$label.' field must contain a valid datetime value.';
         }
 
     }
 
     private function valid_datetimepicker_eu($label, $posted_value) {
+
+        if ($posted_value !== '') {
+
+            try {
+                $posted_date = str_replace(' at ', ' ', $value);
+                $day = substr($posted_value, 0, 2);
+                $month = substr($posted_value, 3, 2);
+                $year = substr($posted_value, 6, 4);
+
+                $posted_value = $month.'/'.$day.'/'.$year;
+
+                $posted_date = new DateTime($posted_value);
+                return true;
+
+            } catch (Exception $e) {
+
+                $this->form_submission_errors[] = 'The '.$label.' field must contain a valid datetime picker value.';
+            }
+
+        }
+
+    }
+
+    private function valid_time($label, $posted_value) {
 
         $got_error = true;
 
@@ -312,80 +234,6 @@ class validation_helper {
             $this->form_submission_errors[] = 'The '.$label.' field must contain a valid time value.';
         }
 
-    }
-
-    private function valid_time($label, $posted_value) {
-
-        $got_error = false;
-
-        if ($posted_value !== '') {
-
-            $bits = explode(' ', $posted_value);
-
-            if (count($bits) !== 3) {
-                $got_error = true;
-            } else {
-                if ($bits[1] !== 'at') {
-                    $got_error = true;
-                } else {
-                    $time = $bits[2];
-                    $time_bits = explode(':', $time);
-
-                    if (count($time_bits) !==2) {
-                        $got_error = true;
-                    } else {
-                        $i = 0;
-                        foreach ($time_bits as $x) {
-                            $i++;
-                            if (((strlen($x) !== 2) || (!is_numeric($x))) || ((($i==1) && ($x>23)) || (($i==2) && ($x>59))))  {
-                                $got_error = true;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if ($got_error == false) {
-
-                $date_value = str_replace('/', '-', $bits[0]);
-                unset($bits);
-                $bits = explode('-', $date_value);
-
-                if (count($bits) !== 3) {
-                    $got_error = true;
-                }
-
-                $count = 0;
-                foreach ($bits as $bit) {
-                    $count++;
-                    if ((($count<3) && (strlen($bit)) !== 2) || (!is_numeric($bit))) {
-                        $got_error = true;
-                    } elseif ((($count==3) && (strlen($bit)) !== 4) || (!is_numeric($bit))) {
-                        $got_error = true;
-                    }
-
-                }
-
-                if ($got_error == false) {
-
-                    $month = $bits[1];
-                    $day = $bits[0];
-
-                    if ($month>12) {
-                        $got_error = true;
-                    } elseif ($day>31) {
-                        $got_error = true;
-                    }
-
-                }
-
-            }
-
-        }
-
-        if ($got_error == true) {
-            $this->form_submission_errors[] = 'The '.$label.' field must contain a valid datetime value.';
-        }        
     }
 
     private function matches($label, $posted_value, $target_field) {
