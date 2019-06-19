@@ -554,9 +554,10 @@ class validation_helper {
             $target_method = str_replace('callback_', '', $test_to_run);
 
             if (class_exists($target_module)) {  
-                $outcome = $target_module::$target_method($posted_value, $label);
+                $outcome = $target_module::$target_method($posted_value);
 
                 if (gettype($outcome) == 'string') {
+                    $outcome = str_replace('{label}', $label, $outcome);
                     $this->form_submission_errors[] = $outcome;
                 }
 
