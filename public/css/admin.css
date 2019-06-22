@@ -68,6 +68,10 @@ textarea {
     position:relative;
 }
 
+.w3-select {
+    height: 2.7em !important;
+}
+
 .pagination {
     display:inline-block;
 }

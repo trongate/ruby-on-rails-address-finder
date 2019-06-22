@@ -173,7 +173,7 @@ function checked($name, $value=NULL, $checked=NULL, $attributes=NULL, $additiona
     $html = str_replace(' type="radio" ', ' type="checkbox" ', $html);
 }
 
-function form_dropdown($name, $options, $selected_key=NULL, $selected_value=NULL, $attributes=NULL, $additional_code=NULL) {
+function form_dropdown($name, $options, $selected_key=NULL, $attributes=NULL, $additional_code=NULL) {
 
     $extra = '';
     if (isset($attributes)) {
@@ -187,10 +187,15 @@ function form_dropdown($name, $options, $selected_key=NULL, $selected_value=NULL
     $html = '<select name="'.$name.'"'.$extra.'>
 ';
 
-
     if (!isset($selected_key)) {
         $selected_key = '';
         $selected_value = 'Select...';
+    }
+
+    if (isset($options[$selected_key])) {
+        $selected_value = $options[$selected_key];
+    } else {
+        $selected_value = '-';
     }
 
     $html.= '<option value="'.$selected_key.'" selected>'.$selected_value.'</option>
