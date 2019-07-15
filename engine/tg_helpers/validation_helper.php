@@ -170,8 +170,8 @@ class validation_helper {
         if ($posted_value !== '') {
 
             try {
-                $posted_date = str_replace(' at ', ' ', $value);
-                $posted_date = new DateTime($posted_value);
+                $posted_date = str_replace(' at ', ' ', $posted_value);
+                $posted_date = new DateTime($posted_date);
                 return true;
 
             } catch (Exception $e) {
@@ -188,7 +188,7 @@ class validation_helper {
         if ($posted_value !== '') {
 
             try {
-                $posted_date = str_replace(' at ', ' ', $value);
+                $posted_date = str_replace(' at ', ' ', $posted_value);
                 $day = substr($posted_value, 0, 2);
                 $month = substr($posted_value, 3, 2);
                 $year = substr($posted_value, 6, 4);
